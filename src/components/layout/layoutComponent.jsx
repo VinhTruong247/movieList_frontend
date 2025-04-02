@@ -1,11 +1,15 @@
 import React from 'react'
+import FooterComponent from './FooterComponent'
+import HeaderComponent from './HeaderComponent'
 
 const layoutComponent = () => {
   return (
     <>
-    <headerComponent />
-    <div></div>
-    <footerComponent />
+    <HeaderComponent />
+    <body>
+      Insert Information Here
+    </body>
+    <FooterComponent />
     </>
   )
 }
