@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { Card, CardMedia, CardContent, Typography, CardActions, Button } from '@mui/material';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
-import { useFavorites } from '../../hooks/useFavorites';
+import { useFavorites } from '../../../hooks/useFavorites';
 import './MovieCard.scss';
 
 const MovieCard = ({ movie }) => {
