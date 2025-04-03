@@ -1,0 +1,38 @@
+.home-container {
+    padding: 20px;
+
+    .title {
+        margin-bottom: 20px;
+    }
+
+    .filter-container {
+        margin-bottom: 20px;
+        display: flex;
+        gap: 10px;
+
+        .filter-button {
+            padding: 8px 16px;
+            background-color: #f8f9fa;
+            color: #333;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+
+            &.active {
+                background-color: #0d6efd;
+                color: white;
+            }
+
+            &:hover:not(.active) {
+                background-color: #e9ecef;
+            }
+        }
+    }
+
+    .movies-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 20px;
+    }
+}
