@@ -86,6 +86,29 @@
             }
         }
     }
+
+    .favorite-button {
+        @include primary-gradient;
+        color: white;
+        border: none;
+        box-shadow: 0 4px 15px rgba($primary-color, 0.2);
+
+        &:hover {
+            @include primary-gradient-hover;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba($primary-color, 0.3);
+        }
+
+        &.is-favorite {
+            background: white;
+            border: 2px solid $secondary-color;
+            color: $secondary-color;
+
+            &:hover {
+                background-color: rgba($secondary-color, 0.1);
+            }
+        }
+    }
 }
 
 .error-message {
