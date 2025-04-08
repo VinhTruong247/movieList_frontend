@@ -15,7 +15,7 @@ const Home = () => {
 
   const handleFilter = (filter) => {
     setActiveFilter(filter);
-    
+
     if (filter === 'all') {
       setFilteredMovies(movies);
     } else if (filter === 'top-rated') {
@@ -31,28 +31,28 @@ const Home = () => {
   return (
     <div className="home-container">
       <h1 className="page-title">Popular Movies</h1>
-      
+
       <div className="filter-buttons">
-        <button 
+        <button
           className={`filter-button ${activeFilter === 'all' ? 'active' : ''}`}
           onClick={() => handleFilter('all')}
         >
           All Movies
         </button>
-        <button 
+        <button
           className={`filter-button ${activeFilter === 'top-rated' ? 'active' : ''}`}
           onClick={() => handleFilter('top-rated')}
         >
           Top Rated
         </button>
-        <button 
+        <button
           className={`filter-button ${activeFilter === 'latest' ? 'active' : ''}`}
           onClick={() => handleFilter('latest')}
         >
           Latest
         </button>
       </div>
-      
+
       <div className="movies-grid">
         {filteredMovies.map(movie => (
           <div key={movie.id} className="movie-item">

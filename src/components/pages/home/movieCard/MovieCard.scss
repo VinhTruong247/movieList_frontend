@@ -1,15 +1,23 @@
+@import '../../../../styles/root';
+
 .movie-card {
   background: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-radius: $border-radius;
+  box-shadow: $card-shadow;
   height: 100%;
   display: flex;
   flex-direction: column;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition: transform $transition-speed, box-shadow $transition-speed;
+  overflow: hidden;
+  position: relative;
 
   &:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 12px 20px rgba(0, 0, 0, 0.2);
+    transform: translateY(-10px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+
+    .movie-poster img {
+      transform: scale(1.05);
+    }
   }
 
   .movie-link {
@@ -18,76 +26,99 @@
   }
 
   .movie-poster {
-    height: 350px;
+    height: 400px;
     overflow: hidden;
-    border-radius: 8px 8px 0 0;
+    position: relative;
+
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 50%;
+      background: linear-gradient(to top, rgba(0, 0, 0, 0.7) 0%, transparent 100%);
+    }
 
     img {
       width: 100%;
       height: 100%;
       object-fit: cover;
+      transition: transform $transition-speed;
     }
   }
 
   .movie-content {
-    padding: 1rem;
+    padding: 1.5rem;
     flex-grow: 1;
+    background: white;
   }
 
   .movie-title {
-    font-size: 1.1rem;
-    margin-bottom: 0.5rem;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    color: $text-color;
   }
 
   .movie-rating,
   .movie-year {
     color: #666;
     font-size: 0.9rem;
-    margin-bottom: 0.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
   }
 
   .movie-actions {
-    padding: 1rem;
+    padding: 1.5rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
     border-top: 1px solid #eee;
+    gap: 1rem;
   }
 
   .view-button,
   .favorite-button {
-    padding: 0.5rem 1rem;
-    border-radius: 4px;
+    padding: 0.75rem 1.5rem;
+    border-radius: $border-radius;
     font-size: 0.9rem;
     cursor: pointer;
-    transition: all 0.3s;
+    transition: all $transition-speed;
+    flex: 1;
+    text-align: center;
   }
 
   .view-button {
-    background-color: #1a237e;
+    @include primary-gradient;
+    border: none;
     color: white;
-    text-decoration: none;
+    transition: all $transition-speed;
+    box-shadow: 0 4px 15px rgba($primary-color, 0.2);
 
     &:hover {
-      background-color: #000051;
+      @include primary-gradient-hover;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba($primary-color, 0.3);
     }
   }
 
   .favorite-button {
-    background: none;
-    border: 1px solid #1a237e;
-    color: #1a237e;
+    background: white;
+    border: 2px solid $primary-color;
+    color: $primary-color;
 
     &:hover {
-      background-color: rgba(26, 35, 126, 0.1);
+      background-color: rgba($primary-color, 0.1);
+      transform: translateY(-2px);
     }
 
     &.is-favorite {
-      border-color: #d32f2f;
-      color: #d32f2f;
+      border-color: $secondary-color;
+      color: $secondary-color;
+      background-color: rgba($secondary-color, 0.1);
     }
   }
 }
