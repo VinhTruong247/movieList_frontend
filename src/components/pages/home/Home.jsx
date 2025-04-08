@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import MovieCarousel from './movieCarousel/MovieCarousel';
 import MovieCard from './movieCard/MovieCard';
 import Loader from '../../common/Loader';
 import { useMovies } from '../../../hooks/useMovies';
@@ -30,6 +31,8 @@ const Home = () => {
 
   return (
     <div className="home-container">
+      <MovieCarousel movies={movies} />
+      
       <h1 className="page-title">Popular Movies</h1>
 
       <div className="filter-buttons">
