@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { fetchMovieById } from '../../../utils/MovieListAPI';
 import Loader from '../../common/Loader';
 import { useFavorites } from '../../../hooks/useFavorites';
+import TrailerPopup from './Trailer/TrailerPopup';
 import './MovieDetail.scss';
 
 const MovieDetail = () => {
@@ -12,6 +13,7 @@ const MovieDetail = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const { addToFavorites, removeFromFavorites, isFavorite } = useFavorites();
+  const [showTrailer, setShowTrailer] = useState(false);
 
   useEffect(() => {
     const getMovie = async () => {
@@ -54,9 +56,12 @@ const MovieDetail = () => {
             <img src={movie.poster} alt={movie.title} />
             <div className="movie-type">{movie.type}</div>
           </div>
-          <a href={movie.trailer} target="_blank" rel="noopener noreferrer" className="trailer-button">
+          <button 
+            className="trailer-button"
+            onClick={() => setShowTrailer(true)}
+          >
             Watch Trailer
-          </a>
+          </button>
         </div>
         
         <div className="movie-info">
@@ -101,6 +106,13 @@ const MovieDetail = () => {
           </button>
         </div>
       </div>
+
+      {showTrailer && (
+        <TrailerPopup 
+          trailerUrl={movie.trailer}
+          onClose={() => setShowTrailer(false)}
+        />
+      )}
     </div>
   );
 };
