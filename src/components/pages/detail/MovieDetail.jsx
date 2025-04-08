@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { fetchMovieById } from '../../utils/MovieListAPI';
-import Loader from '../common/Loader';
+import { fetchMovieById } from '../../../utils/MovieListAPI';
+import Loader from '../../common/Loader';
 import { Button } from '@mui/material'
-import { useFavorites } from '../../hooks/useFavorites';
+import { useFavorites } from '../../../hooks/useFavorites';
 import './MovieDetail.scss'
 
 const MovieDetail = () => {

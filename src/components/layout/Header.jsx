@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { AppBar, Toolbar, Typography, Container } from '@mui/material';
+import { AppBar, Toolbar, Typography, Container, Button } from '@mui/material';
+import FavoriteIcon from '@mui/icons-material/Favorite';
 
 const Header = () => {
   return (
@@ -12,6 +13,20 @@ const Header = () => {
               🎬 Movie Collection
             </Typography>
           </Link>
+          
+          <Button
+            component={Link}
+            to="/favorites"
+            startIcon={<FavoriteIcon />}
+            sx={{
+              color: 'white',
+              '&:hover': {
+                backgroundColor: 'rgba(255, 255, 255, 0.1)'
+              }
+            }}
+          >
+            Favorites
+          </Button>
         </Toolbar>
       </Container>
     </AppBar>

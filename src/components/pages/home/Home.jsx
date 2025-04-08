@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Typography, ButtonGroup, Button, Grid } from '@mui/material';
-import MovieCard from '../movieCard/MovieCard';
-import Loader from '../common/Loader';
-import { useMovies } from '../../hooks/useMovies';
+import MovieCard from './movieCard/MovieCard';
+import Loader from '../../common/Loader';
+import { useMovies } from '../../../hooks/useMovies';
 import './Home.scss';
 
 const Home = () => {

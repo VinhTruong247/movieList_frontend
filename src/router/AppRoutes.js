@@ -1,5 +1,6 @@
-import Home from "../components/home/Home";
-import MovieDetail from "../components/detail/MovieDetail";
+import Home from "../components/pages/home/Home";
+import MovieDetail from "../components/pages/detail/MovieDetail";
+import Favorites from "../components/pages/favorites/Favorites";
 import Layout from "../components/layout/Layout";
 
 const AppRoutes = [
@@ -14,6 +15,10 @@ const AppRoutes = [
       {
         path: "movie/:id",
         element: <MovieDetail />,
+      },
+      {
+        path: 'favorites',
+        element: <Favorites />,
       },
     ],
   },
