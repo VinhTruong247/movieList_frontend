@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Typography, ButtonGroup, Button, Grid } from '@mui/material';
 import MovieCard from './movieCard/MovieCard';
 import Loader from '../../common/Loader';
 import { useMovies } from '../../../hooks/useMovies';
@@ -27,46 +26,41 @@ const Home = () => {
   };
 
   if (loading) return <Loader />;
-  if (error) return <p>Error loading movies: {error}</p>;
+  if (error) return <div className="error-message">Error loading movies: {error}</div>;
 
   return (
-    <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-      <Typography variant="h4" component="h1" gutterBottom sx={{ fontWeight: 'bold' }}>
-        Popular Movies
-      </Typography>
+    <div className="home-container">
+      <h1 className="page-title">Popular Movies</h1>
       
-      <ButtonGroup 
-        variant="contained" 
-        sx={{ mb: 4 }}
-      >
-        <Button 
+      <div className="filter-buttons">
+        <button 
+          className={`filter-button ${activeFilter === 'all' ? 'active' : ''}`}
           onClick={() => handleFilter('all')}
-          color={activeFilter === 'all' ? 'primary' : 'inherit'}
         >
           All Movies
-        </Button>
-        <Button 
+        </button>
+        <button 
+          className={`filter-button ${activeFilter === 'top-rated' ? 'active' : ''}`}
           onClick={() => handleFilter('top-rated')}
-          color={activeFilter === 'top-rated' ? 'primary' : 'inherit'}
         >
           Top Rated
-        </Button>
-        <Button 
+        </button>
+        <button 
+          className={`filter-button ${activeFilter === 'latest' ? 'active' : ''}`}
           onClick={() => handleFilter('latest')}
-          color={activeFilter === 'latest' ? 'primary' : 'inherit'}
         >
           Latest
-        </Button>
-      </ButtonGroup>
+        </button>
+      </div>
       
-      <Grid container spacing={3}>
+      <div className="movies-grid">
         {filteredMovies.map(movie => (
-          <Grid item key={movie.id} xs={12} sm={6} md={4} lg={3}>
+          <div key={movie.id} className="movie-item">
             <MovieCard movie={movie} />
-          </Grid>
+          </div>
         ))}
-      </Grid>
-    </Container>
+      </div>
+    </div>
   );
 };
 

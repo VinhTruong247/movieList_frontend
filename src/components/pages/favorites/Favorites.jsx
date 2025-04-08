@@ -1,53 +1,38 @@
 import React from 'react';
-import { Container, Typography, Grid, Paper, Button } from '@mui/material';
-import MovieCard from '../../pages/home/movieCard/MovieCard';
+import MovieCard from '../home/movieCard/MovieCard';
 import { useFavorites } from '../../../hooks/useFavorites';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import './Favorites.scss';
 
 const Favorites = () => {
   const { favorites } = useFavorites();
+  const navigate = useNavigate();
 
   return (
-    <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-      <Typography variant="h4" component="h1" gutterBottom sx={{ fontWeight: 'bold' }}>
-        Your Favorite Movies
-      </Typography>
+    <div className="favorites-container">
+      <button className="back-button" onClick={() => navigate('/')}>
+        Back to Home Page
+      </button>
+      <h1 className="page-title">Your Favorite Movies</h1>
 
       {favorites.length === 0 ? (
-        <Paper 
-          elevation={3} 
-          sx={{ 
-            p: 4, 
-            textAlign: 'center',
-            backgroundColor: '#f8f9fa'
-          }}
-        >
-          <Typography variant="h5" gutterBottom>
-            No favorite movies yet
-          </Typography>
-          <Typography variant="body1" color="text.secondary" paragraph>
-            Start adding movies to your favorites to see them here!
-          </Typography>
-          <Button 
-            component={Link} 
-            to="/" 
-            variant="contained" 
-            sx={{ backgroundColor: '#1a237e' }}
-          >
+        <div className="empty-state">
+          <h3>No favorite movies yet</h3>
+          <p>Start adding movies to your favorites to see them here!</p>
+          <Link to="/" className="browse-button">
             Browse Movies
-          </Button>
-        </Paper>
+          </Link>
+        </div>
       ) : (
-        <Grid container spacing={3}>
-          {favorites.map(movie => (
-            <Grid item key={movie.id} xs={12} sm={6} md={4} lg={3}>
+        <div className="favorites-grid">
+          {favorites.map((movie) => (
+            <div key={movie.id} className="favorite-item">
               <MovieCard movie={movie} />
-            </Grid>
+            </div>
           ))}
-        </Grid>
+        </div>
       )}
-    </Container>
+    </div>
   );
 };
 
