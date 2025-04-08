@@ -32,8 +32,6 @@ const Home = () => {
   return (
     <div className="home-container">
       <MovieCarousel movies={movies} />
-      
-      <h1 className="page-title">Popular Movies</h1>
 
       <div className="filter-buttons">
         <button

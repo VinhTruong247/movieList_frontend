@@ -1,105 +1,171 @@
 @import '../../../styles/root';
 
 .movie-detail {
-    max-width: 1200px;
-    margin: $header-height auto 0;
     padding: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
 
     .back-button {
-        @include primary-gradient;
-        color: white;
-        padding: 0.75rem 1.5rem;
-        border-radius: $border-radius;
+        background: transparent;
         border: none;
-        font-size: 1rem;
+        color: $primary-color;
+        font-size: 1.1rem;
         cursor: pointer;
+        padding: 0.5rem 1rem;
         margin-bottom: 2rem;
-        display: inline-flex;
+        display: flex;
         align-items: center;
-        gap: 0.5rem;
-        box-shadow: 0 4px 15px rgba($primary-color, 0.2);
-        transition: all $transition-speed;
+        transition: transform $transition-speed;
 
         &:hover {
-            @include primary-gradient-hover;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba($primary-color, 0.3);
+            transform: translateX(-5px);
         }
     }
 
     .detail-content {
         display: grid;
-        grid-template-columns: 300px 1fr;
+        grid-template-columns: 350px 1fr;
         gap: 3rem;
         background: white;
         border-radius: $border-radius;
-        padding: 2rem;
         box-shadow: $card-shadow;
+        overflow: hidden;
     }
 
-    .poster-container {
+    .poster-section {
         .movie-poster {
-            width: 100%;
-            height: auto;
-            border-radius: $border-radius;
-            box-shadow: $card-shadow;
+            position: relative;
+            height: 550px;
+            overflow: hidden;
+
+            img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+
+            .movie-type {
+                position: absolute;
+                top: 1rem;
+                right: 1rem;
+                background: rgba($primary-color, 0.9);
+                color: white;
+                padding: 0.5rem 1rem;
+                border-radius: $border-radius;
+                backdrop-filter: blur(5px);
+            }
+        }
+
+        .trailer-button {
+            display: block;
+            text-align: center;
+            background: linear-gradient(135deg, $primary-color, $accent-color);
+            color: white;
+            text-decoration: none;
+            padding: 1rem;
+            font-weight: 500;
+            transition: all $transition-speed;
+
+            &:hover {
+                background: linear-gradient(135deg, darken($primary-color, 10%), darken($accent-color, 10%));
+            }
         }
     }
 
     .movie-info {
+        padding: 2rem;
+
         .movie-title {
             font-size: 2.5rem;
-            font-weight: 800;
-            color: $primary-color;
             margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, $primary-color, $accent-color);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
         .movie-meta {
             display: flex;
             gap: 2rem;
-            margin-bottom: 2rem;
-            flex-wrap: wrap;
+            margin-bottom: 1.5rem;
 
             span {
-                display: inline-flex;
+                display: flex;
                 align-items: center;
+                gap: 0.5rem;
+                color: $text-color;
+                font-size: 1.1rem;
+            }
+        }
+
+        .genre-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            margin-bottom: 2rem;
+
+            .genre-tag {
+                background: rgba($accent-color, 0.1);
+                color: $accent-color;
                 padding: 0.5rem 1rem;
-                background: rgba($primary-color, 0.1);
                 border-radius: $border-radius;
-                color: $primary-color;
                 font-weight: 500;
             }
         }
 
-        .movie-description {
-            font-size: 1.1rem;
-            line-height: 1.8;
-            color: #4a5568;
-            margin-bottom: 2rem;
+        .movie-details {
+            .description {
+                font-size: 1.1rem;
+                line-height: 1.6;
+                color: $text-color;
+                margin-bottom: 2rem;
+            }
+
+            .additional-info {
+                display: grid;
+                gap: 1rem;
+                margin-bottom: 2rem;
+
+                .info-item {
+                    display: flex;
+                    gap: 1rem;
+
+                    .label {
+                        min-width: 100px;
+                        font-weight: 500;
+                        color: $primary-color;
+                    }
+
+                    .value {
+                        color: $text-color;
+                    }
+                }
+            }
         }
 
         .favorite-button {
-            @include primary-gradient;
-            color: white;
-            padding: 1rem 2rem;
-            border: none;
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid;
             border-radius: $border-radius;
-            font-size: 1rem;
+            font-size: 1.1rem;
+            font-weight: 500;
             cursor: pointer;
             transition: all $transition-speed;
-            box-shadow: 0 4px 15px rgba($primary-color, 0.2);
+            background: transparent;
 
-            &:hover {
-                @include primary-gradient-hover;
-                transform: translateY(-2px);
-                box-shadow: 0 6px 20px rgba($primary-color, 0.3);
+            &:not(.is-favorite) {
+                border-image: linear-gradient(135deg, $primary-color, $accent-color) 1;
+                color: $primary-color;
+
+                &:hover {
+                    background: linear-gradient(135deg, rgba($primary-color, 0.1), rgba($accent-color, 0.1));
+                }
             }
 
             &.is-favorite {
-                background: white;
-                border: 2px solid $secondary-color;
+                border-color: $secondary-color;
                 color: $secondary-color;
-                box-shadow: none;
 
                 &:hover {
                     background: rgba($secondary-color, 0.1);
@@ -119,34 +185,30 @@
     max-width: 600px;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 992px) {
     .movie-detail {
         padding: 1rem;
 
         .detail-content {
             grid-template-columns: 1fr;
-            gap: 2rem;
-            padding: 1.5rem;
         }
 
-        .poster-container {
-            max-width: 300px;
-            margin: 0 auto;
+        .poster-section {
+            .movie-poster {
+                height: 400px;
+            }
         }
 
         .movie-info {
+            padding: 1.5rem;
+
             .movie-title {
                 font-size: 2rem;
-                text-align: center;
             }
 
             .movie-meta {
-                justify-content: center;
+                flex-wrap: wrap;
                 gap: 1rem;
-            }
-
-            .favorite-button {
-                width: 100%;
             }
         }
     }

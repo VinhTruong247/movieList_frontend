@@ -45,28 +45,53 @@ const MovieDetail = () => {
   return (
     <div className="movie-detail">
       <button className="back-button" onClick={() => navigate(-1)}>
-        ← Back to Movies
+        ← Back
       </button>
       
       <div className="detail-content">
-        <div className="poster-container">
-          <img 
-            className="movie-poster"
-            src={movie.poster} 
-            alt={movie.title} 
-          />
+        <div className="poster-section">
+          <div className="movie-poster">
+            <img src={movie.poster} alt={movie.title} />
+            <div className="movie-type">{movie.type}</div>
+          </div>
+          <a href={movie.trailer} target="_blank" rel="noopener noreferrer" className="trailer-button">
+            Watch Trailer
+          </a>
         </div>
         
         <div className="movie-info">
           <h1 className="movie-title">{movie.title}</h1>
           
           <div className="movie-meta">
-            <span className="year">Year: {movie.year}</span>
-            <span className="rating">Rating: {movie.imdb_rating}/10</span>
-            <span className="genre">Genre: {movie.genre.join(", ")}</span>
+            <span className="year">📅 {movie.year}</span>
+            <span className="rating">⭐ {movie.imdb_rating}/10</span>
+            <span className="runtime">⏱️ {movie.runtime}</span>
+          </div>
+
+          <div className="genre-list">
+            {movie.genre.map((genre, index) => (
+              <span key={index} className="genre-tag">{genre}</span>
+            ))}
           </div>
           
-          <p className="movie-description">{movie.description}</p>
+          <div className="movie-details">
+            <p className="description">{movie.description}</p>
+            
+            <div className="additional-info">
+              <div className="info-item">
+                <span className="label">Director:</span>
+                <span className="value">{movie.director}</span>
+              </div>
+              <div className="info-item">
+                <span className="label">Language:</span>
+                <span className="value">{movie.language}</span>
+              </div>
+              <div className="info-item">
+                <span className="label">Country:</span>
+                <span className="value">{movie.country}</span>
+              </div>
+            </div>
+          </div>
           
           <button 
             className={`favorite-button ${favorite ? 'is-favorite' : ''}`}
