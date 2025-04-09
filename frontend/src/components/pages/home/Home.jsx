@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import MovieCarousel from './movieCarousel/MovieCarousel';
 import MovieCard from './movieCard/MovieCard';
+import GenreList from './movieGenreList/GenreList';
 import Loader from '../../common/Loader';
 import { useMovies } from '../../../hooks/useMovies';
 import './Home.scss';
@@ -8,22 +9,33 @@ import './Home.scss';
 const Home = () => {
   const { movies, loading, error } = useMovies();
   const [filteredMovies, setFilteredMovies] = useState([]);
+  const [selectedGenre, setSelectedGenre] = useState('all');
   const [activeFilter, setActiveFilter] = useState('all');
 
   useEffect(() => {
-    setFilteredMovies(movies);
-  }, [movies]);
+    let tempMovies = [...movies];
+
+    if (selectedGenre !== 'all') {
+      tempMovies = tempMovies.filter(movie =>
+        movie.genre.includes(selectedGenre)
+      );
+    }
+
+    if (activeFilter === 'top-rated') {
+      tempMovies.sort((a, b) => b.imdb_rating - a.imdb_rating);
+    } else if (activeFilter === 'latest') {
+      tempMovies.sort((a, b) => b.year - a.year);
+    }
+
+    setFilteredMovies(tempMovies);
+  }, [selectedGenre, activeFilter, movies]);
+
+  const handleGenreSelect = (genre) => {
+    setSelectedGenre(genre);
+  };
 
   const handleFilter = (filter) => {
     setActiveFilter(filter);
-
-    if (filter === 'all') {
-      setFilteredMovies(movies);
-    } else if (filter === 'top-rated') {
-      setFilteredMovies([...movies].sort((a, b) => b.imdb_rating - a.imdb_rating));
-    } else if (filter === 'latest') {
-      setFilteredMovies([...movies].sort((a, b) => b.year - a.year));
-    }
   };
 
   if (loading) return <Loader />;
@@ -33,33 +45,23 @@ const Home = () => {
     <div className="home-container">
       <MovieCarousel movies={movies} />
 
-      <div className="filter-buttons">
-        <button
-          className={`filter-button ${activeFilter === 'all' ? 'active' : ''}`}
-          onClick={() => handleFilter('all')}
-        >
-          All Movies
-        </button>
-        <button
-          className={`filter-button ${activeFilter === 'top-rated' ? 'active' : ''}`}
-          onClick={() => handleFilter('top-rated')}
-        >
-          Top Rated
-        </button>
-        <button
-          className={`filter-button ${activeFilter === 'latest' ? 'active' : ''}`}
-          onClick={() => handleFilter('latest')}
-        >
-          Latest
-        </button>
-      </div>
+      <div className="content-wrapper">
+        <aside className="sidebar">
+          <GenreList
+            selectedGenre={selectedGenre}
+            onGenreSelect={handleGenreSelect}
+            activeFilter={activeFilter}
+            onFilterChange={handleFilter}
+          />
+        </aside>
 
-      <div className="movies-grid">
-        {filteredMovies.map(movie => (
-          <div key={movie.id} className="movie-item">
-            <MovieCard movie={movie} />
+        <div className="main-content">
+          <div className="movies-grid">
+            {filteredMovies.map(movie => (
+              <MovieCard key={movie.id} movie={movie} />
+            ))}
           </div>
-        ))}
+        </div>
       </div>
     </div>
   );

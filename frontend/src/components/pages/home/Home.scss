@@ -1,49 +1,75 @@
 @import '../../../styles/root';
 
 .home-container {
-    max-width: 1200px;
-    margin: 0 auto 0;
+    margin: 0 auto;
 
-    .filter-buttons {
-        margin-top: 2rem;
-        margin-bottom: 3rem;
-        display: flex;
-        gap: 1rem;
-        justify-content: center;
+    .main-content{
+        padding: 0!important;
+    }
 
-        .filter-button {
-            padding: 0.75rem 1.5rem;
-            border: none;
-            border-radius: $border-radius;
-            background: white;
-            color: $text-color;
-            cursor: pointer;
-            transition: all $transition-speed;
-            box-shadow: 0 4px 15px rgba($primary-color, 0.1);
-            font-weight: 500;
+    .sidebar {
+        background: white;
+        border-radius: $border-radius;
+        padding: 1.5rem;
+        box-shadow: $card-shadow;
+        position: sticky;
+        top: 2rem;
+    }
 
-            &:hover {
-                transform: translateY(-2px);
-                box-shadow: 0 6px 20px rgba($primary-color, 0.2);
-            }
-
-            &.active {
-                @include primary-gradient;
-                color: white;
-                box-shadow: 0 4px 15px rgba($primary-color, 0.2);
-
-                &:hover {
-                    @include primary-gradient-hover;
-                    box-shadow: 0 6px 20px rgba($primary-color, 0.3);
-                }
-            }
-        }
+    .content-wrapper {
+        display: grid;
+        grid-template-columns: 280px 1fr;
+        gap: 2rem;
+        padding: 2rem;
     }
 
     .movies-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-        gap: 2rem;
-        padding: 1rem;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1.5rem;
+    }
+}
+
+@media (max-width: 1655px) {
+    .home-container .movies-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 1280px) {
+    .home-container {
+        .content-wrapper {
+            grid-template-columns: 240px 1fr;
+        }
+
+        .movies-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+}
+
+@media (max-width: 956px) {
+    .home-container {
+        .content-wrapper {
+            grid-template-columns: 1fr;
+            padding: 1rem;
+        }
+
+        .sidebar {
+            position: static;
+            margin-bottom: 2rem;
+        }
+
+        .movies-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+}
+
+@media (max-width: 615px) {
+    .home-container {
+        .movies-grid {
+            grid-template-columns: 1fr;
+        }
     }
 }
