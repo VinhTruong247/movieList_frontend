@@ -1,22 +1,22 @@
 [
   {
     "id": "1",
-    "title": "Band of Brothers",
-    "type": "TV Series",
-    "year": "2001",
-    "poster": "https://m.media-amazon.com/images/M/MV5BMTQ3NTdmOTEtZTRmMi00NTg5LWI5NmUtYTNiOTc0ZmNkODU0XkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg",
+    "title": "Fury",
+    "type": "Movie",
+    "year": "2014",
+    "poster": "https://mir-s3-cdn-cf.behance.net/project_modules/hd/40055038000869.5752d5db039c2.jpg",
     "genre": [
       "War",
       "Drama",
-      "History"
+      "Action"
     ],
-    "director": "David Frankel, Mikael Salomon",
-    "imdb_rating": 9.4,
-    "description": "Follows Easy Company, a unit of the 506th Parachute Infantry Regiment during World War II, from training to the end of the war.",
-    "runtime": "10 episodes (~70 min each)",
+    "director": "David Ayer",
+    "imdb_rating": 7.6,
+    "description": "A seasoned tank commander leads his crew on a dangerous mission behind enemy lines in the final months of World War II.",
+    "runtime": "134 min",
     "language": "English",
     "country": "USA",
-    "trailer": "https://www.youtube.com/watch?v=KKRBAFlN5ww"
+    "trailer": "https://www.youtube.com/watch?v=q94n3eWOWXM"
   },
   {
     "id": "2",
@@ -113,22 +113,22 @@
   },
   {
     "id": "7",
-    "title": "Fury",
-    "type": "Movie",
-    "year": "2014",
-    "poster": "https://mir-s3-cdn-cf.behance.net/project_modules/hd/40055038000869.5752d5db039c2.jpg",
+    "title": "Band of Brothers",
+    "type": "TV Series",
+    "year": "2001",
+    "poster": "https://m.media-amazon.com/images/M/MV5BMTQ3NTdmOTEtZTRmMi00NTg5LWI5NmUtYTNiOTc0ZmNkODU0XkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg",
     "genre": [
       "War",
       "Drama",
-      "Action"
+      "History"
     ],
-    "director": "David Ayer",
-    "imdb_rating": 7.6,
-    "description": "A seasoned tank commander leads his crew on a dangerous mission behind enemy lines in the final months of World War II.",
-    "runtime": "134 min",
+    "director": "David Frankel, Mikael Salomon",
+    "imdb_rating": 9.4,
+    "description": "Follows Easy Company, a unit of the 506th Parachute Infantry Regiment during World War II, from training to the end of the war.",
+    "runtime": "10 episodes (~70 min each)",
     "language": "English",
     "country": "USA",
-    "trailer": "https://www.youtube.com/watch?v=q94n3eWOWXM"
+    "trailer": "https://www.youtube.com/watch?v=KKRBAFlN5ww"
   },
   {
     "id": "8",
