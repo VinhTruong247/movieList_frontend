@@ -37,6 +37,18 @@ const GenreList = ({ selectedGenre, onGenreSelect, activeFilter, onFilterChange 
                     All Movies
                 </button>
                 <button
+                    className={`filter-btn ${activeFilter === 'Movie' ? 'active' : ''}`}
+                    onClick={() => onFilterChange('Movie')}
+                >
+                    Movies
+                </button>
+                <button
+                    className={`filter-btn ${activeFilter === 'TV Series' ? 'active' : ''}`}
+                    onClick={() => onFilterChange('TV Series')}
+                >
+                    TV Series
+                </button>
+                <button
                     className={`filter-btn ${activeFilter === 'top-rated' ? 'active' : ''}`}
                     onClick={() => onFilterChange('top-rated')}
                 >

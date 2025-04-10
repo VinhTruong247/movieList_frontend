@@ -15,20 +15,16 @@ const Home = () => {
   useEffect(() => {
     let tempMovies = [...movies];
 
+    tempMovies.sort((a, b) => a.id - b.id);
+
     if (selectedGenre !== 'all') {
       tempMovies = tempMovies.filter(movie =>
         movie.genre.includes(selectedGenre)
       );
     }
 
-    if (activeFilter === 'top-rated') {
-      tempMovies.sort((a, b) => b.imdb_rating - a.imdb_rating);
-    } else if (activeFilter === 'latest') {
-      tempMovies.sort((a, b) => b.year - a.year);
-    }
-
     setFilteredMovies(tempMovies);
-  }, [selectedGenre, activeFilter, movies]);
+  }, [selectedGenre, movies]);
 
   const handleGenreSelect = (genre) => {
     setSelectedGenre(genre);
@@ -36,6 +32,26 @@ const Home = () => {
 
   const handleFilter = (filter) => {
     setActiveFilter(filter);
+
+    let sortedMovies = [...movies];
+
+    if (filter === 'Movie') {
+      sortedMovies = sortedMovies.filter(movie => movie.type === 'Movie');
+    } else if (filter === 'TV Series') {
+      sortedMovies = sortedMovies.filter(movie => movie.type === 'TV Series');
+    }
+
+    if (filter === 'all') {
+      sortedMovies.sort((a, b) => a.id - b.id);
+    } else if (filter === 'top-rated') {
+      sortedMovies.sort((a, b) => b.imdb_rating - a.imdb_rating);
+    } else if (filter === 'latest') {
+      sortedMovies.sort((a, b) => b.year - a.year);
+    } else {
+      sortedMovies.sort((a, b) => a.id - b.id);
+    }
+
+    setFilteredMovies(sortedMovies);
   };
 
   if (loading) return <Loader />;
