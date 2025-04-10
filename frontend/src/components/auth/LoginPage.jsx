@@ -1,44 +1,45 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import { Formik, Form, Field } from 'formik';
 import { loginUser } from '../../utils/UserListAPI';
+import LoginSchema from './Validation';
 import './AuthPage.scss';
 
 const LoginPage = () => {
   const navigate = useNavigate();
-  const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-  });
   const [error, setError] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
 
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
-  };
+  useEffect(() => {
+    if (error) {
+      const timer = setTimeout(() => {
+        setError('');
+      }, 3000);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError('');
-    setIsLoading(true);
+      return () => clearTimeout(timer);
+    }
+  }, [error]);
 
+  const handleSubmit = async (values, { setSubmitting }) => {
     try {
-      const { success, user } = await loginUser(formData.email, formData.password);
-      
-      if (success) {
-                if (user.role === 'admin') {
+      const response = await loginUser(values.email, values.password);
+
+      if (response.success) {
+        if (response.user.role === 'admin') {
           navigate('/admin');
         } else {
           navigate('/');
         }
       }
     } catch (err) {
-      setError(err.message || 'Invalid email or password');
+      if (err.message.includes('email')) {
+        setError('Email not found');
+      } else if (err.message.includes('password')) {
+        setError('Incorrect password');
+      } else {
+        setError('Login failed. Please try again.');
+      }
     } finally {
-      setIsLoading(false);
+      setSubmitting(false);
     }
   };
 
@@ -50,50 +51,65 @@ const LoginPage = () => {
 
         {error && <div className="auth-error">{error}</div>}
 
-        <form onSubmit={handleSubmit} className="auth-form">
-          <div className="form-group">
-            <label htmlFor="email">Email</label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              placeholder="Enter your email"
-              required
-            />
-          </div>
+        <Formik
+          initialValues={{
+            email: '',
+            password: '',
+            rememberMe: false
+          }}
+          validationSchema={LoginSchema}
+          onSubmit={handleSubmit}
+        >
+          {({ errors, touched, isSubmitting }) => (
+            <Form className="auth-form">
+              <div className="form-group">
+                <label htmlFor="email">Email</label>
+                <Field
+                  type="email"
+                  name="email"
+                  id="email"
+                  className={`form-input ${errors.email && touched.email ? 'error' : ''}`}
+                  placeholder="Enter your email"
+                />
+                {errors.email && touched.email && (
+                  <div className="error-message">{errors.email}</div>
+                )}
+              </div>
 
-          <div className="form-group">
-            <label htmlFor="password">Password</label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              placeholder="Enter your password"
-              required
-            />
-          </div>
+              <div className="form-group">
+                <label htmlFor="password">Password</label>
+                <Field
+                  type="password"
+                  name="password"
+                  id="password"
+                  className={`form-input ${errors.password && touched.password ? 'error' : ''}`}
+                  placeholder="Enter your password"
+                />
+                {errors.password && touched.password && (
+                  <div className="error-message">{errors.password}</div>
+                )}
+              </div>
 
-          <div className="form-actions">
-            <label className="remember-me">
-              <input type="checkbox" /> Remember me
-            </label>
-            <Link to="/forgot-password" className="forgot-password">
-              Forgot Password?
-            </Link>
-          </div>
+              <div className="form-actions">
+                <label className="remember-me">
+                  <Field type="checkbox" name="rememberMe" />
+                  <span>Remember me</span>
+                </label>
+                <Link to="/forgot-password" className="forgot-password">
+                  Forgot Password?
+                </Link>
+              </div>
 
-          <button 
-            type="submit" 
-            className="submit-btn"
-            disabled={isLoading}
-          >
-            {isLoading ? 'Signing in...' : 'Sign In'}
-          </button>
-        </form>
+              <button
+                type="submit"
+                className="submit-btn"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? 'Signing in...' : 'Sign In'}
+              </button>
+            </Form>
+          )}
+        </Formik>
 
         <p className="auth-redirect">
           Don't have an account? <Link to="/register">Sign Up</Link>
