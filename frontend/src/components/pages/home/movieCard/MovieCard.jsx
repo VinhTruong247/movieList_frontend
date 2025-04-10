@@ -9,12 +9,18 @@ const MovieCard = ({ movie }) => {
   const currentUser = getCurrentUser();
   const favorite = isFavorite(movie.id);
 
-  const handleFavorite = (e) => {
+  const handleFavorite = async (e) => {
     e.preventDefault();
-    if (favorite) {
-      removeFromFavorites(movie.id);
-    } else {
-      addToFavorites(movie);
+    if (!currentUser) return;
+
+    try {
+      if (favorite) {
+        await removeFromFavorites(movie.id);
+      } else {
+        await addToFavorites(movie);
+      }
+    } catch (error) {
+      console.error('Error updating favorites:', error);
     }
   };
 

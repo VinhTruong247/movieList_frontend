@@ -13,7 +13,7 @@ const MovieDetail = () => {
   const [movie, setMovie] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const { addToFavorites, removeFromFavorites, isFavorite, isUpdating } = useFavorites();
+  const { addToFavorites, removeFromFavorites, isFavorite } = useFavorites();
   const [showTrailer, setShowTrailer] = useState(false);
   const currentUser = getCurrentUser();
 
@@ -33,30 +33,23 @@ const MovieDetail = () => {
   }, [id]);
 
   const handleFavoriteToggle = useCallback(async () => {
-    if (!currentUser || isUpdating) return;
+    if (!currentUser) return;
 
     try {
-      const isCurrentlyFavorite = isFavorite(movie.id);
-      
-      if (isCurrentlyFavorite) {
+      if (isFavorite(movie.id)) {
         await removeFromFavorites(movie.id);
       } else {
         await addToFavorites(movie);
       }
-
-      if (window.location.pathname === '/favorites' && isCurrentlyFavorite) {
-        navigate('/favorites', { replace: true });
-      }
     } catch (error) {
       setError('Failed to update favorites');
     }
-  }, [currentUser, isUpdating, movie, isFavorite, removeFromFavorites, addToFavorites, navigate]);
+  }, [currentUser, movie, isFavorite, removeFromFavorites, addToFavorites]);
 
   if (loading) return <Loader />;
   if (error) return <div className="error-message">Error loading movie: {error}</div>;
   if (!movie) return <div className="error-message">Movie not found</div>;
 
-  // Cache the favorite status
   const favorite = movie ? isFavorite(movie.id) : false;
 
   return (

@@ -97,3 +97,13 @@ export const getCurrentUser = () => {
         return null;
     }
 };
+
+export const updateUserFavorites = async (userId, userData) => {
+    try {
+        const response = await axios.put(`${API_URL}/${userId}`, userData);
+        return response.data;
+    } catch (error) {
+        console.error("Error updating favorites:", error);
+        throw error;
+    }
+};
