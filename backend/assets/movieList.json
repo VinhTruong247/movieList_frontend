@@ -335,5 +335,377 @@
     "language": "English, German, Russian",
     "country": "France, Germany, UK, Ireland, USA",
     "trailer": "https://www.youtube.com/watch?v=UG25omjpoOI"
+  },
+  {
+    "id": "21",
+    "title": "The Longest Day",
+    "type": "Movie",
+    "year": "1962",
+    "poster": "https://m.media-amazon.com/images/M/MV5BYmM0NjAzZWUtMGZmYi00Nzc4LTk4Y2YtOWQ1NmE4ZTlkOTFmXkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg",
+    "genre": [
+      "Action",
+      "Drama",
+      "History"
+    ],
+    "director": "Ken Annakin",
+    "imdb_rating": 7.7,
+    "description": "The events of D-Day, told on a grand scale from both the Allied and German points of view.",
+    "runtime": "178 min",
+    "language": "English, German, French",
+    "country": "USA",
+    "trailer": "https://www.youtube.com/watch?v=upOko4gW2GE"
+  },
+  {
+    "id": "22",
+    "title": "Beasts of No Nation",
+    "type": "Movie",
+    "year": "2015",
+    "poster": "https://m.media-amazon.com/images/M/MV5BMTYwMzMzMDI0NF5BMl5BanBnXkFtZTgwNDQ3NjI3NjE@._V1_.jpg",
+    "genre": [
+      "Drama",
+      "War"
+    ],
+    "director": "Cary Joji Fukunaga",
+    "imdb_rating": 7.7,
+    "description": "A young boy in an unnamed African country is forced to join a group of rebel fighters.",
+    "runtime": "137 min",
+    "language": "English",
+    "country": "USA",
+    "trailer": "https://www.youtube.com/watch?v=2xb9Ty-1frw"
+  },
+  {
+    "id": "23",
+    "title": "Rescue Dawn",
+    "type": "Movie",
+    "year": "2006",
+    "poster": "https://m.media-amazon.com/images/M/MV5BNzUxNzUzNzU2MV5BMl5BanBnXkFtZTcwNTgzNzU2NA@@._V1_FMjpg_UX1000_.jpg",
+    "genre": [
+      "Action",
+      "Biography",
+      "Drama"
+    ],
+    "director": "Werner Herzog",
+    "imdb_rating": 7.3,
+    "description": "A US fighter pilot's struggle for survival after being shot down during the Vietnam War.",
+    "runtime": "120 min",
+    "language": "English",
+    "country": "USA",
+    "trailer": "https://www.youtube.com/watch?v=UNm9Tzo5rvI"
+  },
+  {
+    "id": "24",
+    "title": "Come and See",
+    "type": "Movie",
+    "year": "1985",
+    "poster": "https://m.media-amazon.com/images/M/MV5BNDlkZmVkZDAtZGFmMS00OWIzLWJkY2YtNWE5NjNhNjhiZGE3XkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg",
+    "genre": [
+      "Drama",
+      "War"
+    ],
+    "director": "Elem Klimov",
+    "imdb_rating": 8.4,
+    "description": "A boy joins Soviet partisans during WWII and experiences the horror of war.",
+    "runtime": "142 min",
+    "language": "Russian, Belarusian, German",
+    "country": "Soviet Union",
+    "trailer": "https://www.youtube.com/watch?v=BcCbX1fqFKA"
+  },
+  {
+    "id": "25",
+    "title": "The Godfather",
+    "type": "Movie",
+    "year": "1972",
+    "poster": "https://m.media-amazon.com/images/M/MV5BNGEwYjgwOGQtYjg5ZS00Njc1LTk2ZGEtM2QwZWQ2NjdhZTE5XkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg",
+    "genre": [
+      "Crime",
+      "Drama"
+    ],
+    "director": "Francis Ford Coppola",
+    "imdb_rating": 9.2,
+    "description": "The aging patriarch of an organized crime dynasty transfers control of his clandestine empire to his reluctant son.",
+    "runtime": "175 min",
+    "language": "English, Italian",
+    "country": "USA",
+    "trailer": "https://www.youtube.com/watch?v=UaVTIH8mujA"
+  },
+  {
+    "id": "26",
+    "title": "Stalingrad",
+    "type": "Movie",
+    "year": "1993",
+    "poster": "https://m.media-amazon.com/images/M/MV5BODRiMjFkMmItY2IxZC00YWJmLWJlZTAtMDNhNzY0YmRiMmY4XkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg",
+    "genre": [
+      "Drama",
+      "War"
+    ],
+    "director": "Joseph Vilsmaier",
+    "imdb_rating": 7.5,
+    "description": "German soldiers endure the siege of Stalingrad during one of the war's bloodiest battles.",
+    "runtime": "134 min",
+    "language": "German, Russian",
+    "country": "Germany",
+    "trailer": "https://www.youtube.com/watch?v=k_i7UEQcg_0"
+  },
+  {
+    "id": "27",
+    "title": "The Dark Knight",
+    "type": "Movie",
+    "year": "2008",
+    "poster": "https://m.media-amazon.com/images/M/MV5BMTMxNTMwODM0NF5BMl5BanBnXkFtZTcwODAyMTk2Mw@@._V1_FMjpg_UX1000_.jpg",
+    "genre": [
+      "Action",
+      "Crime",
+      "Drama"
+    ],
+    "director": "Christopher Nolan",
+    "imdb_rating": 9.0,
+    "description": "When the menace known as the Joker wreaks havoc and chaos on Gotham, Batman must accept one of the greatest psychological and physical tests of his ability to fight injustice.",
+    "runtime": "152 min",
+    "language": "English",
+    "country": "USA, UK",
+    "trailer": "https://www.youtube.com/watch?v=EXeTwQWrcwY"
+  },  
+  {
+    "id": "28",
+    "title": "Kajaki",
+    "type": "Movie",
+    "year": "2014",
+    "poster": "https://m.media-amazon.com/images/M/MV5BMTQ5MjYxMDM4MV5BMl5BanBnXkFtZTgwNDU2NzA0MzE@._V1_.jpg",
+    "genre": [
+      "Drama",
+      "Thriller",
+      "War"
+    ],
+    "director": "Paul Katis",
+    "imdb_rating": 7.1,
+    "description": "A harrowing tale of survival when a British patrol in Afghanistan triggers a landmine.",
+    "runtime": "108 min",
+    "language": "English",
+    "country": "UK",
+    "trailer": "https://www.youtube.com/watch?v=D5vhurFXu5c"
+  },
+  {
+    "id": "29",
+    "title": "The Shape of Water",
+    "type": "Movie",
+    "year": "2017",
+    "poster": "https://m.media-amazon.com/images/M/MV5BOGFlMTM2MTgtZDdlMy00ZDZlLWFjOTUtZDMzMGEwNmNiMWY0XkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg",
+    "genre": [
+      "Drama",
+      "Fantasy",
+      "Romance"
+    ],
+    "director": "Guillermo del Toro",
+    "imdb_rating": 7.3,
+    "description": "In a 1960s research facility, a mute janitor forms a unique relationship with an amphibious creature held in captivity.",
+    "runtime": "123 min",
+    "language": "English",
+    "country": "USA",
+    "trailer": "https://www.youtube.com/watch?v=XFYWazblaUA"
+  },  
+  {
+    "id": "30",
+    "title": "The Painted Bird",
+    "type": "Movie",
+    "year": "2019",
+    "poster": "https://m.media-amazon.com/images/M/MV5BOGE0YjI3MjEtY2I2Yy00ODIyLTg1MmYtYzA2ZGU2MGYyZTc5XkEyXkFqcGc@._V1_.jpg",
+    "genre": [
+      "Drama",
+      "War"
+    ],
+    "director": "Václav Marhoul",
+    "imdb_rating": 7.0,
+    "description": "A young boy wanders through Eastern Europe during WWII encountering brutality and horror.",
+    "runtime": "169 min",
+    "language": "Interslavic",
+    "country": "Czech Republic, Ukraine, Slovakia",
+    "trailer": "https://www.youtube.com/watch?v=bRDuc3IdOn8"
+  },
+  {
+    "id": "31",
+    "title": "The Flowers of War",
+    "type": "Movie",
+    "year": "2011",
+    "poster": "https://m.media-amazon.com/images/M/MV5BMjAxMjc0Mjc2Nl5BMl5BanBnXkFtZTcwNzM0MDM5Ng@@._V1_.jpg",
+    "genre": [
+      "Drama",
+      "History",
+      "War"
+    ],
+    "director": "Yimou Zhang",
+    "imdb_rating": 7.5,
+    "description": "A Westerner shelters a group of women during the 1937 Nanking Massacre.",
+    "runtime": "146 min",
+    "language": "Mandarin, English",
+    "country": "China",
+    "trailer": "https://www.youtube.com/watch?v=KqBa2WowG4Y"
+  },
+  {
+    "id": "32",
+    "title": "The Siege of Jadotville",
+    "type": "Movie",
+    "year": "2016",
+    "poster": "https://m.media-amazon.com/images/M/MV5BMTg0MzgxNzc0MF5BMl5BanBnXkFtZTgwMjQ2NjQyMDI@._V1_.jpg",
+    "genre": [
+      "Action",
+      "Drama",
+      "Thriller"
+    ],
+    "director": "Richie Smyth",
+    "imdb_rating": 7.2,
+    "description": "Irish soldiers under UN command fight off a siege during a 1961 Congo crisis.",
+    "runtime": "108 min",
+    "language": "English",
+    "country": "Ireland",
+    "trailer": "https://www.youtube.com/watch?v=9_LXoXZn3W0"
+  },
+  {
+    "id": "33",
+    "title": "The Battle of Algiers",
+    "type": "Movie",
+    "year": "1966",
+    "poster": "https://m.media-amazon.com/images/M/MV5BMTg0NjkxNjk3NV5BMl5BanBnXkFtZTcwNDMzMTQzMQ@@._V1_.jpg",
+    "genre": [
+      "Drama",
+      "War"
+    ],
+    "director": "Gillo Pontecorvo",
+    "imdb_rating": 8.1,
+    "description": "The Algerian struggle for independence from the French in the 1950s.",
+    "runtime": "121 min",
+    "language": "French, Arabic",
+    "country": "Italy, Algeria",
+    "trailer": "https://www.youtube.com/watch?v=m1YffJVGajo"
+  },
+  {
+    "id": "34",
+    "title": "Paths of Glory",
+    "type": "Movie",
+    "year": "1957",
+    "poster": "https://m.media-amazon.com/images/M/MV5BMjEyODUyMjU4OV5BMl5BanBnXkFtZTgwODg1MTk3MDE@._V1_.jpg",
+    "genre": [
+      "Drama",
+      "War"
+    ],
+    "director": "Stanley Kubrick",
+    "imdb_rating": 8.4,
+    "description": "A French colonel defends three soldiers wrongly accused of cowardice during WWI.",
+    "runtime": "88 min",
+    "language": "English",
+    "country": "USA",
+    "trailer": "https://www.youtube.com/watch?v=EbTKArgdC-U"
+  },
+  {
+    "id": "35",
+    "title": "The Outpost",
+    "type": "Movie",
+    "year": "2020",
+    "poster": "https://m.media-amazon.com/images/M/MV5BZGMxZDdhNDQtYTViZC00YTc4LWFiMjktMTM4NDVjNzk2ZDk1XkEyXkFqcGdeQXVyMTkxNjUyNQ@@._V1_.jpg",
+    "genre": [
+      "Action",
+      "Drama",
+      "History"
+    ],
+    "director": "Rod Lurie",
+    "imdb_rating": 6.8,
+    "description": "US soldiers defend a remote base from Taliban forces in Afghanistan.",
+    "runtime": "123 min",
+    "language": "English",
+    "country": "USA",
+    "trailer": "https://www.youtube.com/watch?v=fq5JRzQx9Kk"
+  },
+  {
+    "id": "36",
+    "title": "Operation Finale",
+    "type": "Movie",
+    "year": "2018",
+    "poster": "https://m.media-amazon.com/images/M/MV5BMjI1MjE1OTMwNl5BMl5BanBnXkFtZTgwNjg0MTQ4NTM@._V1_.jpg",
+    "genre": [
+      "Biography",
+      "Drama",
+      "History"
+    ],
+    "director": "Chris Weitz",
+    "imdb_rating": 6.6,
+    "description": "A team of Israeli agents capture Adolf Eichmann, architect of the Holocaust.",
+    "runtime": "122 min",
+    "language": "English, Spanish, German",
+    "country": "USA",
+    "trailer": "https://www.youtube.com/watch?v=Mns23gWgCRA"
+  },
+  {
+    "id": "37",
+    "title": "In This Corner of the World",
+    "type": "Movie",
+    "year": "2016",
+    "poster": "https://m.media-amazon.com/images/M/MV5BMjAzODgxMTg3MF5BMl5BanBnXkFtZTgwNTgyNTc5MjI@._V1_.jpg",
+    "genre": [
+      "Animation",
+      "Drama",
+      "War"
+    ],
+    "director": "Sunao Katabuchi",
+    "imdb_rating": 7.8,
+    "description": "A young woman in Hiroshima tries to survive the hardships of World War II.",
+    "runtime": "129 min",
+    "language": "Japanese",
+    "country": "Japan",
+    "trailer": "https://www.youtube.com/watch?v=6OZrl7WlGu4"
+  },
+  {
+    "id": "38",
+    "title": "Battle for Sevastopol",
+    "type": "Movie",
+    "year": "2015",
+    "poster": "https://m.media-amazon.com/images/M/MV5BMjM0MjY3NTY3NV5BMl5BanBnXkFtZTgwOTI4NjQ5NTE@._V1_.jpg",
+    "genre": [
+      "Biography",
+      "Drama",
+      "War"
+    ],
+    "director": "Sergey Mokritskiy",
+    "imdb_rating": 7.1,
+    "description": "The story of female sniper Lyudmila Pavlichenko in WWII.",
+    "runtime": "110 min",
+    "language": "Russian, English",
+    "country": "Russia, Ukraine",
+    "trailer": "https://www.youtube.com/watch?v=K3wJYNTzFzY"
+  },
+  {
+    "id": "39",
+    "title": "The 12th Man",
+    "type": "Movie",
+    "year": "2017",
+    "poster": "https://m.media-amazon.com/images/M/MV5BMTU2MzI2NDI3NF5BMl5BanBnXkFtZTgwNzUzNzI2NDM@._V1_.jpg",
+    "genre": [
+      "Drama",
+      "History",
+      "Thriller"
+    ],
+    "director": "Harald Zwart",
+    "imdb_rating": 7.4,
+    "description": "A Norwegian resistance fighter escapes the Nazis in an epic survival journey.",
+    "runtime": "135 min",
+    "language": "Norwegian, German",
+    "country": "Norway",
+    "trailer": "https://www.youtube.com/watch?v=Prs3lvKLo2c"
+  },
+  {
+    "id": "40",
+    "title": "The Shawshank Redemption",
+    "type": "Movie",
+    "year": "1994",
+    "poster": "https://m.media-amazon.com/images/M/MV5BMDAyY2FhYjctNDc5OS00MDNlLThiMGUtY2UxYWVkNGY2ZjljXkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg",
+    "genre": [
+      "Drama",
+      "Epic"
+    ],
+    "director": "Frank Darabont",
+    "imdb_rating": 9.3,
+    "description": "A banker convicted of uxoricide forms a friendship over a quarter century with a hardened convict, while maintaining his innocence and trying to remain hopeful through simple compassion.",
+    "runtime": "140 min",
+    "language": "English",
+    "country": "USA",
+    "trailer": "https://www.youtube.com/watch?v=PLl99DlL6b4"
   }
 ]
