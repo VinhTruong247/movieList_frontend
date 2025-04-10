@@ -11,11 +11,16 @@ const Home = () => {
   const [filteredMovies, setFilteredMovies] = useState([]);
   const [selectedGenre, setSelectedGenre] = useState('all');
   const [activeFilter, setActiveFilter] = useState('all');
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     let tempMovies = [...movies];
 
-    tempMovies.sort((a, b) => a.id - b.id);
+    if (searchQuery) {
+      tempMovies = tempMovies.filter(movie =>
+        movie.title.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
 
     if (selectedGenre !== 'all') {
       tempMovies = tempMovies.filter(movie =>
@@ -23,8 +28,9 @@ const Home = () => {
       );
     }
 
+    tempMovies.sort((a, b) => Number(a.id) - Number(b.id));
     setFilteredMovies(tempMovies);
-  }, [selectedGenre, movies]);
+  }, [selectedGenre, movies, searchQuery]);
 
   const handleGenreSelect = (genre) => {
     setSelectedGenre(genre);
@@ -54,6 +60,10 @@ const Home = () => {
     setFilteredMovies(sortedMovies);
   };
 
+  const handleSearch = (event) => {
+    setSearchQuery(event.target.value);
+  };
+
   if (loading) return <Loader />;
   if (error) return <div className="error-message">Error loading movies: {error}</div>;
 
@@ -63,6 +73,15 @@ const Home = () => {
 
       <div className="content-wrapper">
         <aside className="sidebar">
+          <div className="search-container">
+            <input
+              type="text"
+              placeholder="Search movies..."
+              value={searchQuery}
+              onChange={handleSearch}
+              className="search-input"
+            />
+          </div>
           <GenreList
             selectedGenre={selectedGenre}
             onGenreSelect={handleGenreSelect}
