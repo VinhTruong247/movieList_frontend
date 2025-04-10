@@ -51,3 +51,48 @@ export const deleteUser = async (id) => {
         throw error;
     }
 };
+
+export const loginUser = async (email, password) => {
+    try {
+        const response = await axios.get(API_URL);
+        const users = response.data;
+        
+        const user = users.find(u => 
+            u.email === email && u.password === password
+        );
+
+        if (user) {
+            const { password: _, ...userWithoutPassword } = user;
+            localStorage.setItem('user', JSON.stringify(userWithoutPassword));
+            return {
+                success: true,
+                user: userWithoutPassword
+            };
+        } else {
+            throw new Error('Invalid email or password');
+        }
+    } catch (error) {
+        console.error("Login error:", error);
+        throw error;
+    }
+};
+
+export const logoutUser = () => {
+    try {
+        localStorage.removeItem('user');
+        return { success: true };
+    } catch (error) {
+        console.error("Logout error:", error);
+        throw error;
+    }
+};
+
+export const getCurrentUser = () => {
+    try {
+        const user = localStorage.getItem('user');
+        return user ? JSON.parse(user) : null;
+    } catch (error) {
+        console.error("Error getting current user:", error);
+        return null;
+    }
+};

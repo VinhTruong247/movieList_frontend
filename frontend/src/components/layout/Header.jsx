@@ -10,9 +10,13 @@ const Header = () => {
           <Link to="/" className="logo">
             🎬 Movie Collection
           </Link>
-          
+
           <Link to="/favorites" className="favorites-link">
             ❤️ Favorites
+          </Link>
+
+          <Link to="/login" className="login-link">
+            Sign In
           </Link>
         </nav>
       </div>
