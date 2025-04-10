@@ -100,10 +100,15 @@
 
   .movie-actions {
     padding: 1.25rem;
-    display: flex;
+    display: grid;
     gap: 1rem;
     background: #f8f9fa;
     border-top: 1px solid rgba($primary-color, 0.1);
+    grid-template-columns: 1fr;
+
+    &:has(.favorite-button) {
+        grid-template-columns: 1fr 1fr;
+    }
   }
 
   .view-button,

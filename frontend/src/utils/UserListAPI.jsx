@@ -64,6 +64,7 @@ export const loginUser = async (email, password) => {
         if (user) {
             const { password: _, ...userWithoutPassword } = user;
             localStorage.setItem('user', JSON.stringify(userWithoutPassword));
+            
             return {
                 success: true,
                 user: userWithoutPassword

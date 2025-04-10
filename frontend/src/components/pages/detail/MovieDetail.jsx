@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { fetchMovieById } from '../../../utils/MovieListAPI';
+import { getCurrentUser } from '../../../utils/UserListAPI';
 import Loader from '../../common/Loader';
 import { useFavorites } from '../../../hooks/useFavorites';
 import TrailerPopup from './Trailer/TrailerPopup';
@@ -12,8 +13,9 @@ const MovieDetail = () => {
   const [movie, setMovie] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const { addToFavorites, removeFromFavorites, isFavorite } = useFavorites();
+  const { addToFavorites, removeFromFavorites, isFavorite, isUpdating } = useFavorites();
   const [showTrailer, setShowTrailer] = useState(false);
+  const currentUser = getCurrentUser();
 
   useEffect(() => {
     const getMovie = async () => {
@@ -30,19 +32,32 @@ const MovieDetail = () => {
     getMovie();
   }, [id]);
 
-  const handleFavoriteToggle = () => {
-    if (isFavorite(movie.id)) {
-      removeFromFavorites(movie.id);
-    } else {
-      addToFavorites(movie);
+  const handleFavoriteToggle = useCallback(async () => {
+    if (!currentUser || isUpdating) return;
+
+    try {
+      const isCurrentlyFavorite = isFavorite(movie.id);
+      
+      if (isCurrentlyFavorite) {
+        await removeFromFavorites(movie.id);
+      } else {
+        await addToFavorites(movie);
+      }
+
+      if (window.location.pathname === '/favorites' && isCurrentlyFavorite) {
+        navigate('/favorites', { replace: true });
+      }
+    } catch (error) {
+      setError('Failed to update favorites');
     }
-  };
+  }, [currentUser, isUpdating, movie, isFavorite, removeFromFavorites, addToFavorites, navigate]);
 
   if (loading) return <Loader />;
   if (error) return <div className="error-message">Error loading movie: {error}</div>;
   if (!movie) return <div className="error-message">Movie not found</div>;
 
-  const favorite = isFavorite(movie.id);
+  // Cache the favorite status
+  const favorite = movie ? isFavorite(movie.id) : false;
 
   return (
     <div className="movie-detail">
@@ -98,12 +113,14 @@ const MovieDetail = () => {
             </div>
           </div>
           
-          <button 
-            className={`favorite-button ${favorite ? 'is-favorite' : ''}`}
-            onClick={handleFavoriteToggle}
-          >
-            {favorite ? '❤️ Remove from Favorites' : '🤍 Add to Favorites'}
-          </button>
+          {currentUser && (
+            <button 
+              className={`favorite-button ${favorite ? 'is-favorite' : ''}`}
+              onClick={handleFavoriteToggle}
+            >
+              {favorite ? '❤️ Remove from Favorites' : '🤍 Add to Favorites'}
+            </button>
+          )}
         </div>
       </div>
 

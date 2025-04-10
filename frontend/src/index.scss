@@ -34,5 +34,6 @@ button {
 
 .main-content {
   flex: 1;
-  padding-top: $header-height;
+  // padding-top: $header-height;
+  padding-top: 0 !important;
 }

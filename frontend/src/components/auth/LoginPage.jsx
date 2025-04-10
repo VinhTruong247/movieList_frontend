@@ -29,7 +29,7 @@ const LoginPage = () => {
       const { success, user } = await loginUser(formData.email, formData.password);
       
       if (success) {
-        if (user.role === 'admin') {
+                if (user.role === 'admin') {
           navigate('/admin');
         } else {
           navigate('/');

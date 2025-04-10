@@ -1,10 +1,12 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useFavorites } from '../../../../hooks/useFavorites';
+import { getCurrentUser } from '../../../../utils/UserListAPI';
 import './MovieCard.scss';
 
 const MovieCard = ({ movie }) => {
   const { addToFavorites, removeFromFavorites, isFavorite } = useFavorites();
+  const currentUser = getCurrentUser();
   const favorite = isFavorite(movie.id);
 
   const handleFavorite = (e) => {
@@ -41,12 +43,14 @@ const MovieCard = ({ movie }) => {
         <Link to={`/movie/${movie.id}`} className="view-button">
           View Details
         </Link>
-        <button 
-          className={`favorite-button ${favorite ? 'is-favorite' : ''}`}
-          onClick={handleFavorite}
-        >
-          {favorite ? '❤️ Favorited' : '🤍 Favorite'}
-        </button>
+        {currentUser && (
+          <button 
+            className={`favorite-button ${favorite ? 'is-favorite' : ''}`}
+            onClick={handleFavorite}
+          >
+            {favorite ? '❤️ Favorited' : '🤍 Favorite'}
+          </button>
+        )}
       </div>
     </div>
   );
