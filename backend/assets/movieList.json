@@ -526,7 +526,7 @@
     "title": "The Flowers of War",
     "type": "Movie",
     "year": "2011",
-    "poster": "https://m.media-amazon.com/images/M/MV5BMjAxMjc0Mjc2Nl5BMl5BanBnXkFtZTcwNzM0MDM5Ng@@._V1_.jpg",
+    "poster": "https://m.media-amazon.com/images/M/MV5BMjE3OTUzODA3Ml5BMl5BanBnXkFtZTcwNDk5NTUyNw@@._V1_.jpg",
     "genre": [
       "Drama",
       "History",
@@ -538,14 +538,14 @@
     "runtime": "146 min",
     "language": "Mandarin, English",
     "country": "China",
-    "trailer": "https://www.youtube.com/watch?v=KqBa2WowG4Y"
+    "trailer": "https://www.youtube.com/watch?v=cj2uhyfVNmQ"
   },
   {
     "id": "32",
     "title": "The Siege of Jadotville",
     "type": "Movie",
     "year": "2016",
-    "poster": "https://m.media-amazon.com/images/M/MV5BMTg0MzgxNzc0MF5BMl5BanBnXkFtZTgwMjQ2NjQyMDI@._V1_.jpg",
+    "poster": "https://m.media-amazon.com/images/M/MV5BNjJhZGY0NTUtOTI0Yi00NGY5LTk4ZWYtYmVmNGFiMTZiZTgwXkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg",
     "genre": [
       "Action",
       "Drama",
@@ -557,50 +557,52 @@
     "runtime": "108 min",
     "language": "English",
     "country": "Ireland",
-    "trailer": "https://www.youtube.com/watch?v=9_LXoXZn3W0"
+    "trailer": "https://www.youtube.com/watch?v=9_JHsiQTTmg"
   },
   {
     "id": "33",
-    "title": "The Battle of Algiers",
+    "title": "Joker",
     "type": "Movie",
-    "year": "1966",
-    "poster": "https://m.media-amazon.com/images/M/MV5BMTg0NjkxNjk3NV5BMl5BanBnXkFtZTcwNDMzMTQzMQ@@._V1_.jpg",
+    "year": "2019",
+    "poster": "https://m.media-amazon.com/images/M/MV5BNzY3OWQ5NDktNWQ2OC00ZjdlLThkMmItMDhhNDk3NTFiZGU4XkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg",
     "genre": [
+      "Crime",
       "Drama",
-      "War"
+      "Thriller"
     ],
-    "director": "Gillo Pontecorvo",
-    "imdb_rating": 8.1,
-    "description": "The Algerian struggle for independence from the French in the 1950s.",
-    "runtime": "121 min",
-    "language": "French, Arabic",
-    "country": "Italy, Algeria",
-    "trailer": "https://www.youtube.com/watch?v=m1YffJVGajo"
+    "director": "Todd Phillips",
+    "imdb_rating": 8.4,
+    "description": "In Gotham City, a mentally troubled comedian embarks on a downward spiral that leads to the creation of an iconic villain.",
+    "runtime": "122 min",
+    "language": "English",
+    "country": "USA",
+    "trailer": "https://www.youtube.com/watch?v=zAGVQLHvwOY"
   },
   {
     "id": "34",
-    "title": "Paths of Glory",
+    "title": "Napoleon",
     "type": "Movie",
-    "year": "1957",
-    "poster": "https://m.media-amazon.com/images/M/MV5BMjEyODUyMjU4OV5BMl5BanBnXkFtZTgwODg1MTk3MDE@._V1_.jpg",
+    "year": "2023",
+    "poster": "https://m.media-amazon.com/images/M/MV5BM2ZiZjRkZDYtOTA5Ny00YjZhLWJkMzctNGU5NmI2NGMyYzE2XkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg",
     "genre": [
+      "Biography",
       "Drama",
-      "War"
+      "History"
     ],
-    "director": "Stanley Kubrick",
-    "imdb_rating": 8.4,
-    "description": "A French colonel defends three soldiers wrongly accused of cowardice during WWI.",
-    "runtime": "88 min",
+    "director": "Ridley Scott",
+    "imdb_rating": 6.5,
+    "description": "An epic portrayal of Napoleon Bonaparte's rise to power, his military triumphs, and his complex relationship with Empress Joséphine.",
+    "runtime": "158 min",
     "language": "English",
     "country": "USA",
-    "trailer": "https://www.youtube.com/watch?v=EbTKArgdC-U"
+    "trailer": "https://www.youtube.com/watch?v=OAZWXUkrjPc"
   },
   {
     "id": "35",
     "title": "The Outpost",
     "type": "Movie",
     "year": "2020",
-    "poster": "https://m.media-amazon.com/images/M/MV5BZGMxZDdhNDQtYTViZC00YTc4LWFiMjktMTM4NDVjNzk2ZDk1XkEyXkFqcGdeQXVyMTkxNjUyNQ@@._V1_.jpg",
+    "poster": "https://m.media-amazon.com/images/M/MV5BNTQyZDhkYWYtMDE3YS00NWEyLWI1YWYtOTg4YzM5MTM1YTE0XkEyXkFqcGc@._V1_.jpg",
     "genre": [
       "Action",
       "Drama",
@@ -612,33 +614,31 @@
     "runtime": "123 min",
     "language": "English",
     "country": "USA",
-    "trailer": "https://www.youtube.com/watch?v=fq5JRzQx9Kk"
+    "trailer": "https://www.youtube.com/watch?v=f4LM9a02q9Q"
   },
   {
     "id": "36",
-    "title": "Operation Finale",
+    "title": "Grown Ups",
     "type": "Movie",
-    "year": "2018",
-    "poster": "https://m.media-amazon.com/images/M/MV5BMjI1MjE1OTMwNl5BMl5BanBnXkFtZTgwNjg0MTQ4NTM@._V1_.jpg",
+    "year": "2010",
+    "poster": "https://m.media-amazon.com/images/M/MV5BMjA0ODYwNzU5Nl5BMl5BanBnXkFtZTcwNTI1MTgxMw@@._V1_FMjpg_UX1000_.jpg",
     "genre": [
-      "Biography",
-      "Drama",
-      "History"
+      "Comedy"
     ],
-    "director": "Chris Weitz",
-    "imdb_rating": 6.6,
-    "description": "A team of Israeli agents capture Adolf Eichmann, architect of the Holocaust.",
-    "runtime": "122 min",
-    "language": "English, Spanish, German",
+    "director": "Dennis Dugan",
+    "imdb_rating": 5.9,
+    "description": "After their high school basketball coach passes away, five friends reunite for a Fourth of July holiday weekend.",
+    "runtime": "102 min",
+    "language": "English",
     "country": "USA",
-    "trailer": "https://www.youtube.com/watch?v=Mns23gWgCRA"
+    "trailer": "https://www.youtube.com/watch?v=e01NVCveGkg"
   },
   {
     "id": "37",
     "title": "In This Corner of the World",
     "type": "Movie",
     "year": "2016",
-    "poster": "https://m.media-amazon.com/images/M/MV5BMjAzODgxMTg3MF5BMl5BanBnXkFtZTgwNTgyNTc5MjI@._V1_.jpg",
+    "poster": "https://m.media-amazon.com/images/M/MV5BMjk2MjViY2QtNjZjZS00OTI5LWI1NmQtNmZiZDEyYjIxMGMwXkEyXkFqcGc@._V1_.jpg",
     "genre": [
       "Animation",
       "Drama",
@@ -650,14 +650,14 @@
     "runtime": "129 min",
     "language": "Japanese",
     "country": "Japan",
-    "trailer": "https://www.youtube.com/watch?v=6OZrl7WlGu4"
+    "trailer": "https://www.youtube.com/watch?v=-jBe-uHhlNs"
   },
   {
     "id": "38",
     "title": "Battle for Sevastopol",
     "type": "Movie",
     "year": "2015",
-    "poster": "https://m.media-amazon.com/images/M/MV5BMjM0MjY3NTY3NV5BMl5BanBnXkFtZTgwOTI4NjQ5NTE@._V1_.jpg",
+    "poster": "https://m.media-amazon.com/images/M/MV5BNDRjYjcxNWMtMTIxYi00MDJhLWFhY2YtN2RmZjNhZDNiNTFhXkEyXkFqcGc@._V1_.jpg",
     "genre": [
       "Biography",
       "Drama",
@@ -669,27 +669,27 @@
     "runtime": "110 min",
     "language": "Russian, English",
     "country": "Russia, Ukraine",
-    "trailer": "https://www.youtube.com/watch?v=K3wJYNTzFzY"
+    "trailer": "https://www.youtube.com/watch?v=DrbRyxCWLx0"
   },
   {
     "id": "39",
-    "title": "The 12th Man",
+    "title": "Django Unchained",
     "type": "Movie",
-    "year": "2017",
-    "poster": "https://m.media-amazon.com/images/M/MV5BMTU2MzI2NDI3NF5BMl5BanBnXkFtZTgwNzUzNzI2NDM@._V1_.jpg",
+    "year": "2012",
+    "poster": "https://m.media-amazon.com/images/M/MV5BMjIyNTQ5NjQ1OV5BMl5BanBnXkFtZTcwODg1MDU4OA@@._V1_.jpg",
     "genre": [
       "Drama",
-      "History",
-      "Thriller"
+      "Western"
     ],
-    "director": "Harald Zwart",
-    "imdb_rating": 7.4,
-    "description": "A Norwegian resistance fighter escapes the Nazis in an epic survival journey.",
-    "runtime": "135 min",
-    "language": "Norwegian, German",
-    "country": "Norway",
-    "trailer": "https://www.youtube.com/watch?v=Prs3lvKLo2c"
-  },
+    "director": "Quentin Tarantino",
+    "imdb_rating": 8.5,
+    "description": "With the help of a German bounty hunter, a freed slave sets out to rescue his wife from a brutal Mississippi plantation owner.",
+    "runtime": "165 min",
+    "language": "English, German, French",
+    "country": "USA",
+    "trailer": "https://www.youtube.com/watch?v=_iH0UBYDI4g"
+  }
+  ,
   {
     "id": "40",
     "title": "The Shawshank Redemption",
