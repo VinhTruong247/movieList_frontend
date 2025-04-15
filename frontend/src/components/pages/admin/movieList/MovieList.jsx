@@ -1,13 +1,17 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useMovies } from '../../../../hooks/useMovies';
+import { createMovie, updateMovie } from '../../../../utils/MovieListAPI';
+import MovieForm from './movieForm/MovieForm';
 import './MovieList.scss';
 
 const ITEMS_PER_PAGE = 10;
 
 const MovieList = () => {
-  const { movies, loading, error } = useMovies();
+  const { movies, loading, error, refreshMovies } = useMovies();
   const [searchMovie, setSearchMovie] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
+  const [showForm, setShowForm] = useState(false);
+  const [editingMovie, setEditingMovie] = useState(null);
 
   const filteredMovies = useMemo(() => {
     let result = [...movies].sort((a, b) => Number(a.id) - Number(b.id));
@@ -36,6 +40,32 @@ const MovieList = () => {
     setCurrentPage(pageNumber);
   };
 
+  const handleAddMovie = () => {
+    setEditingMovie(null);
+    setShowForm(true);
+  };
+
+  const handleEditMovie = (movie) => {
+    setEditingMovie(movie);
+    setShowForm(true);
+  };
+
+  const handleSubmit = async (values, { setSubmitting }) => {
+    try {
+      if (editingMovie) {
+        await updateMovie(editingMovie.id, values);
+      } else {
+        await createMovie(values);
+      }
+      await refreshMovies();
+      setShowForm(false);
+    } catch (error) {
+      console.error('Error saving movie:', error);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   if (loading) return <div className="loading">Loading...</div>;
   if (error) return <div className="error-message">{error}</div>;
 
@@ -43,14 +73,19 @@ const MovieList = () => {
     <div className="movie-list-section">
       <div className="list-header">
         <h2>Movie Management</h2>
-        <div className="search-box">
-          <input
-            type="text"
-            placeholder="Search by ID or Title..."
-            value={searchMovie}
-            onChange={(e) => setSearchMovie(e.target.value)}
-            className="search-input"
-          />
+        <div className="header-actions">
+          <div className="search-box">
+            <input
+              type="text"
+              placeholder="Search by ID or Title..."
+              value={searchMovie}
+              onChange={(e) => setSearchMovie(e.target.value)}
+              className="search-input"
+            />
+          </div>
+          <button className="add-btn" onClick={handleAddMovie}>
+            Add Movie
+          </button>
         </div>
       </div>
 
@@ -64,6 +99,7 @@ const MovieList = () => {
               <th>Year</th>
               <th>Rating</th>
               <th>Genre</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -75,6 +111,14 @@ const MovieList = () => {
                 <td>{movie.year}</td>
                 <td>⭐ {movie.imdb_rating}</td>
                 <td>{movie.genre.join(', ')}</td>
+                <td>
+                  <button
+                    className="edit-btn"
+                    onClick={() => handleEditMovie(movie)}
+                  >
+                    Edit
+                  </button>
+                </td>
               </tr>
             ))}
           </tbody>
@@ -111,6 +155,16 @@ const MovieList = () => {
         </div>
       )}
 
+      {showForm && (
+        <MovieForm
+          movie={editingMovie}
+          onSubmit={handleSubmit}
+          onClose={() => {
+            setShowForm(false);
+            setEditingMovie(null);
+          }}
+        />
+      )}
     </div>
   );
 };

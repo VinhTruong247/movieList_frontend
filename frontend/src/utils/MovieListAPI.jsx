@@ -21,3 +21,23 @@ export const fetchMovieById = async (id) => {
     throw error;
   }
 };
+
+export const createMovie = async (movieData) => {
+  try {
+    const response = await axios.post(API_URL, movieData);
+    return response.data;
+  } catch (error) {
+    console.error('Error creating movie:', error);
+    throw error;
+  }
+};
+
+export const updateMovie = async (id, movieData) => {
+  try {
+    const response = await axios.put(`${API_URL}/${id}`, movieData);
+    return response.data;
+  } catch (error) {
+    console.error('Error updating movie:', error);
+    throw error;
+  }
+};

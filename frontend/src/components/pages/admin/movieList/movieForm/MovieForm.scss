@@ -1,0 +1,146 @@
+@import '../../../../../styles/root';
+
+.movie-form-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.movie-form-container {
+  background: white;
+  padding: 2rem;
+  border-radius: $border-radius;
+  width: 90%;
+  max-width: 900px;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+
+  h2 {
+    color: $primary-color;
+    margin-bottom: 2rem;
+  }
+
+  .close-btn {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: $text-color;
+
+    &:hover {
+      color: $primary-color;
+    }
+  }
+}
+
+.movie-form {
+  .form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+
+    .form-group {
+      &.full-width {
+        grid-column: 1 / -1;
+      }
+
+      label {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: $text-color;
+      }
+
+      input,
+      select,
+      textarea {
+        width: 100%;
+        padding: 0.75rem;
+        border: 2px solid rgba($primary-color, 0.1);
+        border-radius: $border-radius;
+        font-size: 0.95rem;
+
+        &:focus {
+          outline: none;
+          border-color: $accent-color;
+        }
+      }
+
+      textarea {
+        height: 100px;
+        resize: vertical;
+      }
+
+      .error {
+        color: $secondary-color;
+        font-size: 0.85rem;
+        margin-top: 0.5rem;
+      }
+    }
+
+    .genre-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 0.5rem;
+      padding: 1rem;
+      border: 2px solid rgba($primary-color, 0.1);
+      border-radius: $border-radius;
+
+      .genre-checkbox {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        cursor: pointer;
+
+        input {
+          width: auto;
+        }
+      }
+    }
+  }
+
+  .form-actions {
+    margin-top: 2rem;
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+
+    button {
+      padding: 0.75rem 1.5rem;
+      border-radius: $border-radius;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all $transition-speed;
+    }
+
+    .cancel-btn {
+      background: transparent;
+      border: 2px solid $text-color;
+      color: $text-color;
+
+      &:hover {
+        background: rgba($text-color, 0.1);
+      }
+    }
+
+    .submit-btn {
+      background: $accent-color;
+      border: none;
+      color: white;
+
+      &:hover {
+        background: darken($accent-color, 10%);
+      }
+    }
+  }
+}

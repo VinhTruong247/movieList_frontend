@@ -36,7 +36,7 @@ const Header = () => {
                 </span>
                 {currentUser.role === 'admin' && (
                   <Link to="/admin" className="nav-link admin-link">
-                    Admin Panel
+                    Admin Dashboard
                   </Link>
                 )}
                 <button onClick={handleLogout} className="logout-btn">

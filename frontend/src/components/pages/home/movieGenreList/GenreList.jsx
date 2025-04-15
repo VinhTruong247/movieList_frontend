@@ -24,7 +24,7 @@ const genres = [
     { id: "20", name: "Thriller" },
     { id: "21", name: "War" },
     { id: "22", name: "Western" }
-  ];  
+];
 
 const GenreList = ({ selectedGenre, onGenreSelect, activeFilter, onFilterChange }) => {
     return (
