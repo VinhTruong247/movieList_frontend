@@ -1,16 +1,59 @@
-import React from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useMovies } from '../../../../hooks/useMovies';
 import './MovieList.scss';
 
+const ITEMS_PER_PAGE = 10;
+
 const MovieList = () => {
   const { movies, loading, error } = useMovies();
+  const [searchMovie, setSearchMovie] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const filteredMovies = useMemo(() => {
+    let result = [...movies].sort((a, b) => Number(a.id) - Number(b.id));
+
+    if (searchMovie) {
+      const searchedMovie = searchMovie.toLowerCase();
+      result = result.filter(movie =>
+        movie.id.toLowerCase().includes(searchedMovie) ||
+        movie.title.toLowerCase().includes(searchedMovie)
+      );
+    }
+    return result;
+  }, [movies, searchMovie]);
+
+  const totalPages = Math.ceil(filteredMovies.length / ITEMS_PER_PAGE);
+  const paginatedMovies = filteredMovies.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchMovie]);
+
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
 
   if (loading) return <div className="loading">Loading...</div>;
   if (error) return <div className="error-message">{error}</div>;
 
   return (
     <div className="movie-list-section">
-      <h2>Movie Management</h2>
+      <div className="list-header">
+        <h2>Movie Management</h2>
+        <div className="search-box">
+          <input
+            type="text"
+            placeholder="Search by ID or Title..."
+            value={searchMovie}
+            onChange={(e) => setSearchMovie(e.target.value)}
+            className="search-input"
+          />
+        </div>
+      </div>
+
       <div className="table-container">
         <table className="data-table">
           <thead>
@@ -24,7 +67,7 @@ const MovieList = () => {
             </tr>
           </thead>
           <tbody>
-            {movies.map(movie => (
+            {paginatedMovies.map(movie => (
               <tr key={movie.id}>
                 <td>{movie.id}</td>
                 <td>{movie.title}</td>
@@ -37,6 +80,37 @@ const MovieList = () => {
           </tbody>
         </table>
       </div>
+
+      {totalPages > 1 && (
+        <div className="pagination">
+          <button
+            className="page-btn"
+            onClick={() => handlePageChange(currentPage - 1)}
+            disabled={currentPage === 1}
+          >
+            Previous
+          </button>
+
+          {[...Array(totalPages)].map((_, index) => (
+            <button
+              key={index + 1}
+              className={`page-btn ${currentPage === index + 1 ? 'active' : ''}`}
+              onClick={() => handlePageChange(index + 1)}
+            >
+              {index + 1}
+            </button>
+          ))}
+
+          <button
+            className="page-btn"
+            onClick={() => handlePageChange(currentPage + 1)}
+            disabled={currentPage === totalPages}
+          >
+            Next
+          </button>
+        </div>
+      )}
+
     </div>
   );
 };
