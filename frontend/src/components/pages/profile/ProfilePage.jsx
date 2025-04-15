@@ -25,10 +25,12 @@ const ProfilePage = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    if (name === 'username') {
+      setFormData(prev => ({
+        ...prev,
+        [name]: value
+      }));
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -36,7 +38,7 @@ const ProfilePage = () => {
     try {
       const updatedUser = {
         ...currentUser,
-        ...formData
+        username: formData.username
       };
       await updateUser(currentUser.id, updatedUser);
       localStorage.setItem('user', JSON.stringify(updatedUser));
@@ -89,8 +91,9 @@ const ProfilePage = () => {
                   type="email"
                   name="email"
                   value={formData.email}
-                  onChange={handleInputChange}
-                  required
+                  className="disabled-input"
+                  disabled
+                  title="Email cannot be changed"
                 />
               </div>
 
