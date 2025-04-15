@@ -1,11 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { fetchUsers, updateUser } from '../../../../utils/UserListAPI';
 import './UserList.scss';
+
+const ITEMS_PER_PAGE = 10;
 
 const UserList = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [searchUser, setSearchUser] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
     loadUsers();
@@ -21,6 +25,34 @@ const UserList = () => {
       setError('Failed to load users');
       setLoading(false);
     }
+  };
+
+  const filteredUsers = useMemo(() => {
+    let result = [...users].sort((a, b) => Number(a.id) - Number(b.id));
+
+    if (searchUser) {
+      const searchQuery = searchUser.toLowerCase();
+      result = result.filter(user =>
+        user.id.toLowerCase().includes(searchQuery) ||
+        user.username.toLowerCase().includes(searchQuery) ||
+        user.email.toLowerCase().includes(searchQuery)
+      );
+    }
+    return result;
+  }, [users, searchUser]);
+
+  const totalPages = Math.ceil(filteredUsers.length / ITEMS_PER_PAGE);
+  const paginatedUsers = filteredUsers.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchUser]);
+
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
   };
 
   const handleToggleDisable = async (user) => {
@@ -44,7 +76,19 @@ const UserList = () => {
 
   return (
     <div className="user-list-section">
-      <h2>User Management</h2>
+      <div className="list-header">
+        <h2>User Management</h2>
+        <div className="search-box">
+          <input
+            type="text"
+            placeholder="Search by ID, Username, or Email..."
+            value={searchUser}
+            onChange={(e) => setSearchUser(e.target.value)}
+            className="search-input"
+          />
+        </div>
+      </div>
+
       <div className="table-container">
         <table className="data-table">
           <thead>
@@ -58,7 +102,7 @@ const UserList = () => {
             </tr>
           </thead>
           <tbody>
-            {users.map(user => (
+            {paginatedUsers.map(user => (
               <tr key={user.id} className={user.isDisable ? 'disabled-row' : ''}>
                 <td>{user.id}</td>
                 <td>{user.username}</td>
@@ -82,6 +126,36 @@ const UserList = () => {
           </tbody>
         </table>
       </div>
+
+      {totalPages > 1 && (
+        <div className="pagination">
+          <button
+            className="page-btn"
+            onClick={() => handlePageChange(currentPage - 1)}
+            disabled={currentPage === 1}
+          >
+            Previous
+          </button>
+
+          {[...Array(totalPages)].map((_, index) => (
+            <button
+              key={index + 1}
+              className={`page-btn ${currentPage === index + 1 ? 'active' : ''}`}
+              onClick={() => handlePageChange(index + 1)}
+            >
+              {index + 1}
+            </button>
+          ))}
+
+          <button
+            className="page-btn"
+            onClick={() => handlePageChange(currentPage + 1)}
+            disabled={currentPage === totalPages}
+          >
+            Next
+          </button>
+        </div>
+      )}
     </div>
   );
 };
