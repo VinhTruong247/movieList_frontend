@@ -1,12 +1,12 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Link } from 'react-router-dom';
 import { useFavorites } from '../../../../hooks/useFavorites';
-import { getCurrentUser } from '../../../../utils/UserListAPI';
+import { MovieContext } from '../../../../context/MovieContext';
 import './MovieCard.scss';
 
 const MovieCard = ({ movie }) => {
   const { addToFavorites, removeFromFavorites, isFavorite } = useFavorites();
-  const currentUser = getCurrentUser();
+  const { currentUser } = useContext(MovieContext);
   const favorite = isFavorite(movie.id);
 
   const handleFavorite = async (e) => {

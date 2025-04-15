@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect } from 'react';
+import React, { createContext, useState, useEffect, useCallback } from 'react';
 import { fetchMovies } from '../utils/MovieListAPI';
 import { getCurrentUser, updateUserFavorites } from '../utils/UserListAPI';
 
@@ -9,12 +9,22 @@ export const MovieProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [favorites, setFavorites] = useState([]);
-  const currentUser = getCurrentUser();
-  // const [favorites, setFavorites] = useState(() => {
-  //   const savedFavorites = localStorage.getItem('favorites');
-  //   return savedFavorites ? JSON.parse(savedFavorites) : [];
-  // });
+  const [currentUser, setCurrentUser] = useState(getCurrentUser());
 
+  // Watch for user changes
+  useEffect(() => {
+    const handleUserChange = () => {
+      const user = getCurrentUser();
+      setCurrentUser(user);
+      setFavorites(user?.favorites || []);
+    };
+
+    // Listen for auth changes
+    window.addEventListener('auth-change', handleUserChange);
+    return () => window.removeEventListener('auth-change', handleUserChange);
+  }, []);
+
+  // Load movies
   useEffect(() => {
     const getMovies = async () => {
       try {
@@ -30,56 +40,23 @@ export const MovieProvider = ({ children }) => {
     getMovies();
   }, []);
 
-  useEffect(() => {
-    if (currentUser) {
-      setFavorites(currentUser.favorites || []);
-    }
-  }, [currentUser]);
-
-  //This sectiom is commented out to avoid local storage issues with API calls
-
-  // useEffect(() => {
-  //   localStorage.setItem('favorites', JSON.stringify(favorites));
-  // }, [favorites]);
-
-  // const addToFavorites = (movie) => {
-  //   setFavorites(prevFavorites => {
-  //     if (!prevFavorites.some(fav => fav.id === movie.id)) {
-  //       return [...prevFavorites, movie];
-  //     }
-  //     return prevFavorites;
-  //   });
-  // };
-
-  // const removeFromFavorites = (id) => {
-  //   setFavorites(prevFavorites =>
-  //     prevFavorites.filter(movie => movie.id !== id)
-  //   );
-  // };
-
-  const addToFavorites = async (movie) => {
+  const addToFavorites = useCallback(async (movie) => {
     if (!currentUser) return;
-    
+
     try {
       const newFavorites = [...favorites, movie];
       await updateUserFavorites(currentUser.id, {
         ...currentUser,
         favorites: newFavorites
       });
-      
-      localStorage.setItem('user', JSON.stringify({
-        ...currentUser,
-        favorites: newFavorites
-      }));
-      
       setFavorites(newFavorites);
     } catch (error) {
       console.error('Error adding to favorites:', error);
       throw error;
     }
-  };
+  }, [favorites, currentUser]);
 
-  const removeFromFavorites = async (movieId) => {
+  const removeFromFavorites = useCallback(async (movieId) => {
     if (!currentUser) return;
 
     try {
@@ -88,18 +65,12 @@ export const MovieProvider = ({ children }) => {
         ...currentUser,
         favorites: newFavorites
       });
-      
-      localStorage.setItem('user', JSON.stringify({
-        ...currentUser,
-        favorites: newFavorites
-      }));
-      
       setFavorites(newFavorites);
     } catch (error) {
       console.error('Error removing from favorites:', error);
       throw error;
     }
-  };
+  }, [favorites, currentUser]);
 
   return (
     <MovieContext.Provider
@@ -108,6 +79,7 @@ export const MovieProvider = ({ children }) => {
         loading,
         error,
         favorites,
+        currentUser,
         addToFavorites,
         removeFromFavorites
       }}
@@ -116,3 +88,5 @@ export const MovieProvider = ({ children }) => {
     </MovieContext.Provider>
   );
 };
+
+export default MovieProvider;

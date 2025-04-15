@@ -65,6 +65,9 @@ export const loginUser = async (email, password) => {
             const { password: _, ...userWithoutPassword } = user;
             localStorage.setItem('user', JSON.stringify(userWithoutPassword));
             
+            // Dispatch auth change event
+            window.dispatchEvent(new Event('auth-change'));
+            
             return {
                 success: true,
                 user: userWithoutPassword
@@ -81,6 +84,8 @@ export const loginUser = async (email, password) => {
 export const logoutUser = () => {
     try {
         localStorage.removeItem('user');
+        // Dispatch auth change event
+        window.dispatchEvent(new Event('auth-change'));
         return { success: true };
     } catch (error) {
         console.error("Logout error:", error);
