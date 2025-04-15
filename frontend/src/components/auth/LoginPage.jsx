@@ -8,6 +8,7 @@ import './AuthPage.scss';
 const LoginPage = () => {
   const navigate = useNavigate();
   const [error, setError] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
     if (error) {
@@ -87,13 +88,23 @@ const LoginPage = () => {
 
               <div className="form-group">
                 <label htmlFor="password">Password</label>
-                <Field
-                  type="password"
-                  name="password"
-                  id="password"
-                  className={`form-input ${errors.password && touched.password ? 'error' : ''}`}
-                  placeholder="Enter your password"
-                />
+                <div className="password-field">
+                  <Field
+                    type={showPassword ? "text" : "password"}
+                    name="password"
+                    id="password"
+                    className={`form-input ${errors.password && touched.password ? 'error' : ''}`}
+                    placeholder="Enter your password"
+                  />
+                  <button
+                    type="button"
+                    className="password-toggle"
+                    onClick={() => setShowPassword(!showPassword)}
+                    aria-label={showPassword ? "Hide password" : "Show password"}
+                  >
+                    {showPassword ? "Hide" : "Show"}
+                  </button>
+                </div>
                 {errors.password && touched.password && (
                   <div className="error-message">{errors.password}</div>
                 )}
