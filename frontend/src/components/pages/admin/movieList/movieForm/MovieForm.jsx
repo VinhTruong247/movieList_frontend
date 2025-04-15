@@ -36,7 +36,13 @@ const MovieSchema = Yup.object().shape({
   director: Yup.string().required('Director is required'),
   imdb_rating: Yup.number().min(0).max(10).required('Rating is required'),
   description: Yup.string().required('Description is required'),
-  runtime: Yup.string().required('Runtime is required'),
+  runtime: Yup.string()
+    .required('Runtime is required')
+    .test('valid-runtime', 'Must be a valid number', function(value) {
+      if (!value) return false;
+      const number = parseInt(value.split(' ')[0]);
+      return !isNaN(number) && number > 0;
+    }),
   language: Yup.string().required('Language is required'),
   country: Yup.string().required('Country is required'),
   poster: Yup.string().required('Poster URL is required'),
@@ -46,7 +52,7 @@ const MovieSchema = Yup.object().shape({
 const MovieForm = ({ movie, onSubmit, onClose }) => {
   const initialValues = movie || {
     title: '',
-    type: 'Movie',
+    type: '',
     year: new Date().getFullYear().toString(),
     genre: [],
     director: '',
@@ -57,6 +63,11 @@ const MovieForm = ({ movie, onSubmit, onClose }) => {
     country: '',
     poster: '',
     trailer: ''
+  };
+
+  const handleRuntimeChange = (e, setFieldValue, type) => {
+    let value = e.target.value.replace(/[^0-9]/g, '');
+    setFieldValue('runtime', value);
   };
 
   return (
@@ -75,7 +86,11 @@ const MovieForm = ({ movie, onSubmit, onClose }) => {
               <div className="form-grid">
                 <div className="form-group">
                   <label>Title</label>
-                  <Field name="title" type="text" />
+                  <Field
+                    name="title"
+                    type="text"
+                    placeholder="Enter movie title"
+                  />
                   {errors.title && touched.title && (
                     <div className="error">{errors.title}</div>
                   )}
@@ -83,19 +98,60 @@ const MovieForm = ({ movie, onSubmit, onClose }) => {
 
                 <div className="form-group">
                   <label>Type</label>
-                  <Field as="select" name="type">
+                  <Field
+                    as="select"
+                    name="type"
+                    onChange={(e) => {
+                      setFieldValue('type', e.target.value);
+                      setFieldValue('runtime', '');
+                    }}
+                  >
+                    <option value="">Select Type</option>
                     <option value="Movie">Movie</option>
                     <option value="TV Series">TV Series</option>
                   </Field>
+                  {errors.type && touched.type && (
+                    <div className="error">{errors.type}</div>
+                  )}
                 </div>
 
                 <div className="form-group">
                   <label>Year</label>
-                  <Field name="year" type="text" />
+                  <Field
+                    name="year"
+                    type="text"
+                    placeholder={new Date().getFullYear().toString()}
+                  />
                   {errors.year && touched.year && (
                     <div className="error">{errors.year}</div>
                   )}
                 </div>
+
+                {values.type && (
+                  <div className="form-group runtime-group">
+                    <label>Runtime {values.type === 'Movie' ? '(minutes)' : '(episodes)'}</label>
+                    <div className="input-group">
+                      <Field name="runtime">
+                        {({ field }) => (
+                          <input
+                            {...field}
+                            type="text"
+                            className="runtime-input"
+                            placeholder={values.type === 'Movie' ? '120' : '12'}
+                            value={field.value}
+                            onChange={(e) => handleRuntimeChange(e, setFieldValue, values.type)}
+                          />
+                        )}
+                      </Field>
+                      <span className="input-suffix">
+                        {values.type === 'Movie' ? 'min' : 'episodes'}
+                      </span>
+                    </div>
+                    {errors.runtime && touched.runtime && (
+                      <div className="error">{errors.runtime}</div>
+                    )}
+                  </div>
+                )}
 
                 <div className="form-group full-width">
                   <label>Genres</label>
@@ -126,7 +182,11 @@ const MovieForm = ({ movie, onSubmit, onClose }) => {
 
                 <div className="form-group">
                   <label>Director</label>
-                  <Field name="director" type="text" />
+                  <Field
+                    name="director"
+                    type="text"
+                    placeholder="Enter director's name"
+                  />
                   {errors.director && touched.director && (
                     <div className="error">{errors.director}</div>
                   )}
@@ -134,7 +194,14 @@ const MovieForm = ({ movie, onSubmit, onClose }) => {
 
                 <div className="form-group">
                   <label>IMDb Rating</label>
-                  <Field name="imdb_rating" type="number" step="0.1" min="0" max="10" />
+                  <Field
+                    name="imdb_rating"
+                    type="number"
+                    step="0.1"
+                    min="0"
+                    max="10"
+                    placeholder="0.0 - 10.0"
+                  />
                   {errors.imdb_rating && touched.imdb_rating && (
                     <div className="error">{errors.imdb_rating}</div>
                   )}
@@ -142,23 +209,23 @@ const MovieForm = ({ movie, onSubmit, onClose }) => {
 
                 <div className="form-group full-width">
                   <label>Description</label>
-                  <Field as="textarea" name="description" />
+                  <Field
+                    as="textarea"
+                    name="description"
+                    placeholder="Enter movie description"
+                  />
                   {errors.description && touched.description && (
                     <div className="error">{errors.description}</div>
                   )}
                 </div>
 
                 <div className="form-group">
-                  <label>Runtime</label>
-                  <Field name="runtime" type="text" placeholder="e.g. 120 min" />
-                  {errors.runtime && touched.runtime && (
-                    <div className="error">{errors.runtime}</div>
-                  )}
-                </div>
-
-                <div className="form-group">
                   <label>Language</label>
-                  <Field name="language" type="text" />
+                  <Field
+                    name="language"
+                    type="text"
+                    placeholder="e.g. English"
+                  />
                   {errors.language && touched.language && (
                     <div className="error">{errors.language}</div>
                   )}
@@ -166,7 +233,11 @@ const MovieForm = ({ movie, onSubmit, onClose }) => {
 
                 <div className="form-group">
                   <label>Country</label>
-                  <Field name="country" type="text" />
+                  <Field
+                    name="country"
+                    type="text"
+                    placeholder="e.g. United States"
+                  />
                   {errors.country && touched.country && (
                     <div className="error">{errors.country}</div>
                   )}
@@ -174,7 +245,11 @@ const MovieForm = ({ movie, onSubmit, onClose }) => {
 
                 <div className="form-group full-width">
                   <label>Poster URL</label>
-                  <Field name="poster" type="url" />
+                  <Field
+                    name="poster"
+                    type="url"
+                    placeholder="https://example.com/poster.jpg"
+                  />
                   {errors.poster && touched.poster && (
                     <div className="error">{errors.poster}</div>
                   )}
@@ -182,7 +257,11 @@ const MovieForm = ({ movie, onSubmit, onClose }) => {
 
                 <div className="form-group full-width">
                   <label>Trailer URL</label>
-                  <Field name="trailer" type="url" />
+                  <Field
+                    name="trailer"
+                    type="url"
+                    placeholder="https://youtube.com/watch?v=..."
+                  />
                   {errors.trailer && touched.trailer && (
                     <div className="error">{errors.trailer}</div>
                   )}

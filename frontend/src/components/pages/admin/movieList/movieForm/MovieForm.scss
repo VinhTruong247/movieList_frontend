@@ -143,4 +143,47 @@
       }
     }
   }
+
+  .runtime-group {
+    input {
+      border: 0px !important;
+    }
+  }
+
+  .input-group {
+    display: flex;
+    align-items: stretch;
+    border: 2px solid rgba($primary-color, 0.1);
+    border-radius: $border-radius;
+    transition: all $transition-speed;
+
+    &:focus-within {
+      border-color: $accent-color;
+      box-shadow: 0 2px 8px rgba($accent-color, 0.1);
+    }
+
+    .runtime-input {
+      flex: 1;
+      border: none;
+      padding: 0.75rem;
+      font-size: 0.95rem;
+      background: transparent;
+
+      &:focus {
+        outline: none;
+      }
+    }
+
+    .input-suffix {
+      padding: 0.75rem 1rem;
+      background: rgba($primary-color, 0.05);
+      color: rgba($text-color, 0.7);
+      font-size: 0.95rem;
+      white-space: nowrap;
+      user-select: none;
+      display: flex;
+      align-items: center;
+      border-left: 2px solid rgba($primary-color, 0.1);
+    }
+  }
 }
