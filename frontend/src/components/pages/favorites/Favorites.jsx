@@ -8,8 +8,6 @@ const Favorites = () => {
   const { favorites } = useFavorites();
   const navigate = useNavigate();
 
-  console.log('Favorites:', favorites);
-
   return (
     <div className="favorites-container">
       <button 

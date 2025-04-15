@@ -1,4 +1,5 @@
-@import '../../../styles/root';
+@use '../../../styles/root' as *;
+@use 'sass:color';
 
 .home-container {
     margin: 0 auto;

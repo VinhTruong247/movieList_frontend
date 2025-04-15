@@ -1,4 +1,5 @@
-@import '../../../../styles/root';
+@use '../../../../styles/root' as *;
+@use 'sass:color';
 
 .genre-list-container {
     background: rgb(255, 255, 255);
@@ -56,7 +57,7 @@
                 }
 
                 &:hover {
-                    background: darken($accent-color, 5%);
+                    background: color.adjust($accent-color, $lightness: -5%);;
                 }
             }
         }
@@ -99,7 +100,7 @@
                 font-weight: 500;
 
                 &:hover {
-                    background: darken($accent-color, 5%);
+                    background: color.adjust($accent-color, $lightness: -5%);
                     transform: translateX(5px);
                 }
             }
