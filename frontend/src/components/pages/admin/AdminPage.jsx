@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { fetchUsers, deleteUser } from '../../../utils/UserListAPI';
+import { fetchUsers } from '../../../utils/UserListAPI';
 import { useMovies } from '../../../hooks/useMovies';
+import UserList from './userList/UserList';
+import MovieList from './movieList/MovieList';
 import './AdminPage.scss';
 
 const AdminPage = () => {
@@ -8,12 +10,14 @@ const AdminPage = () => {
   const { movies } = useMovies();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [activeTab, setActiveTab] = useState('users');
 
   useEffect(() => {
     const loadUsers = async () => {
       try {
         const data = await fetchUsers();
-        setUsers(data);
+        const filteredUsers = data.filter(user => user.role !== 'admin');
+        setUsers(filteredUsers);
       } catch (err) {
         setError('Failed to load users');
       } finally {
@@ -23,17 +27,6 @@ const AdminPage = () => {
 
     loadUsers();
   }, []);
-
-  const handleDeleteUser = async (userId) => {
-    if (window.confirm('Are you sure you want to delete this user?')) {
-      try {
-        await deleteUser(userId);
-        setUsers(users.filter(user => user.id !== userId));
-      } catch (err) {
-        setError('Failed to delete user');
-      }
-    }
-  };
 
   if (loading) return <div className="loading">Loading...</div>;
   if (error) return <div className="error-message">{error}</div>;
@@ -55,40 +48,23 @@ const AdminPage = () => {
         </div>
       </div>
 
-      <div className="content-section">
-        <h2>User Management</h2>
-        <div className="table-container">
-          <table className="data-table">
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Username</th>
-                <th>Email</th>
-                <th>Role</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {users.map(user => (
-                <tr key={user.id}>
-                  <td>{user.id}</td>
-                  <td>{user.username}</td>
-                  <td>{user.email}</td>
-                  <td>{user.role}</td>
-                  <td>
-                    <button
-                      className="delete-btn"
-                      onClick={() => handleDeleteUser(user.id)}
-                      disabled={user.role === 'admin'}
-                    >
-                      Delete
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+      <div className="content-tabs">
+        <button 
+          className={`tab-button ${activeTab === 'users' ? 'active' : ''}`}
+          onClick={() => setActiveTab('users')}
+        >
+          User Management
+        </button>
+        <button 
+          className={`tab-button ${activeTab === 'movies' ? 'active' : ''}`}
+          onClick={() => setActiveTab('movies')}
+        >
+          Movie Management
+        </button>
+      </div>
+
+      <div className="tab-content">
+        {activeTab === 'users' ? <UserList /> : <MovieList />}
       </div>
     </div>
   );

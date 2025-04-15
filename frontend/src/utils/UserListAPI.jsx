@@ -65,7 +65,6 @@ export const loginUser = async (email, password) => {
             const { password: _, ...userWithoutPassword } = user;
             localStorage.setItem('user', JSON.stringify(userWithoutPassword));
             
-            // Dispatch auth change event
             window.dispatchEvent(new Event('auth-change'));
             
             return {
@@ -84,7 +83,6 @@ export const loginUser = async (email, password) => {
 export const logoutUser = () => {
     try {
         localStorage.removeItem('user');
-        // Dispatch auth change event
         window.dispatchEvent(new Event('auth-change'));
         return { success: true };
     } catch (error) {
