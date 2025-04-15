@@ -5,6 +5,7 @@ import LoginPage from "../components/auth/LoginPage";
 import Layout from "../components/layout/User/Layout"
 import AdminLayout from "../components/layout/Admin/AdminLayout";
 import AdminPage from "../components/pages/admin/AdminPage";
+import ProfilePage from "../components/pages/profile/ProfilePage";
 
 const AppRoutes = [
   {
@@ -16,6 +17,10 @@ const AppRoutes = [
         element: <Home />,
       },
       {
+        path: "profile",
+        element: <ProfilePage />,
+      },
+      {
         path: "movie/:id",
         element: <MovieDetail />,
       },
@@ -24,13 +29,13 @@ const AppRoutes = [
         element: <Favorites />,
       },
       {
-        path: "/login",
+        path: "login",
         element: <LoginPage />,
       },
     ],
   },
   {
-    path: "/admin",
+    path: "admin",
     element: <AdminLayout />,
     children: [
       {
