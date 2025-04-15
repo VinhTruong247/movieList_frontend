@@ -40,6 +40,11 @@
   margin-bottom: 1.5rem;
   font-size: 0.9rem;
   animation: fadeIn 0.3s ease-in-out;
+
+  &.disabled {
+    background: rgba(#f1c40f, 0.1);
+    color: #f1c40f;
+  }
 }
 
 .auth-form {

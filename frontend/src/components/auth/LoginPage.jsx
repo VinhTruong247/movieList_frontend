@@ -24,6 +24,11 @@ const LoginPage = () => {
       const response = await loginUser(values.email, values.password);
 
       if (response.success) {
+        if (response.user.isDisable) {
+          setError('Your account has been disabled. Please contact support.');
+          return;
+        }
+
         if (response.user.role === 'admin') {
           navigate('/admin');
         } else {
@@ -49,7 +54,11 @@ const LoginPage = () => {
         <h2 className="auth-title">Welcome Back</h2>
         <p className="auth-subtitle">Please sign in to continue</p>
 
-        {error && <div className="auth-error">{error}</div>}
+        {error && (
+          <div className={`auth-error ${error.includes('disabled') ? 'disabled' : ''}`}>
+            {error}
+          </div>
+        )}
 
         <Formik
           initialValues={{
