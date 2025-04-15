@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { getCurrentUser, logoutUser } from '../../utils/UserListAPI';
+import { getCurrentUser, logoutUser } from '../../../utils/UserListAPI';
 import './styles/Header.scss';
 
 const Header = () => {

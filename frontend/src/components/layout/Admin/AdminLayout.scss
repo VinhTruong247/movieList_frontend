@@ -1,0 +1,11 @@
+@import '../../../styles/root';
+
+.admin-layout {
+    min-height: 100vh;
+    background: $background-color;
+
+    .admin-main {
+        padding: 2rem;
+        margin-top: $header-height;
+    }
+}

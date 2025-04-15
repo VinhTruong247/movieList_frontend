@@ -2,7 +2,9 @@ import Home from "../components/pages/home/Home";
 import MovieDetail from "../components/pages/detail/MovieDetail";
 import Favorites from "../components/pages/favorites/Favorites";
 import LoginPage from "../components/auth/LoginPage";
-import Layout from "../components/layout/Layout";
+import Layout from "../components/layout/User/Layout"
+import AdminLayout from "../components/layout/Admin/AdminLayout";
+import AdminPage from "../components/pages/admin/AdminPage";
 
 const AppRoutes = [
   {
@@ -25,6 +27,16 @@ const AppRoutes = [
         path: "/login",
         element: <LoginPage />,
       },
+    ],
+  },
+  {
+    path: "/admin",
+    element: <AdminLayout />,
+    children: [
+      {
+        path: "",
+        element: <AdminPage />,
+      }
     ],
   },
 ];
