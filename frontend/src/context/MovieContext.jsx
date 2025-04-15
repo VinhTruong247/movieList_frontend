@@ -8,23 +8,25 @@ export const MovieProvider = ({ children }) => {
   const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [favorites, setFavorites] = useState([]);
   const [currentUser, setCurrentUser] = useState(getCurrentUser());
+  const [favorites, setFavorites] = useState(getCurrentUser()?.favorites || []);
 
-  // Watch for user changes
   useEffect(() => {
     const handleUserChange = () => {
       const user = getCurrentUser();
       setCurrentUser(user);
-      setFavorites(user?.favorites || []);
+      if (user && user.favorites) {
+        setFavorites(user.favorites);
+      } else {
+        setFavorites([]);
+      }
     };
+    handleUserChange();
 
-    // Listen for auth changes
     window.addEventListener('auth-change', handleUserChange);
     return () => window.removeEventListener('auth-change', handleUserChange);
   }, []);
 
-  // Load movies
   useEffect(() => {
     const getMovies = async () => {
       try {
@@ -39,6 +41,13 @@ export const MovieProvider = ({ children }) => {
 
     getMovies();
   }, []);
+
+  useEffect(() => {
+    if (currentUser && favorites.length >= 0) {
+      const updatedUser = { ...currentUser, favorites };
+      localStorage.setItem('user', JSON.stringify(updatedUser));
+    }
+  }, [favorites, currentUser]);
 
   const addToFavorites = useCallback(async (movie) => {
     if (!currentUser) return;
