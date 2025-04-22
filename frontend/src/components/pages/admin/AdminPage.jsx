@@ -16,7 +16,7 @@ const AdminPage = () => {
     const loadUsers = async () => {
       try {
         const data = await fetchUsers();
-        const filteredUsers = data.filter(user => user.role !== 'admin');
+        const filteredUsers = data.filter((user) => user.role !== 'admin');
         setUsers(filteredUsers);
       } catch (err) {
         setError('Failed to load users');
@@ -49,13 +49,13 @@ const AdminPage = () => {
       </div>
 
       <div className="content-tabs">
-        <button 
+        <button
           className={`tab-button ${activeTab === 'users' ? 'active' : ''}`}
           onClick={() => setActiveTab('users')}
         >
           User Management
         </button>
-        <button 
+        <button
           className={`tab-button ${activeTab === 'movies' ? 'active' : ''}`}
           onClick={() => setActiveTab('movies')}
         >

@@ -49,37 +49,43 @@ export const MovieProvider = ({ children }) => {
     }
   }, [favorites, currentUser]);
 
-  const addToFavorites = useCallback(async (movie) => {
-    if (!currentUser) return;
+  const addToFavorites = useCallback(
+    async (movie) => {
+      if (!currentUser) return;
 
-    try {
-      const newFavorites = [...favorites, movie];
-      await updateUserFavorites(currentUser.id, {
-        ...currentUser,
-        favorites: newFavorites
-      });
-      setFavorites(newFavorites);
-    } catch (error) {
-      console.error('Error adding to favorites:', error);
-      throw error;
-    }
-  }, [favorites, currentUser]);
+      try {
+        const newFavorites = [...favorites, movie];
+        await updateUserFavorites(currentUser.id, {
+          ...currentUser,
+          favorites: newFavorites,
+        });
+        setFavorites(newFavorites);
+      } catch (error) {
+        console.error('Error adding to favorites:', error);
+        throw error;
+      }
+    },
+    [favorites, currentUser]
+  );
 
-  const removeFromFavorites = useCallback(async (movieId) => {
-    if (!currentUser) return;
+  const removeFromFavorites = useCallback(
+    async (movieId) => {
+      if (!currentUser) return;
 
-    try {
-      const newFavorites = favorites.filter(movie => movie.id !== movieId);
-      await updateUserFavorites(currentUser.id, {
-        ...currentUser,
-        favorites: newFavorites
-      });
-      setFavorites(newFavorites);
-    } catch (error) {
-      console.error('Error removing from favorites:', error);
-      throw error;
-    }
-  }, [favorites, currentUser]);
+      try {
+        const newFavorites = favorites.filter((movie) => movie.id !== movieId);
+        await updateUserFavorites(currentUser.id, {
+          ...currentUser,
+          favorites: newFavorites,
+        });
+        setFavorites(newFavorites);
+      } catch (error) {
+        console.error('Error removing from favorites:', error);
+        throw error;
+      }
+    },
+    [favorites, currentUser]
+  );
 
   return (
     <MovieContext.Provider
@@ -90,7 +96,7 @@ export const MovieProvider = ({ children }) => {
         favorites,
         currentUser,
         addToFavorites,
-        removeFromFavorites
+        removeFromFavorites,
       }}
     >
       {children}

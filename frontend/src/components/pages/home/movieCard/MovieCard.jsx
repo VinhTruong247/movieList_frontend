@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 import { useFavorites } from '../../../../hooks/useFavorites';
 import { MovieContext } from '../../../../context/MovieContext';
 import './MovieCard.scss';
@@ -23,7 +23,7 @@ const MovieCard = ({ movie }) => {
       console.error('Error updating favorites:', error);
     }
   };
-
+  console.log('a3');
   return (
     <div className="movie-card">
       <Link to={`/movie/${movie.id}`} className="movie-link">
@@ -39,7 +39,9 @@ const MovieCard = ({ movie }) => {
           </div>
           <div className="movie-genres">
             {movie.genre.map((genre, index) => (
-              <span key={index} className="genre-tag">{genre}</span>
+              <span key={index} className="genre-tag">
+                {genre}
+              </span>
             ))}
           </div>
           <p className="movie-runtime">{movie.runtime}</p>
@@ -50,7 +52,7 @@ const MovieCard = ({ movie }) => {
           View Details
         </Link>
         {currentUser && (
-          <button 
+          <button
             className={`favorite-button ${favorite ? 'is-favorite' : ''}`}
             onClick={handleFavorite}
           >

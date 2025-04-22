@@ -17,13 +17,13 @@ const Home = () => {
     let tempMovies = [...movies];
 
     if (searchQuery) {
-      tempMovies = tempMovies.filter(movie =>
+      tempMovies = tempMovies.filter((movie) =>
         movie.title.toLowerCase().includes(searchQuery.toLowerCase())
       );
     }
 
     if (selectedGenre !== 'all') {
-      tempMovies = tempMovies.filter(movie =>
+      tempMovies = tempMovies.filter((movie) =>
         movie.genre.includes(selectedGenre)
       );
     }
@@ -42,9 +42,9 @@ const Home = () => {
     let sortedMovies = [...movies];
 
     if (filter === 'Movie') {
-      sortedMovies = sortedMovies.filter(movie => movie.type === 'Movie');
+      sortedMovies = sortedMovies.filter((movie) => movie.type === 'Movie');
     } else if (filter === 'TV Series') {
-      sortedMovies = sortedMovies.filter(movie => movie.type === 'TV Series');
+      sortedMovies = sortedMovies.filter((movie) => movie.type === 'TV Series');
     }
 
     if (filter === 'all') {
@@ -65,7 +65,8 @@ const Home = () => {
   };
 
   if (loading) return <Loader />;
-  if (error) return <div className="error-message">Error loading movies: {error}</div>;
+  if (error)
+    return <div className="error-message">Error loading movies: {error}</div>;
 
   return (
     <div className="home-container">
@@ -92,7 +93,7 @@ const Home = () => {
 
         <div className="main-content">
           <div className="movies-grid">
-            {filteredMovies.map(movie => (
+            {filteredMovies.map((movie) => (
               <MovieCard key={movie.id} movie={movie} />
             ))}
           </div>

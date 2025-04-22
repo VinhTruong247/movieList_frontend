@@ -3,7 +3,8 @@ import './TrailerPopup.scss';
 
 const TrailerPopup = ({ trailerUrl, onClose }) => {
   const getYouTubeVideoId = (url) => {
-    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+    const regExp =
+      /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
     const match = url.match(regExp);
     return match && match[2].length === 11 ? match[2] : null;
   };
@@ -13,8 +14,13 @@ const TrailerPopup = ({ trailerUrl, onClose }) => {
 
   return (
     <div className="trailer-popup-overlay" onClick={onClose}>
-      <div className="trailer-popup-content" onClick={e => e.stopPropagation()}>
-        <button className="close-button" onClick={onClose}>×</button>
+      <div
+        className="trailer-popup-content"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <button className="close-button" onClick={onClose}>
+          ×
+        </button>
         <div className="video-container">
           <iframe
             src={embedUrl}

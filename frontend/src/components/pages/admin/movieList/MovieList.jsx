@@ -18,9 +18,10 @@ const MovieList = () => {
 
     if (searchMovie) {
       const searchedMovie = searchMovie.toLowerCase();
-      result = result.filter(movie =>
-        movie.id.toLowerCase().includes(searchedMovie) ||
-        movie.title.toLowerCase().includes(searchedMovie)
+      result = result.filter(
+        (movie) =>
+          movie.id.toLowerCase().includes(searchedMovie) ||
+          movie.title.toLowerCase().includes(searchedMovie)
       );
     }
     return result;
@@ -103,7 +104,7 @@ const MovieList = () => {
             </tr>
           </thead>
           <tbody>
-            {paginatedMovies.map(movie => (
+            {paginatedMovies.map((movie) => (
               <tr key={movie.id}>
                 <td>{movie.id}</td>
                 <td>{movie.title}</td>

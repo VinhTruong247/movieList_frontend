@@ -1,9 +1,9 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
-import { BrowserRouter as Router, useRoutes } from 'react-router-dom';
+import { BrowserRouter as Router, useRoutes } from 'react-router';
 import { MovieProvider } from './context/MovieContext';
 import AppRoutes from './router/AppRoutes';
-import './index.scss';
+import './main.scss';
 
 const AppRouter = () => {
   const routes = useRoutes(AppRoutes);

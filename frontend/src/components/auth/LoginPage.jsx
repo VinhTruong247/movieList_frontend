@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router';
 import { Formik, Form, Field } from 'formik';
 import { loginUser } from '../../utils/UserListAPI';
 import LoginSchema from './Validation';
@@ -56,7 +56,9 @@ const LoginPage = () => {
         <p className="auth-subtitle">Please sign in to continue</p>
 
         {error && (
-          <div className={`auth-error ${error.includes('disabled') ? 'disabled' : ''}`}>
+          <div
+            className={`auth-error ${error.includes('disabled') ? 'disabled' : ''}`}
+          >
             {error}
           </div>
         )}
@@ -65,7 +67,7 @@ const LoginPage = () => {
           initialValues={{
             email: '',
             password: '',
-            rememberMe: false
+            rememberMe: false,
           }}
           validationSchema={LoginSchema}
           onSubmit={handleSubmit}
@@ -90,7 +92,7 @@ const LoginPage = () => {
                 <label htmlFor="password">Password</label>
                 <div className="password-field">
                   <Field
-                    type={showPassword ? "text" : "password"}
+                    type={showPassword ? 'text' : 'password'}
                     name="password"
                     id="password"
                     className={`form-input ${errors.password && touched.password ? 'error' : ''}`}
@@ -100,9 +102,8 @@ const LoginPage = () => {
                     type="button"
                     className="password-toggle"
                     onClick={() => setShowPassword(!showPassword)}
-                    aria-label={showPassword ? "Hide password" : "Show password"}
                   >
-                    {showPassword ? "Hide" : "Show"}
+                    {showPassword ? 'Hide' : 'Show'}
                   </button>
                 </div>
                 {errors.password && touched.password && (

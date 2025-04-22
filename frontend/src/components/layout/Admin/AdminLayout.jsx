@@ -1,5 +1,5 @@
 import React from 'react';
-import { Outlet, Navigate } from 'react-router-dom';
+import { Outlet, Navigate } from 'react-router';
 import AdminHeader from './Header';
 import { getCurrentUser } from '../../../utils/UserListAPI';
 import './AdminLayout.scss';

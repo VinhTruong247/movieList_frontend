@@ -7,7 +7,11 @@
   align-items: center;
   justify-content: center;
   padding: 2rem;
-  background: linear-gradient(135deg, rgba($primary-color, 0.1), rgba($accent-color, 0.1));
+  background: linear-gradient(
+    135deg,
+    rgba($primary-color, 0.1),
+    rgba($accent-color, 0.1)
+  );
 }
 
 .auth-box {
@@ -89,7 +93,7 @@
       color: $text-color;
       cursor: pointer;
 
-      input[type="checkbox"] {
+      input[type='checkbox'] {
         accent-color: $accent-color;
       }
     }
@@ -185,8 +189,8 @@
     box-shadow: 0 2px 8px rgba($accent-color, 0.1);
   }
 
-  &[type="password"],
-  &[type="text"] {
+  &[type='password'],
+  &[type='text'] {
     margin-bottom: 0;
   }
 }

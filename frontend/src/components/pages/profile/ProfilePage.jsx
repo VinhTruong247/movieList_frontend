@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 import { getCurrentUser, updateUser } from '../../../utils/UserListAPI';
 import { useFavorites } from '../../../hooks/useFavorites';
 import MovieCard from '../home/movieCard/MovieCard';
@@ -14,7 +14,7 @@ const ProfilePage = () => {
   const [successMessage, setSuccessMessage] = useState('');
   const [formData, setFormData] = useState({
     username: currentUser?.username || '',
-    email: currentUser?.email || ''
+    email: currentUser?.email || '',
   });
 
   useEffect(() => {
@@ -26,9 +26,9 @@ const ProfilePage = () => {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     if (name === 'username') {
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
-        [name]: value
+        [name]: value,
       }));
     }
   };
@@ -38,7 +38,7 @@ const ProfilePage = () => {
     try {
       const updatedUser = {
         ...currentUser,
-        username: formData.username
+        username: formData.username,
       };
       await updateUser(currentUser.id, updatedUser);
       localStorage.setItem('user', JSON.stringify(updatedUser));
@@ -58,13 +58,15 @@ const ProfilePage = () => {
       <h1>My Profile</h1>
 
       {error && <div className="error-message">{error}</div>}
-      {successMessage && <div className="success-message">{successMessage}</div>}
+      {successMessage && (
+        <div className="success-message">{successMessage}</div>
+      )}
 
       <div className="profile-content">
         <div className="profile-section">
           <div className="section-header">
             <h2>Profile Information</h2>
-            <button 
+            <button
               className="edit-button"
               onClick={() => setIsEditing(!isEditing)}
             >
@@ -113,7 +115,9 @@ const ProfilePage = () => {
               </div>
               <div className="info-item">
                 <span className="label">Account Status:</span>
-                <span className={`value status ${currentUser.isDisable ? 'disabled' : 'active'}`}>
+                <span
+                  className={`value status ${currentUser.isDisable ? 'disabled' : 'active'}`}
+                >
                   {currentUser.isDisable ? 'Disabled' : 'Active'}
                 </span>
               </div>
@@ -125,7 +129,7 @@ const ProfilePage = () => {
           <h2>My Favorites</h2>
           {favorites.length > 0 ? (
             <div className="favorites-grid">
-              {favorites.map(movie => (
+              {favorites.map((movie) => (
                 <MovieCard key={movie.id} movie={movie} />
               ))}
             </div>

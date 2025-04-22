@@ -18,7 +18,7 @@ const UserList = () => {
   const loadUsers = async () => {
     try {
       const data = await fetchUsers();
-      const filteredUsers = data.filter(user => user.role !== 'admin');
+      const filteredUsers = data.filter((user) => user.role !== 'admin');
       setUsers(filteredUsers);
       setLoading(false);
     } catch (err) {
@@ -32,10 +32,11 @@ const UserList = () => {
 
     if (searchUser) {
       const searchQuery = searchUser.toLowerCase();
-      result = result.filter(user =>
-        user.id.toLowerCase().includes(searchQuery) ||
-        user.username.toLowerCase().includes(searchQuery) ||
-        user.email.toLowerCase().includes(searchQuery)
+      result = result.filter(
+        (user) =>
+          user.id.toLowerCase().includes(searchQuery) ||
+          user.username.toLowerCase().includes(searchQuery) ||
+          user.email.toLowerCase().includes(searchQuery)
       );
     }
     return result;
@@ -61,10 +62,10 @@ const UserList = () => {
       try {
         const updatedUser = {
           ...user,
-          isDisable: !user.isDisable
+          isDisable: !user.isDisable,
         };
         await updateUser(user.id, updatedUser);
-        setUsers(users.map(u => u.id === user.id ? updatedUser : u));
+        setUsers(users.map((u) => (u.id === user.id ? updatedUser : u)));
       } catch (err) {
         setError(`Failed to ${message} user`);
       }
@@ -102,14 +103,19 @@ const UserList = () => {
             </tr>
           </thead>
           <tbody>
-            {paginatedUsers.map(user => (
-              <tr key={user.id} className={user.isDisable ? 'disabled-row' : ''}>
+            {paginatedUsers.map((user) => (
+              <tr
+                key={user.id}
+                className={user.isDisable ? 'disabled-row' : ''}
+              >
                 <td>{user.id}</td>
                 <td>{user.username}</td>
                 <td>{user.email}</td>
                 <td>{user.role}</td>
                 <td>
-                  <span className={`status-badge ${user.isDisable ? 'disabled' : 'active'}`}>
+                  <span
+                    className={`status-badge ${user.isDisable ? 'disabled' : 'active'}`}
+                  >
                     {user.isDisable ? 'Disabled' : 'Active'}
                   </span>
                 </td>

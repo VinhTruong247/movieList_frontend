@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router';
 import { fetchMovieById } from '../../../utils/MovieListAPI';
 import { getCurrentUser } from '../../../utils/UserListAPI';
 import Loader from '../../common/Loader';
@@ -47,7 +47,8 @@ const MovieDetail = () => {
   }, [currentUser, movie, isFavorite, removeFromFavorites, addToFavorites]);
 
   if (loading) return <Loader />;
-  if (error) return <div className="error-message">Error loading movie: {error}</div>;
+  if (error)
+    return <div className="error-message">Error loading movie: {error}</div>;
   if (!movie) return <div className="error-message">Movie not found</div>;
 
   const favorite = movie ? isFavorite(movie.id) : false;
@@ -57,24 +58,24 @@ const MovieDetail = () => {
       <button className="back-button" onClick={() => navigate(-1)}>
         ← Back
       </button>
-      
+
       <div className="detail-content">
         <div className="poster-section">
           <div className="movie-poster">
             <img src={movie.poster} alt={movie.title} />
             <div className="movie-type">{movie.type}</div>
           </div>
-          <button 
+          <button
             className="trailer-button"
             onClick={() => setShowTrailer(true)}
           >
             Watch Trailer
           </button>
         </div>
-        
+
         <div className="movie-info">
           <h1 className="movie-title">{movie.title}</h1>
-          
+
           <div className="movie-meta">
             <span className="year">📅 {movie.year}</span>
             <span className="rating">⭐ {movie.imdb_rating}/10</span>
@@ -83,13 +84,15 @@ const MovieDetail = () => {
 
           <div className="genre-list">
             {movie.genre.map((genre, index) => (
-              <span key={index} className="genre-tag">{genre}</span>
+              <span key={index} className="genre-tag">
+                {genre}
+              </span>
             ))}
           </div>
-          
+
           <div className="movie-details">
             <p className="description">{movie.description}</p>
-            
+
             <div className="additional-info">
               <div className="info-item">
                 <span className="label">Director:</span>
@@ -105,9 +108,9 @@ const MovieDetail = () => {
               </div>
             </div>
           </div>
-          
+
           {currentUser && (
-            <button 
+            <button
               className={`favorite-button ${favorite ? 'is-favorite' : ''}`}
               onClick={handleFavoriteToggle}
             >
@@ -118,7 +121,7 @@ const MovieDetail = () => {
       </div>
 
       {showTrailer && (
-        <TrailerPopup 
+        <TrailerPopup
           trailerUrl={movie.trailer}
           onClose={() => setShowTrailer(false)}
         />

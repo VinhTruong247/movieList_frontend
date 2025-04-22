@@ -108,7 +108,7 @@
     grid-template-columns: 1fr;
 
     &:has(.favorite-button) {
-        grid-template-columns: 1fr 1fr;
+      grid-template-columns: 1fr 1fr;
     }
   }
 

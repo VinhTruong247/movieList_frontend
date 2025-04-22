@@ -2,111 +2,111 @@
 @use 'sass:color';
 
 .home-container {
-    margin: 0 auto;
+  margin: 0 auto;
 
-    .sidebar {
-        background: rgb(255, 255, 255);
-        border-radius: $border-radius;
-        padding: 1rem;
-        box-shadow: $card-shadow;
-        position: sticky;
-        top: 2rem;
-    }
+  .sidebar {
+    background: rgb(255, 255, 255);
+    border-radius: $border-radius;
+    padding: 1rem;
+    box-shadow: $card-shadow;
+    position: sticky;
+    top: 2rem;
+  }
 
-    .content-wrapper {
-        display: grid;
-        grid-template-columns: 280px 1fr;
-        gap: 2rem;
-        padding: 2rem;
-        padding-top: 3rem;
-    }
+  .content-wrapper {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 2rem;
+    padding: 2rem;
+    padding-top: 3rem;
+  }
 
-    .movies-grid {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 1.5rem;
-    }
+  .movies-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+  }
 }
 
 .search-container {
-    margin-bottom: 1.5rem;
-    padding-bottom: 1.5rem;
-    border-bottom: 1px solid rgba($primary-color, 0.1);
+  margin-bottom: 1.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid rgba($primary-color, 0.1);
 
-    .search-input {
-        width: 100%;
-        padding: 0.75rem 1rem;
-        border: 2px solid rgba($accent-color, 0.1);
-        border-radius: $border-radius;
-        font-size: 0.95rem;
-        transition: all $transition-speed;
-        background: rgba($accent-color, 0.05);
+  .search-input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 2px solid rgba($accent-color, 0.1);
+    border-radius: $border-radius;
+    font-size: 0.95rem;
+    transition: all $transition-speed;
+    background: rgba($accent-color, 0.05);
 
-        &::placeholder {
-            color: rgba($text-color, 0.5);
-        }
-
-        &:focus {
-            outline: none;
-            border-color: $accent-color;
-            background: white;
-            box-shadow: 0 2px 8px rgba($accent-color, 0.1);
-        }
+    &::placeholder {
+      color: rgba($text-color, 0.5);
     }
+
+    &:focus {
+      outline: none;
+      border-color: $accent-color;
+      background: white;
+      box-shadow: 0 2px 8px rgba($accent-color, 0.1);
+    }
+  }
 }
 
 @media (max-width: 1655px) {
-    .home-container .movies-grid {
-        grid-template-columns: repeat(3, 1fr);
-    }
+  .home-container .movies-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
 }
 
 @media (max-width: 1280px) {
-    .home-container {
-        .content-wrapper {
-            grid-template-columns: 240px 1fr;
-        }
-
-        .movies-grid {
-            grid-template-columns: repeat(2, 1fr);
-        }
+  .home-container {
+    .content-wrapper {
+      grid-template-columns: 240px 1fr;
     }
+
+    .movies-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
 }
 
 @media (max-width: 956px) {
-    .home-container {
-        .content-wrapper {
-            grid-template-columns: 1fr;
-            padding: 1rem;
-        }
-
-        .sidebar {
-            position: static;
-            margin-bottom: 2rem;
-        }
-
-        .movies-grid {
-            grid-template-columns: repeat(2, 1fr);
-        }
+  .home-container {
+    .content-wrapper {
+      grid-template-columns: 1fr;
+      padding: 1rem;
     }
+
+    .sidebar {
+      position: static;
+      margin-bottom: 2rem;
+    }
+
+    .movies-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
 }
 
 @media (max-width: 768px) {
-    .search-container {
-        margin-bottom: 1rem;
-        padding-bottom: 1rem;
+  .search-container {
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
 
-        .search-input {
-            padding: 0.6rem 0.8rem;
-            font-size: 0.9rem;
-        }
+    .search-input {
+      padding: 0.6rem 0.8rem;
+      font-size: 0.9rem;
     }
+  }
 }
 
 @media (max-width: 615px) {
-    .home-container {
-        .movies-grid {
-            grid-template-columns: 1fr;
-        }
+  .home-container {
+    .movies-grid {
+      grid-template-columns: 1fr;
     }
+  }
 }
