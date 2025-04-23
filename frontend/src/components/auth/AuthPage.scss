@@ -146,33 +146,11 @@
 
   .form-input {
     width: 100%;
-    padding-right: 4rem;
   }
 
-  .password-toggle {
-    position: absolute;
-    right: 1rem;
-    top: 50%;
-    transform: translateY(-50%);
-    background: none;
-    border: none;
-    padding: 0.5rem;
-    color: $text-color;
-    opacity: 0.6;
-    cursor: pointer;
-    transition: all $transition-speed;
-    font-size: 0.9rem;
-
-    &:hover {
-      opacity: 1;
-      color: $accent-color;
-    }
-
-    &:focus {
-      outline: none;
-      opacity: 1;
-      color: $accent-color;
-    }
+  .form-input {
+    width: 100%;
+    padding-right: 4rem;
   }
 }
 
