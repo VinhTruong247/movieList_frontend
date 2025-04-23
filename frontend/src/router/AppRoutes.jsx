@@ -6,6 +6,7 @@ import Layout from '../components/layout/User/Layout';
 import AdminLayout from '../components/layout/Admin/AdminLayout';
 import AdminPage from '../components/pages/admin/AdminPage';
 import ProfilePage from '../components/pages/profile/ProfilePage';
+import NotAuthen from '../components/common/NotAuthen';
 
 const AppRoutes = [
   {
@@ -31,6 +32,10 @@ const AppRoutes = [
       {
         path: 'login',
         element: <LoginPage />,
+      },
+      {
+        path: 'not-authen',
+        element: <NotAuthen />,
       },
     ],
   },

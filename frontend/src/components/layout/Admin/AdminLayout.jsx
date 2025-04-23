@@ -8,7 +8,7 @@ const AdminLayout = () => {
   const currentUser = getCurrentUser();
 
   if (!currentUser || currentUser.role !== 'admin') {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/not-authen" replace />;
   }
 
   return (
