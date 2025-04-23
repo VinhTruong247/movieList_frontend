@@ -7,6 +7,7 @@ import AdminLayout from '../components/layout/Admin/AdminLayout';
 import AdminPage from '../components/pages/admin/AdminPage';
 import ProfilePage from '../components/pages/profile/ProfilePage';
 import NotAuthen from '../components/common/NotAuthen';
+import NotFound from '../components/common/NotFound';
 
 const AppRoutes = [
   {
@@ -48,6 +49,10 @@ const AppRoutes = [
         element: <AdminPage />,
       },
     ],
+  },
+  {
+    path: '*',
+    element: <NotFound />,
   },
 ];
 
