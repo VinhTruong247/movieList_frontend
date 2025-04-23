@@ -129,6 +129,13 @@
     &:active {
       transform: translateY(0);
     }
+
+    &.disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: translateY(0);
+      background: $accent-color;
+    }
   }
 }
 
@@ -197,9 +204,9 @@
 
 .error-message {
   color: $secondary-color;
-  font-size: 0.85rem;
+  font-size: 1rem !important;
   margin-top: 0.5rem;
-  padding: 0.8rem !important;
+  padding: 0.5rem !important;
 }
 
 .auth-redirect {

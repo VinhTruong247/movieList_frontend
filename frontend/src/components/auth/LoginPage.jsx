@@ -72,7 +72,7 @@ const LoginPage = () => {
           validationSchema={LoginSchema}
           onSubmit={handleSubmit}
         >
-          {({ errors, touched, isSubmitting }) => (
+          {({ errors, touched, isSubmitting, values }) => (
             <Form className="auth-form">
               <div className="form-group">
                 <label htmlFor="email">Email</label>
@@ -123,8 +123,8 @@ const LoginPage = () => {
 
               <button
                 type="submit"
-                className="submit-btn"
-                disabled={isSubmitting}
+                className={`submit-btn ${!values.email & !values.password ? 'disabled' : ''}`}
+                disabled={isSubmitting || !values.email || !values.password}
               >
                 {isSubmitting ? 'Signing in...' : 'Sign In'}
               </button>
