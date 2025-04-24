@@ -1,8 +1,8 @@
-import React, { useContext } from 'react';
-import { Link } from 'react-router';
-import { useFavorites } from '../../../../hooks/useFavorites';
-import { MovieContext } from '../../../../context/MovieContext';
-import './MovieCard.scss';
+import React, { useContext } from "react";
+import { Link } from "react-router";
+import { useFavorites } from "../../../../hooks/useFavorites";
+import { MovieContext } from "../../../../context/MovieContext";
+import "./MovieCard.scss";
 
 const MovieCard = ({ movie }) => {
   const { addToFavorites, removeFromFavorites, isFavorite } = useFavorites();
@@ -20,10 +20,10 @@ const MovieCard = ({ movie }) => {
         await addToFavorites(movie);
       }
     } catch (error) {
-      console.error('Error updating favorites:', error);
+      console.error("Error updating favorites:", error);
     }
   };
-  console.log('a3');
+
   return (
     <div className="movie-card">
       <Link to={`/movie/${movie.id}`} className="movie-link">
@@ -51,12 +51,12 @@ const MovieCard = ({ movie }) => {
         <Link to={`/movie/${movie.id}`} className="view-button">
           View Details
         </Link>
-        {currentUser && (
+        {currentUser && currentUser.role !== "admin" && (
           <button
-            className={`favorite-button ${favorite ? 'is-favorite' : ''}`}
+            className={`favorite-button ${favorite ? "is-favorite" : ""}`}
             onClick={handleFavorite}
           >
-            {favorite ? '❤️ Favorited' : '🤍 Favorite'}
+            {favorite ? "❤️ Favorited" : "🤍 Favorite"}
           </button>
         )}
       </div>

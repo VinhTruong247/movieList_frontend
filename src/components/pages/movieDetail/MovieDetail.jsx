@@ -1,11 +1,11 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { useParams, useNavigate } from 'react-router';
-import { fetchMovieById } from '../../../utils/MovieListAPI';
-import { getCurrentUser } from '../../../utils/UserListAPI';
-import Loader from '../../common/Loader';
-import { useFavorites } from '../../../hooks/useFavorites';
-import TrailerPopup from './Trailer/TrailerPopup';
-import './MovieDetail.scss';
+import React, { useState, useEffect, useCallback } from "react";
+import { useParams, useNavigate } from "react-router";
+import { fetchMovieById } from "../../../utils/MovieListAPI";
+import { getCurrentUser } from "../../../utils/UserListAPI";
+import Loader from "../../common/Loader";
+import { useFavorites } from "../../../hooks/useFavorites";
+import TrailerPopup from "./Trailer/TrailerPopup";
+import "./MovieDetail.scss";
 
 const MovieDetail = () => {
   const { id } = useParams();
@@ -42,7 +42,7 @@ const MovieDetail = () => {
         await addToFavorites(movie);
       }
     } catch (error) {
-      setError('Failed to update favorites');
+      setError("Failed to update favorites");
     }
   }, [currentUser, movie, isFavorite, removeFromFavorites, addToFavorites]);
 
@@ -109,12 +109,12 @@ const MovieDetail = () => {
             </div>
           </div>
 
-          {currentUser && (
+          {currentUser && currentUser.role !== "admin" && (
             <button
-              className={`favorite-button ${favorite ? 'is-favorite' : ''}`}
+              className={`favorite-button ${favorite ? "is-favorite" : ""}`}
               onClick={handleFavoriteToggle}
             >
-              {favorite ? '❤️ Remove from Favorites' : '🤍 Add to Favorites'}
+              {favorite ? "❤️ Remove from Favorites" : "🤍 Add to Favorites"}
             </button>
           )}
         </div>

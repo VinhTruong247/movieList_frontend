@@ -21,12 +21,14 @@
     {
       "source": "/not-authen",
       "destination": "/not-authen",
-      "permanent": false
+      "permanent": false,
+      "statusCode": 401
     },
     {
       "source": "/404",
       "destination": "/404",
-      "permanent": false
+      "permanent": false,
+      "statusCode": 404
     }
   ],
   "cleanUrls": true,
