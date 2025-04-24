@@ -1,0 +1,21 @@
+{
+  "version": 2,
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
+    }
+  ],
+  "redirects": [
+    {
+      "source": "/not-authen",
+      "destination": "/not-authen",
+      "statusCode": 401
+    },
+    {
+      "source": "/404",
+      "destination": "/404",
+      "statusCode": 404
+    }
+  ]
+}

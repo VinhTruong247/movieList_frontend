@@ -1,58 +1,52 @@
-import Home from '../components/pages/home/Home';
-import MovieDetail from '../components/pages/movieDetail/MovieDetail';
-import Favorites from '../components/pages/favorites/Favorites';
-import LoginPage from '../components/auth/LoginPage';
-import Layout from '../components/layout/User/Layout';
-import AdminLayout from '../components/layout/Admin/AdminLayout';
-import AdminPage from '../components/pages/admin/AdminPage';
-import ProfilePage from '../components/pages/profile/ProfilePage';
-import NotAuthen from '../components/common/NotAuthen';
-import NotFound from '../components/common/NotFound';
+import Home from "../components/pages/home/Home";
+import MovieDetail from "../components/pages/movieDetail/MovieDetail";
+import Favorites from "../components/pages/favorites/Favorites";
+import LoginPage from "../components/auth/LoginPage";
+import Layout from "../components/layout/User/Layout";
+import ProfilePage from "../components/pages/profile/ProfilePage";
+import NotAuthen from "../components/common/NotAuthen";
+import NotFound from "../components/common/NotFound";
+import { Navigate } from "react-router";
 
 const AppRoutes = [
   {
-    path: '/',
+    path: "/",
     element: <Layout />,
+    errorElement: <NotFound />,
     children: [
       {
-        path: '',
+        path: "",
         element: <Home />,
       },
       {
-        path: 'profile',
+        path: "profile",
         element: <ProfilePage />,
       },
       {
-        path: 'movie/:id',
+        path: "movie/:id",
         element: <MovieDetail />,
       },
       {
-        path: 'favorites',
+        path: "favorites",
         element: <Favorites />,
       },
       {
-        path: 'login',
+        path: "login",
         element: <LoginPage />,
       },
-      {
-        path: 'not-authen',
-        element: <NotAuthen />,
-      },
     ],
   },
   {
-    path: 'admin',
-    element: <AdminLayout />,
-    children: [
-      {
-        path: '',
-        element: <AdminPage />,
-      },
-    ],
+    path: "/not-authen",
+    element: <NotAuthen />,
   },
   {
-    path: '*',
+    path: "/404",
     element: <NotFound />,
+  },
+  {
+    path: "*",
+    element: <Navigate to="/404" replace />,
   },
 ];
 
