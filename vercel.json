@@ -7,33 +7,30 @@
       "config": { "distDir": "dist" }
     }
   ],
-  "routes": [
+  "rewrites": [
     {
-      "handle": "filesystem"
+      "source": "/assets/(.*)",
+      "destination": "/assets/$1"
     },
     {
-      "src": "/assets/(.*)",
-      "dest": "/assets/$1"
-    },
-    {
-      "src": "/(.*\\.[a-z0-9]+$)",
-      "dest": "/$1"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/index.html"
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
   ],
   "redirects": [
     {
       "source": "/not-authen",
       "destination": "/not-authen",
+      "permanent": false,
       "statusCode": 401
     },
     {
       "source": "/404",
       "destination": "/404",
+      "permanent": false,
       "statusCode": 404
     }
-  ]
+  ],
+  "cleanUrls": true,
+  "trailingSlash": false
 }
