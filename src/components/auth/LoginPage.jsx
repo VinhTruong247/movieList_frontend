@@ -1,18 +1,18 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router';
-import { Formik, Form, Field } from 'formik';
-import { loginUser } from '../../utils/UserListAPI';
-import LoginSchema from './Validation';
-import './AuthPage.scss';
+import React, { useState, useEffect } from "react";
+import { useNavigate, Link } from "react-router";
+import { Formik, Form, Field } from "formik";
+import { loginUser } from "../../utils/UserListAPI";
+import LoginSchema from "./Validation";
+import "./LoginPage.scss";
 
 const LoginPage = () => {
   const navigate = useNavigate();
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
   useEffect(() => {
     if (error) {
       const timer = setTimeout(() => {
-        setError('');
+        setError("");
       }, 3000);
 
       return () => clearTimeout(timer);
@@ -25,23 +25,23 @@ const LoginPage = () => {
 
       if (response.success) {
         if (response.user.isDisable) {
-          setError('Your account has been disabled. Please contact support.');
+          setError("Your account has been disabled. Please contact support.");
           return;
         }
 
-        if (response.user.role === 'admin') {
-          navigate('/admin');
+        if (response.user.role === "admin") {
+          navigate("/admin");
         } else {
-          navigate('/');
+          navigate("/");
         }
       }
     } catch (err) {
-      if (err.message.includes('email')) {
-        setError('Email not found');
-      } else if (err.message.includes('password')) {
-        setError('Incorrect password');
+      if (err.response?.data?.message?.includes("email")) {
+        setError("Email not found");
+      } else if (err.response?.data?.message?.includes("password")) {
+        setError("Incorrect password");
       } else {
-        setError('Login failed. Please try again.');
+        setError("Login failed. Please try again.");
       }
     } finally {
       setSubmitting(false);
@@ -56,7 +56,7 @@ const LoginPage = () => {
 
         {error && (
           <div
-            className={`auth-error ${error.includes('disabled') ? 'disabled' : ''}`}
+            className={`auth-error ${error.includes("disabled") ? "disabled" : ""}`}
           >
             {error}
           </div>
@@ -64,8 +64,8 @@ const LoginPage = () => {
 
         <Formik
           initialValues={{
-            email: '',
-            password: '',
+            email: "",
+            password: "",
             rememberMe: false,
           }}
           validationSchema={LoginSchema}
@@ -79,7 +79,7 @@ const LoginPage = () => {
                   type="email"
                   name="email"
                   id="email"
-                  className={`form-input ${errors.email && touched.email ? 'error' : ''}`}
+                  className={`form-input ${errors.email && touched.email ? "error" : ""}`}
                   placeholder="Enter your email"
                 />
                 {errors.email && touched.email && (
@@ -94,7 +94,7 @@ const LoginPage = () => {
                     type="password"
                     name="password"
                     id="password"
-                    className={`form-input ${errors.password && touched.password ? 'error' : ''}`}
+                    className={`form-input ${errors.password && touched.password ? "error" : ""}`}
                     placeholder="Enter your password"
                   />
                 </div>
@@ -115,10 +115,10 @@ const LoginPage = () => {
 
               <button
                 type="submit"
-                className={`submit-btn ${!values.email & !values.password ? 'disabled' : ''}`}
+                className={`submit-btn ${!values.email || !values.password ? "disabled" : ""}`}
                 disabled={isSubmitting || !values.email || !values.password}
               >
-                {isSubmitting ? 'Signing in...' : 'Sign In'}
+                {isSubmitting ? "Signing in..." : "Sign In"}
               </button>
             </Form>
           )}
