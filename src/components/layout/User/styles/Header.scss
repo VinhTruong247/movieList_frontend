@@ -1,0 +1,126 @@
+@use '../../../../styles/root' as *;
+@use 'sass:color';
+
+.main-header {
+  @include primary-gradient;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  color: white;
+
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
+  }
+
+  .nav-wrapper {
+    height: $header-height;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+    color: white;
+    font-size: 1.25rem;
+    font-weight: 600;
+
+    .logo-icon {
+      font-size: 1.5rem;
+    }
+
+    &:hover .logo-text {
+      opacity: 0.8;
+    }
+  }
+
+  .nav-links {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+  }
+
+  .nav-link {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+    color: white;
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    border-radius: $border-radius;
+    transition: all $transition-speed;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .icon {
+      font-size: 1.2rem;
+    }
+  }
+
+  .user-menu {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+
+    .username {
+      color: rgba(255, 255, 255, 0.9);
+      font-weight: 500;
+    }
+
+    .admin-link {
+      color: white;
+      font-weight: 600;
+      background: rgba(255, 255, 255, 0.1);
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.2);
+      }
+    }
+
+    .logout-btn {
+      padding: 0.5rem 1rem;
+      border: 2px solid rgba(255, 255, 255, 0.8);
+      border-radius: $border-radius;
+      background: transparent;
+      color: white;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all $transition-speed;
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.1);
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .main-header {
+    .logo-text {
+      display: none;
+    }
+
+    .nav-link .text {
+      display: none;
+    }
+
+    .user-menu {
+      .username {
+        display: none;
+      }
+
+      .admin-link {
+        padding: 0.5rem;
+      }
+    }
+  }
+}

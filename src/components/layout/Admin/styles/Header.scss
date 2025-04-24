@@ -1,0 +1,70 @@
+@use '../../../../styles/root' as *;
+@use 'sass:color';
+
+.admin-header {
+  background: $primary-color;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: $header-height;
+  color: white;
+  z-index: 1000;
+
+  .header-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 2rem;
+    height: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .admin-logo {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: white;
+    text-decoration: none;
+  }
+
+  .admin-nav {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+
+    .nav-link {
+      color: white;
+      text-decoration: none;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+
+  .admin-user {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+
+    .username {
+      font-weight: 500;
+    }
+
+    .logout-btn {
+      padding: 0.5rem 1rem;
+      border: 2px solid white;
+      background: transparent;
+      color: white;
+      border-radius: $border-radius;
+      cursor: pointer;
+      transition: all $transition-speed;
+
+      &:hover {
+        background: white;
+        color: $primary-color;
+      }
+    }
+  }
+}
