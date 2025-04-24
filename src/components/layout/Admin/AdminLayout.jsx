@@ -7,8 +7,6 @@ import "./AdminLayout.scss";
 const AdminLayout = () => {
   const currentUser = getCurrentUser();
 
-  console.log("AdminLayout", currentUser);
-
   if (!currentUser) {
     return <Navigate to="/not-authen" replace state={{ status: 401 }} />;
   }

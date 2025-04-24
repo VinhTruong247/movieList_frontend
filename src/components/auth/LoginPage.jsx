@@ -48,6 +48,8 @@ const LoginPage = () => {
     }
   };
 
+  console.log(err.response);
+
   return (
     <div className="auth-container">
       <div className="auth-box">
