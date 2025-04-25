@@ -36,19 +36,11 @@ const LoginPage = () => {
         }
       }
     } catch (err) {
-      if (err.response?.data?.message?.includes("email")) {
-        setError("Email not found");
-      } else if (err.response?.data?.message?.includes("password")) {
-        setError("Incorrect password");
-      } else {
-        setError("Login failed. Please try again.");
-      }
+      setError("Invalid email or password. Please try again.");
     } finally {
       setSubmitting(false);
     }
   };
-
-  console.log(err.response);
 
   return (
     <div className="auth-container">
