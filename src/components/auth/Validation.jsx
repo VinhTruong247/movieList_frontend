@@ -13,7 +13,10 @@ const LoginSchema = Yup.object().shape({
 
 const PasswordChangeSchema = Yup.object().shape({
   currentPassword: Yup.string().required("Current password is required"),
-  newPassword: passwordRules,
+  newPassword: passwordRules.notOneOf(
+    [Yup.ref("currentPassword")],
+    "New password must be different from current password"
+  ),
   confirmPassword: Yup.string()
     .oneOf([Yup.ref("newPassword"), null], "Passwords must match")
     .required("Password confirmation is required"),

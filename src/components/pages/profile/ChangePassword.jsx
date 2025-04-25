@@ -1,54 +1,41 @@
 import React, { useState } from "react";
+import { Formik, Form, Field } from "formik";
 import { PasswordChangeSchema } from "../../auth/Validation";
-import { updateUser } from "../../../utils/UserListAPI";
+import { updateUser, verifyPassword } from "../../../utils/UserListAPI";
 import "./ChangePassword.scss";
 
 const ChangePassword = ({ currentUser, onSuccess, onError }) => {
   const [showForm, setShowForm] = useState(false);
-  const [formData, setFormData] = useState({
-    currentPassword: "",
-    newPassword: "",
-    confirmPassword: "",
-  });
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
-  const handlePasswordChange = async (e) => {
-    e.preventDefault();
-
+  const handleSubmit = async (
+    values,
+    { setSubmitting, resetForm, setFieldError }
+  ) => {
     try {
-      await PasswordChangeSchema.validate(
-        {
-          currentPassword: formData.currentPassword,
-          newPassword: formData.newPassword,
-          confirmPassword: formData.confirmPassword,
-        },
-        { abortEarly: false }
+      const isValidPassword = await verifyPassword(
+        currentUser.id,
+        values.currentPassword
       );
+      if (!isValidPassword) {
+        setFieldError("currentPassword", "Current password is incorrect");
+        return;
+      }
 
       const updatedUser = {
         ...currentUser,
-        password: formData.newPassword,
-        currentPassword: formData.currentPassword,
+        password: values.newPassword,
+        currentPassword: values.currentPassword,
       };
 
       await updateUser(currentUser.id, updatedUser);
-
-      setFormData({
-        currentPassword: "",
-        newPassword: "",
-        confirmPassword: "",
-      });
+      resetForm();
       setShowForm(false);
       onSuccess("Password updated successfully!");
+      setTimeout(() => onSuccess(""), 3000);
     } catch (error) {
       onError(error.errors ? error.errors[0] : "Failed to update password");
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -69,52 +56,84 @@ const ChangePassword = ({ currentUser, onSuccess, onError }) => {
               Cancel
             </button>
           </div>
-          <form onSubmit={handlePasswordChange}>
-            <div className="form-group">
-              <label htmlFor="currentPassword">Current Password</label>
-              <input
-                id="currentPassword"
-                type="password"
-                name="currentPassword"
-                value={formData.currentPassword}
-                onChange={handleInputChange}
-                placeholder="Enter current password"
-                required
-              />
-            </div>
 
-            <div className="form-group">
-              <label htmlFor="newPassword">New Password</label>
-              <input
-                id="newPassword"
-                type="password"
-                name="newPassword"
-                value={formData.newPassword}
-                onChange={handleInputChange}
-                placeholder="Enter new password"
-                minLength="6"
-                required
-              />
-            </div>
+          <Formik
+            initialValues={{
+              currentPassword: "",
+              newPassword: "",
+              confirmPassword: "",
+            }}
+            validationSchema={PasswordChangeSchema}
+            onSubmit={handleSubmit}
+          >
+            {({ errors, touched, isSubmitting, isValid, dirty }) => (
+              <Form className="password-form">
+                <div className="form-group">
+                  <label htmlFor="currentPassword">Current Password</label>
+                  <Field
+                    id="currentPassword"
+                    name="currentPassword"
+                    type="password"
+                    placeholder="Enter current password"
+                    className={
+                      errors.currentPassword && touched.currentPassword
+                        ? "error"
+                        : ""
+                    }
+                  />
+                  {errors.currentPassword && touched.currentPassword && (
+                    <div className="error-message">
+                      {errors.currentPassword}
+                    </div>
+                  )}
+                </div>
 
-            <div className="form-group">
-              <label htmlFor="confirmPassword">Confirm New Password</label>
-              <input
-                id="confirmPassword"
-                type="password"
-                name="confirmPassword"
-                value={formData.confirmPassword}
-                onChange={handleInputChange}
-                placeholder="Confirm new password"
-                minLength="6"
-                required
-              />
-            </div>
+                <div className="form-group">
+                  <label htmlFor="newPassword">New Password</label>
+                  <Field
+                    id="newPassword"
+                    name="newPassword"
+                    type="password"
+                    placeholder="Enter new password"
+                    className={
+                      errors.newPassword && touched.newPassword ? "error" : ""
+                    }
+                  />
+                  {errors.newPassword && touched.newPassword && (
+                    <div className="error-message">{errors.newPassword}</div>
+                  )}
+                </div>
 
-            <button type="submit" className="save-button">
-              Update Password
-            </button>
-          </form>
+                <div className="form-group">
+                  <label htmlFor="confirmPassword">Confirm New Password</label>
+                  <Field
+                    id="confirmPassword"
+                    name="confirmPassword"
+                    type="password"
+                    placeholder="Confirm new password"
+                    className={
+                      errors.confirmPassword && touched.confirmPassword
+                        ? "error"
+                        : ""
+                    }
+                  />
+                  {errors.confirmPassword && touched.confirmPassword && (
+                    <div className="error-message">
+                      {errors.confirmPassword}
+                    </div>
+                  )}
+                </div>
+
+                <button
+                  type="submit"
+                  className={`save-button ${!isValid || !dirty || isSubmitting ? "disabled" : ""}`}
+                  disabled={!isValid || !dirty || isSubmitting}
+                >
+                  {isSubmitting ? "Updating..." : "Update Password"}
+                </button>
+              </Form>
+            )}
+          </Formik>
         </>
       )}
     </div>

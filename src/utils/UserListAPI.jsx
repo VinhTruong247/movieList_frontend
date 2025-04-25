@@ -42,6 +42,24 @@ export const updateUser = async (id, userData) => {
   }
 };
 
+export const verifyPassword = async (userId, password) => {
+  try {
+    const response = await axios.get(API_URL);
+    const users = response.data;
+
+    const user = users.find((u) => u.id === userId);
+
+    if (!user) {
+      return false;
+    }
+
+    return user.password === password;
+  } catch (error) {
+    // console.error("Error verifying password:", error);
+    return false;
+  }
+};
+
 export const deleteUser = async (id) => {
   try {
     const response = await axios.delete(`${API_URL}/${id}`);
