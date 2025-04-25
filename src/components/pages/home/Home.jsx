@@ -1,17 +1,17 @@
-import React, { useState, useEffect } from 'react';
-import MovieCarousel from './movieCarousel/MovieCarousel';
-import MovieCard from './movieCard/MovieCard';
-import GenreList from './movieGenreList/GenreList';
-import Loader from '../../common/Loader';
-import { useMovies } from '../../../hooks/useMovies';
-import './Home.scss';
+import React, { useState, useEffect } from "react";
+import MovieCarousel from "./movieCarousel/MovieCarousel";
+import MovieCard from "./movieCard/MovieCard";
+import GenreList from "./movieGenreList/GenreList";
+import Loader from "../../common/Loader";
+import { useMovies } from "../../../hooks/useMovies";
+import "./Home.scss";
 
 const Home = () => {
   const { movies, loading, error } = useMovies();
   const [filteredMovies, setFilteredMovies] = useState([]);
-  const [selectedGenre, setSelectedGenre] = useState('all');
-  const [activeFilter, setActiveFilter] = useState('all');
-  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedGenre, setSelectedGenre] = useState("all");
+  const [activeFilter, setActiveFilter] = useState("all");
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     let tempMovies = [...movies];
@@ -22,7 +22,7 @@ const Home = () => {
       );
     }
 
-    if (selectedGenre !== 'all') {
+    if (selectedGenre !== "all") {
       tempMovies = tempMovies.filter((movie) =>
         movie.genre.includes(selectedGenre)
       );
@@ -41,17 +41,29 @@ const Home = () => {
 
     let sortedMovies = [...movies];
 
-    if (filter === 'Movie') {
-      sortedMovies = sortedMovies.filter((movie) => movie.type === 'Movie');
-    } else if (filter === 'TV Series') {
-      sortedMovies = sortedMovies.filter((movie) => movie.type === 'TV Series');
+    if (searchQuery) {
+      sortedMovies = sortedMovies.filter((movie) =>
+        movie.title.toLowerCase().includes(searchQuery.toLowerCase())
+      );
     }
 
-    if (filter === 'all') {
+    if (selectedGenre !== "all") {
+      sortedMovies = sortedMovies.filter((movie) =>
+        movie.genre.includes(selectedGenre)
+      );
+    }
+
+    if (filter === "Movie") {
+      sortedMovies = sortedMovies.filter((movie) => movie.type === "Movie");
+    } else if (filter === "TV Series") {
+      sortedMovies = sortedMovies.filter((movie) => movie.type === "TV Series");
+    }
+
+    if (filter === "all") {
       sortedMovies.sort((a, b) => a.id - b.id);
-    } else if (filter === 'top-rated') {
+    } else if (filter === "top-rated") {
       sortedMovies.sort((a, b) => b.imdb_rating - a.imdb_rating);
-    } else if (filter === 'latest') {
+    } else if (filter === "latest") {
       sortedMovies.sort((a, b) => b.year - a.year);
     } else {
       sortedMovies.sort((a, b) => a.id - b.id);
