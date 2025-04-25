@@ -15,27 +15,9 @@ const Home = () => {
   const [activeMovieType, setActiveMovieType] = useState("all");
   const [activeSortType, setActiveSortType] = useState("all");
 
-  useEffect(() => {
-    let tempMovies = [...movies];
-
-    if (searchQuery) {
-      tempMovies = tempMovies.filter((movie) =>
-        movie.title.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-    }
-
-    if (selectedGenre !== "all") {
-      tempMovies = tempMovies.filter((movie) =>
-        movie.genre.includes(selectedGenre)
-      );
-    }
-
-    tempMovies.sort((a, b) => Number(a.id) - Number(b.id));
-    setFilteredMovies(tempMovies);
-  }, [selectedGenre, movies, searchQuery]);
-
   const handleGenreSelect = (genre) => {
     setSelectedGenre(genre);
+    filterAndSortMovies(activeMovieType, activeSortType, genre);
   };
 
   const handleFilter = (filter) => {
@@ -73,7 +55,41 @@ const Home = () => {
   };
 
   const handleSearch = (event) => {
-    setSearchQuery(event.target.value);
+    const query = event.target.value;
+    setSearchQuery(query);
+    let filteredResults = [...movies];
+
+    if (query) {
+      filteredResults = filteredResults.filter((movie) =>
+        movie.title.toLowerCase().includes(query.toLowerCase())
+      );
+    }
+
+    if (selectedGenre !== "all") {
+      filteredResults = filteredResults.filter((movie) =>
+        movie.genre.includes(selectedGenre)
+      );
+    }
+
+    if (activeMovieType === "Movie") {
+      filteredResults = filteredResults.filter(
+        (movie) => movie.type === "Movie"
+      );
+    } else if (activeMovieType === "TV Series") {
+      filteredResults = filteredResults.filter(
+        (movie) => movie.type === "TV Series"
+      );
+    }
+
+    if (activeSortType === "top-rated") {
+      filteredResults.sort((a, b) => b.imdb_rating - a.imdb_rating);
+    } else if (activeSortType === "latest") {
+      filteredResults.sort((a, b) => b.year - a.year);
+    } else {
+      filteredResults.sort((a, b) => a.id - b.id);
+    }
+
+    setFilteredMovies(filteredResults);
   };
 
   const handleMovieTypeFilter = (type) => {
@@ -86,8 +102,9 @@ const Home = () => {
     filterAndSortMovies(activeMovieType, sortType);
   };
 
-  const filterAndSortMovies = (movieType, sortType) => {
+  const filterAndSortMovies = (movieType, sortType, genreOverride = null) => {
     let filteredResults = [...movies];
+    const genreToUse = genreOverride !== null ? genreOverride : selectedGenre;
 
     if (searchQuery) {
       filteredResults = filteredResults.filter((movie) =>
@@ -95,9 +112,9 @@ const Home = () => {
       );
     }
 
-    if (selectedGenre !== "all") {
+    if (genreToUse !== "all") {
       filteredResults = filteredResults.filter((movie) =>
-        movie.genre.includes(selectedGenre)
+        movie.genre.includes(genreToUse)
       );
     }
 
@@ -152,11 +169,30 @@ const Home = () => {
         </aside>
 
         <div className="main-content">
-          <div className="movies-grid">
-            {filteredMovies.map((movie) => (
-              <MovieCard key={movie.id} movie={movie} />
-            ))}
-          </div>
+          {filteredMovies.length > 0 ? (
+            <div className="movies-grid">
+              {filteredMovies.map((movie) => (
+                <MovieCard key={movie.id} movie={movie} />
+              ))}
+            </div>
+          ) : (
+            <div className="no-movies-found">
+              <h3>No movies found</h3>
+              <p>Try adjusting your search criteria or filters</p>
+              <button
+                className="reset-filters-btn"
+                onClick={() => {
+                  setSearchQuery("");
+                  setSelectedGenre("all");
+                  setActiveMovieType("all");
+                  setActiveSortType("all");
+                  setFilteredMovies([...movies]);
+                }}
+              >
+                Reset Filters
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>
