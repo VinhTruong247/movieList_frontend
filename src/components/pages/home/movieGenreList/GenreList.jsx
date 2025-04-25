@@ -1,84 +1,97 @@
-import React from 'react';
-import './GenreList.scss';
+import React from "react";
+import "./GenreList.scss";
 
 const genres = [
-  { id: '1', name: 'Action' },
-  { id: '2', name: 'Adventure' },
-  { id: '3', name: 'Animation' },
-  { id: '4', name: 'Biography' },
-  { id: '5', name: 'Comedy' },
-  { id: '6', name: 'Crime' },
-  { id: '7', name: 'Documentary' },
-  { id: '8', name: 'Drama' },
-  { id: '9', name: 'Family' },
-  { id: '10', name: 'Fantasy' },
-  { id: '11', name: 'History' },
-  { id: '12', name: 'Horror' },
-  { id: '13', name: 'Indie' },
-  { id: '14', name: 'Medieval' },
-  { id: '15', name: 'Musical' },
-  { id: '16', name: 'Mystery' },
-  { id: '17', name: 'Romance' },
-  { id: '18', name: 'Sci-Fi' },
-  { id: '19', name: 'Sport' },
-  { id: '20', name: 'Thriller' },
-  { id: '21', name: 'War' },
-  { id: '22', name: 'Western' },
+  { id: "1", name: "Action" },
+  { id: "2", name: "Adventure" },
+  { id: "3", name: "Animation" },
+  { id: "4", name: "Biography" },
+  { id: "5", name: "Comedy" },
+  { id: "6", name: "Crime" },
+  { id: "7", name: "Documentary" },
+  { id: "8", name: "Drama" },
+  { id: "9", name: "Family" },
+  { id: "10", name: "Fantasy" },
+  { id: "11", name: "History" },
+  { id: "12", name: "Horror" },
+  { id: "13", name: "Indie" },
+  { id: "14", name: "Medieval" },
+  { id: "15", name: "Musical" },
+  { id: "16", name: "Mystery" },
+  { id: "17", name: "Romance" },
+  { id: "18", name: "Sci-Fi" },
+  { id: "19", name: "Sport" },
+  { id: "20", name: "Thriller" },
+  { id: "21", name: "War" },
+  { id: "22", name: "Western" },
 ];
 
 const GenreList = ({
   selectedGenre,
   onGenreSelect,
-  activeFilter,
-  onFilterChange,
+  activeMovieType,
+  activeSortType,
+  onMovieTypeChange,
+  onSortTypeChange,
 }) => {
   return (
     <div className="genre-list-container">
+      <h3 className="filter-title">Movie Type</h3>
       <div className="filter-buttons">
         <button
-          className={`filter-btn ${activeFilter === 'all' ? 'active' : ''}`}
-          onClick={() => onFilterChange('all')}
+          className={`filter-btn ${activeMovieType === "all" ? "active" : ""}`}
+          onClick={() => onMovieTypeChange("all")}
         >
-          All Movies
+          All Types
         </button>
         <button
-          className={`filter-btn ${activeFilter === 'Movie' ? 'active' : ''}`}
-          onClick={() => onFilterChange('Movie')}
+          className={`filter-btn ${activeMovieType === "Movie" ? "active" : ""}`}
+          onClick={() => onMovieTypeChange("Movie")}
         >
           Movies
         </button>
         <button
-          className={`filter-btn ${activeFilter === 'TV Series' ? 'active' : ''}`}
-          onClick={() => onFilterChange('TV Series')}
+          className={`filter-btn ${activeMovieType === "TV Series" ? "active" : ""}`}
+          onClick={() => onMovieTypeChange("TV Series")}
         >
           TV Series
         </button>
+      </div>
+
+      <h3 className="filter-title">Sort By</h3>
+      <div className="filter-buttons">
         <button
-          className={`filter-btn ${activeFilter === 'top-rated' ? 'active' : ''}`}
-          onClick={() => onFilterChange('top-rated')}
+          className={`filter-btn ${activeSortType === "all" ? "active" : ""}`}
+          onClick={() => onSortTypeChange("all")}
+        >
+          Default
+        </button>
+        <button
+          className={`filter-btn ${activeSortType === "top-rated" ? "active" : ""}`}
+          onClick={() => onSortTypeChange("top-rated")}
         >
           Top Rated
         </button>
         <button
-          className={`filter-btn ${activeFilter === 'latest' ? 'active' : ''}`}
-          onClick={() => onFilterChange('latest')}
+          className={`filter-btn ${activeSortType === "latest" ? "active" : ""}`}
+          onClick={() => onSortTypeChange("latest")}
         >
           Latest
         </button>
       </div>
 
-      <h3 className="genre-title">Genres</h3>
+      <h3 className="filter-title">Genres</h3>
       <div className="genre-list">
         <button
-          className={`genre-item ${selectedGenre === 'all' ? 'active' : ''}`}
-          onClick={() => onGenreSelect('all')}
+          className={`genre-item ${selectedGenre === "all" ? "active" : ""}`}
+          onClick={() => onGenreSelect("all")}
         >
           All Genres
         </button>
         {genres.map((genre) => (
           <button
             key={genre.id}
-            className={`genre-item ${selectedGenre === genre.name ? 'active' : ''}`}
+            className={`genre-item ${selectedGenre === genre.name ? "active" : ""}`}
             onClick={() => onGenreSelect(genre.name)}
           >
             {genre.name}

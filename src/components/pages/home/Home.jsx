@@ -12,6 +12,8 @@ const Home = () => {
   const [selectedGenre, setSelectedGenre] = useState("all");
   const [activeFilter, setActiveFilter] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
+  const [activeMovieType, setActiveMovieType] = useState("all");
+  const [activeSortType, setActiveSortType] = useState("all");
 
   useEffect(() => {
     let tempMovies = [...movies];
@@ -58,7 +60,6 @@ const Home = () => {
     } else if (filter === "TV Series") {
       sortedMovies = sortedMovies.filter((movie) => movie.type === "TV Series");
     }
-
     if (filter === "all") {
       sortedMovies.sort((a, b) => a.id - b.id);
     } else if (filter === "top-rated") {
@@ -68,12 +69,57 @@ const Home = () => {
     } else {
       sortedMovies.sort((a, b) => a.id - b.id);
     }
-
     setFilteredMovies(sortedMovies);
   };
 
   const handleSearch = (event) => {
     setSearchQuery(event.target.value);
+  };
+
+  const handleMovieTypeFilter = (type) => {
+    setActiveMovieType(type);
+    filterAndSortMovies(type, activeSortType);
+  };
+
+  const handleSortTypeFilter = (sortType) => {
+    setActiveSortType(sortType);
+    filterAndSortMovies(activeMovieType, sortType);
+  };
+
+  const filterAndSortMovies = (movieType, sortType) => {
+    let filteredResults = [...movies];
+
+    if (searchQuery) {
+      filteredResults = filteredResults.filter((movie) =>
+        movie.title.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+
+    if (selectedGenre !== "all") {
+      filteredResults = filteredResults.filter((movie) =>
+        movie.genre.includes(selectedGenre)
+      );
+    }
+
+    if (movieType === "Movie") {
+      filteredResults = filteredResults.filter(
+        (movie) => movie.type === "Movie"
+      );
+    } else if (movieType === "TV Series") {
+      filteredResults = filteredResults.filter(
+        (movie) => movie.type === "TV Series"
+      );
+    }
+
+    if (sortType === "all") {
+      filteredResults.sort((a, b) => a.id - b.id);
+    } else if (sortType === "top-rated") {
+      filteredResults.sort((a, b) => b.imdb_rating - a.imdb_rating);
+    } else if (sortType === "latest") {
+      filteredResults.sort((a, b) => b.year - a.year);
+    }
+
+    setFilteredMovies(filteredResults);
   };
 
   if (loading) return <Loader />;
@@ -98,8 +144,10 @@ const Home = () => {
           <GenreList
             selectedGenre={selectedGenre}
             onGenreSelect={handleGenreSelect}
-            activeFilter={activeFilter}
-            onFilterChange={handleFilter}
+            activeMovieType={activeMovieType}
+            activeSortType={activeSortType}
+            onMovieTypeChange={handleMovieTypeFilter}
+            onSortTypeChange={handleSortTypeFilter}
           />
         </aside>
 
