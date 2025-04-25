@@ -1,6 +1,6 @@
-import React, { createContext, useState, useEffect, useCallback } from 'react';
-import { fetchMovies } from '../utils/MovieListAPI';
-import { getCurrentUser, updateUserFavorites } from '../utils/UserListAPI';
+import React, { createContext, useState, useEffect, useCallback } from "react";
+import { fetchMovies } from "../utils/MovieListAPI";
+import { getCurrentUser, updateUserFavorites } from "../utils/UserListAPI";
 
 export const MovieContext = createContext();
 
@@ -10,6 +10,7 @@ export const MovieProvider = ({ children }) => {
   const [error, setError] = useState(null);
   const [currentUser, setCurrentUser] = useState(getCurrentUser());
   const [favorites, setFavorites] = useState(getCurrentUser()?.favorites || []);
+  const [userUpdate, setUserUpdate] = useState(0);
 
   useEffect(() => {
     const handleUserChange = () => {
@@ -23,8 +24,8 @@ export const MovieProvider = ({ children }) => {
     };
     handleUserChange();
 
-    window.addEventListener('auth-change', handleUserChange);
-    return () => window.removeEventListener('auth-change', handleUserChange);
+    window.addEventListener("auth-change", handleUserChange);
+    return () => window.removeEventListener("auth-change", handleUserChange);
   }, []);
 
   useEffect(() => {
@@ -45,7 +46,7 @@ export const MovieProvider = ({ children }) => {
   useEffect(() => {
     if (currentUser && favorites.length >= 0) {
       const updatedUser = { ...currentUser, favorites };
-      localStorage.setItem('user', JSON.stringify(updatedUser));
+      localStorage.setItem("user", JSON.stringify(updatedUser));
     }
   }, [favorites, currentUser]);
 
@@ -61,7 +62,7 @@ export const MovieProvider = ({ children }) => {
         });
         setFavorites(newFavorites);
       } catch (error) {
-        console.error('Error adding to favorites:', error);
+        console.error("Error adding to favorites:", error);
         throw error;
       }
     },
@@ -80,12 +81,18 @@ export const MovieProvider = ({ children }) => {
         });
         setFavorites(newFavorites);
       } catch (error) {
-        console.error('Error removing from favorites:', error);
+        console.error("Error removing from favorites:", error);
         throw error;
       }
     },
     [favorites, currentUser]
   );
+
+  const refreshUserData = useCallback(() => {
+    const freshUser = getCurrentUser();
+    setCurrentUser(freshUser);
+    setUserUpdate((prev) => prev + 1);
+  }, []);
 
   return (
     <MovieContext.Provider
@@ -97,6 +104,8 @@ export const MovieProvider = ({ children }) => {
         currentUser,
         addToFavorites,
         removeFromFavorites,
+        refreshUserData,
+        userUpdate,
       }}
     >
       {children}

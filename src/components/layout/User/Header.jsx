@@ -1,15 +1,16 @@
-import React from 'react';
-import { Link, useNavigate } from 'react-router';
-import { getCurrentUser, logoutUser } from '../../../utils/UserListAPI';
-import './styles/Header.scss';
+import React, { useContext } from "react";
+import { Link, useNavigate } from "react-router";
+import { MovieContext } from "../../../context/MovieContext";
+import { logoutUser } from "../../../utils/UserListAPI";
+import "./styles/Header.scss";
 
 const Header = () => {
   const navigate = useNavigate();
-  const currentUser = getCurrentUser();
+  const { currentUser, userUpdate } = useContext(MovieContext);
 
   const handleLogout = () => {
     logoutUser();
-    navigate('/login');
+    navigate("/login");
   };
 
   return (
@@ -32,9 +33,9 @@ const Header = () => {
             {currentUser ? (
               <div className="user-menu">
                 <span className="username">
-                  Welcome, {currentUser.username}
+                  Welcome, {currentUser?.username}
                 </span>
-                {currentUser.role === 'admin' ? (
+                {currentUser.role === "admin" ? (
                   <Link to="/admin" className="nav-link admin-link">
                     Admin Dashboard
                   </Link>

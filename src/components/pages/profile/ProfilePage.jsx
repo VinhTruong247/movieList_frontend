@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { Formik, Form, Field } from "formik";
 import { useNavigate } from "react-router";
 import { getCurrentUser, updateUser } from "../../../utils/UserListAPI";
@@ -6,6 +6,7 @@ import { useFavorites } from "../../../hooks/useFavorites";
 import MovieCard from "../home/movieCard/MovieCard";
 import ChangePassword from "./ChangePassword";
 import { ProfileSchema } from "../../auth/Validation";
+import { MovieContext } from "../../../context/MovieContext";
 import "./ProfilePage.scss";
 
 const ProfilePage = () => {
@@ -15,6 +16,7 @@ const ProfilePage = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
+  const { refreshUserData } = useContext(MovieContext);
 
   useEffect(() => {
     if (!currentUser || currentUser.role === "admin") {
@@ -28,13 +30,12 @@ const ProfilePage = () => {
         ...currentUser,
         username: values.username,
       };
-
       await updateUser(currentUser.id, updatedUser);
       localStorage.setItem("user", JSON.stringify(updatedUser));
-
+      refreshUserData();
+      setSuccessMessage("Profile updated successfully!");
       setIsEditing(false);
       setError("");
-      setSuccessMessage("Profile updated successfully!");
       setTimeout(() => setSuccessMessage(""), 3000);
     } catch (err) {
       setError("Failed to update profile. Please try again.");
@@ -76,7 +77,7 @@ const ProfilePage = () => {
                 validationSchema={ProfileSchema}
                 onSubmit={handleSubmit}
               >
-                {({ errors, touched, isSubmitting }) => (
+                {({ errors, touched, isSubmitting, dirty, isValid }) => (
                   <Form className="profile-form">
                     <div className="form-group">
                       <label htmlFor="username">Username</label>
@@ -107,10 +108,16 @@ const ProfilePage = () => {
 
                     <button
                       type="submit"
-                      className="save-button"
-                      disabled={isSubmitting}
+                      className={`save-button ${isSubmitting ? "loading" : ""}`}
+                      disabled={isSubmitting || !isValid || !dirty}
                     >
-                      {isSubmitting ? "Saving..." : "Save Changes"}
+                      {isSubmitting ? (
+                        <span className="loading-text">
+                          Updating Profile...
+                        </span>
+                      ) : (
+                        "Save Changes"
+                      )}
                     </button>
                   </Form>
                 )}
