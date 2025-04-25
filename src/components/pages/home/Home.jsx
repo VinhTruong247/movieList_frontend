@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import MovieCarousel from "./movieCarousel/MovieCarousel";
 import MovieCard from "./movieCard/MovieCard";
 import GenreList from "./movieGenreList/GenreList";
@@ -13,6 +13,12 @@ const Home = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeMovieType, setActiveMovieType] = useState("all");
   const [activeSortType, setActiveSortType] = useState("all");
+
+  useEffect(() => {
+    if (movies && movies.length > 0) {
+      setFilteredMovies([...movies]);
+    }
+  }, [movies]);
 
   const handleGenreSelect = (genre) => {
     setSelectedGenre(genre);
@@ -134,7 +140,7 @@ const Home = () => {
         </aside>
 
         <div className="main-content">
-          {filteredMovies.length < 0 ? (
+          {filteredMovies.length > 0 ? (
             <div className="movies-grid">
               {filteredMovies.map((movie) => (
                 <MovieCard key={movie.id} movie={movie} />
