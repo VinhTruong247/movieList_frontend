@@ -1,5 +1,5 @@
-@use '../../../styles/root' as *;
-@use 'sass:color';
+@use "../../../styles/root" as *;
+@use "sass:color";
 
 .profile-container {
   max-width: 1200px;
@@ -21,12 +21,13 @@
 
   .error-message,
   .success-message {
-    padding: 1rem;
+    padding: 0.75rem 1rem;
     border-radius: $border-radius;
     margin-bottom: 1.5rem;
     text-align: center;
     font-weight: 500;
     animation: fadeIn 0.3s ease-in-out;
+    max-width: 100% !important;
   }
 
   .error-message {
@@ -36,9 +37,9 @@
   }
 
   .success-message {
-    background: rgba(#2ecc71, 0.1);
-    color: #2ecc71;
-    border: 1px solid rgba(#2ecc71, 0.2);
+    background: rgba($success-color, 0.1);
+    color: $success-color;
+    border: 1px solid rgba($success-color, 0.2);
   }
 
   .profile-section {
@@ -121,9 +122,9 @@
             min-width: 100px;
 
             &.active {
-              background: rgba(#2ecc71, 0.1);
-              color: #2ecc71;
-              border: 1px solid rgba(#2ecc71, 0.2);
+              background: rgba($success-color, 0.1);
+              color: $success-color;
+              border: 1px solid rgba($success-color, 0.2);
             }
 
             &.disabled {

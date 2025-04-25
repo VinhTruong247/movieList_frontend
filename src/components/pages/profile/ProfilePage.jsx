@@ -1,53 +1,45 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router';
-import { getCurrentUser, updateUser } from '../../../utils/UserListAPI';
-import { useFavorites } from '../../../hooks/useFavorites';
-import MovieCard from '../home/movieCard/MovieCard';
-import './ProfilePage.scss';
+import React, { useState, useEffect } from "react";
+import { Formik, Form, Field } from "formik";
+import { useNavigate } from "react-router";
+import { getCurrentUser, updateUser } from "../../../utils/UserListAPI";
+import { useFavorites } from "../../../hooks/useFavorites";
+import MovieCard from "../home/movieCard/MovieCard";
+import ChangePassword from "./ChangePassword";
+import { ProfileSchema } from "../../auth/Validation";
+import "./ProfilePage.scss";
 
 const ProfilePage = () => {
   const navigate = useNavigate();
   const currentUser = getCurrentUser();
   const { favorites } = useFavorites();
   const [isEditing, setIsEditing] = useState(false);
-  const [error, setError] = useState('');
-  const [successMessage, setSuccessMessage] = useState('');
-  const [formData, setFormData] = useState({
-    username: currentUser?.username || '',
-    email: currentUser?.email || '',
-  });
+  const [error, setError] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
 
   useEffect(() => {
-    if (!currentUser || currentUser.role === 'admin') {
-      navigate('/');
+    if (!currentUser || currentUser.role === "admin") {
+      navigate("/");
     }
   }, [currentUser, navigate]);
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    if (name === 'username') {
-      setFormData((prev) => ({
-        ...prev,
-        [name]: value,
-      }));
-    }
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit = async (values, { setSubmitting }) => {
     try {
       const updatedUser = {
         ...currentUser,
-        username: formData.username,
+        username: values.username,
       };
+
       await updateUser(currentUser.id, updatedUser);
-      localStorage.setItem('user', JSON.stringify(updatedUser));
+      localStorage.setItem("user", JSON.stringify(updatedUser));
+
       setIsEditing(false);
-      setError('');
-      setSuccessMessage('Profile updated successfully!');
-      setTimeout(() => setSuccessMessage(''), 3000);
+      setError("");
+      setSuccessMessage("Profile updated successfully!");
+      setTimeout(() => setSuccessMessage(""), 3000);
     } catch (err) {
-      setError('Failed to update profile');
+      setError("Failed to update profile. Please try again.");
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -70,39 +62,66 @@ const ProfilePage = () => {
               className="edit-button"
               onClick={() => setIsEditing(!isEditing)}
             >
-              {isEditing ? 'Cancel' : 'Edit Profile'}
+              {isEditing ? "Cancel" : "Edit Profile"}
             </button>
           </div>
 
           {isEditing ? (
-            <form onSubmit={handleSubmit} className="profile-form">
-              <div className="form-group">
-                <label>Username</label>
-                <input
-                  type="text"
-                  name="username"
-                  value={formData.username}
-                  onChange={handleInputChange}
-                  required
-                />
-              </div>
+            <>
+              <Formik
+                initialValues={{
+                  username: currentUser.username,
+                  email: currentUser.email,
+                }}
+                validationSchema={ProfileSchema}
+                onSubmit={handleSubmit}
+              >
+                {({ errors, touched, isSubmitting }) => (
+                  <Form className="profile-form">
+                    <div className="form-group">
+                      <label htmlFor="username">Username</label>
+                      <Field
+                        id="username"
+                        name="username"
+                        type="text"
+                        className={
+                          errors.username && touched.username ? "error" : ""
+                        }
+                      />
+                      {errors.username && touched.username && (
+                        <div className="error-message">{errors.username}</div>
+                      )}
+                    </div>
 
-              <div className="form-group">
-                <label>Email</label>
-                <input
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  className="disabled-input"
-                  disabled
-                  title="Email cannot be changed"
-                />
-              </div>
+                    <div className="form-group">
+                      <label htmlFor="email">Email</label>
+                      <Field
+                        id="email"
+                        name="email"
+                        type="email"
+                        className="disabled-input"
+                        disabled
+                        title="Email cannot be changed"
+                      />
+                    </div>
 
-              <button type="submit" className="save-button">
-                Save Changes
-              </button>
-            </form>
+                    <button
+                      type="submit"
+                      className="save-button"
+                      disabled={isSubmitting}
+                    >
+                      {isSubmitting ? "Saving..." : "Save Changes"}
+                    </button>
+                  </Form>
+                )}
+              </Formik>
+
+              <ChangePassword
+                currentUser={currentUser}
+                onSuccess={setSuccessMessage}
+                onError={setError}
+              />
+            </>
           ) : (
             <div className="profile-info">
               <div className="info-item">
@@ -116,9 +135,9 @@ const ProfilePage = () => {
               <div className="info-item">
                 <span className="label">Account Status:</span>
                 <span
-                  className={`value status ${currentUser.isDisable ? 'disabled' : 'active'}`}
+                  className={`value status ${currentUser.isDisable ? "disabled" : "active"}`}
                 >
-                  {currentUser.isDisable ? 'Disabled' : 'Active'}
+                  {currentUser.isDisable ? "Disabled" : "Active"}
                 </span>
               </div>
             </div>

@@ -1,5 +1,5 @@
-@use '../../../../styles/root' as *;
-@use 'sass:color';
+@use "../../../../styles/root" as *;
+@use "sass:color";
 
 .user-list-section {
   background: white;
@@ -70,8 +70,8 @@
       font-weight: 500;
 
       &.active {
-        background: rgba(#2ecc71, 0.1);
-        color: #2ecc71;
+        background: rgba($success-color, 0.1);
+        color: $success-color;
       }
 
       &.disabled {
@@ -99,11 +99,11 @@
       }
 
       &.enable {
-        background: rgba(#2ecc71, 0.1);
-        color: #2ecc71;
+        background: rgba($success-color, 0.1);
+        color: $success-color;
 
         &:hover:not(:disabled) {
-          background: #2ecc71;
+          background: $success-color;
           color: white;
         }
       }

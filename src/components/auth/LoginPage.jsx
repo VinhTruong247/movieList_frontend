@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router";
 import { Formik, Form, Field } from "formik";
 import { loginUser } from "../../utils/UserListAPI";
-import LoginSchema from "./Validation";
+import { LoginSchema } from "./Validation";
 import "./LoginPage.scss";
 
 const LoginPage = () => {
