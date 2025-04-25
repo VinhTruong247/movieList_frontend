@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router';
-import './MovieCarousel.scss';
+import React, { useState, useEffect } from "react";
+import { Link } from "react-router";
+import "./MovieCarousel.scss";
 
 const MovieCarousel = ({ movies }) => {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -20,10 +20,10 @@ const MovieCarousel = ({ movies }) => {
     );
   };
 
-  useEffect(() => {
-    const timer = setInterval(nextSlide, 5000);
-    return () => clearInterval(timer);
-  });
+  // useEffect(() => {
+  //   const timer = setInterval(nextSlide, 5000);
+  //   return () => clearInterval(timer);
+  // });
 
   return (
     <div className="carousel-container">
@@ -31,7 +31,7 @@ const MovieCarousel = ({ movies }) => {
         {featuredMovies.map((movie, index) => (
           <div
             key={movie.id}
-            className={`carousel-slide ${index === currentSlide ? 'active' : ''}`}
+            className={`carousel-slide ${index === currentSlide ? "active" : ""}`}
             style={{ backgroundImage: `url(${movie.poster})` }}
           >
             <div className="slide-content">
@@ -39,10 +39,13 @@ const MovieCarousel = ({ movies }) => {
               <div className="movie-info">
                 <span className="rating">⭐ {movie.imdb_rating}/10</span>
                 <span className="year">{movie.year}</span>
-                <span className="genre">{movie.genre.join(', ')}</span>
+                <span className="genre">{movie.genre.join(", ")}</span>
               </div>
               <p className="description">{movie.description}</p>
-              <Link to={`/movie/${movie.id}`} className="view-button">
+              <Link
+                to={`/movie/${movie.id}`}
+                className={`view-button ${index === currentSlide ? "active" : ""}`}
+              >
                 View Details
               </Link>
             </div>
@@ -60,7 +63,7 @@ const MovieCarousel = ({ movies }) => {
           {featuredMovies.map((_, index) => (
             <button
               key={index}
-              className={`dot ${index === currentSlide ? 'active' : ''}`}
+              className={`dot ${index === currentSlide ? "active" : ""}`}
               onClick={() => setCurrentSlide(index)}
             />
           ))}
