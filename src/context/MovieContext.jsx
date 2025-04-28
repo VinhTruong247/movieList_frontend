@@ -80,21 +80,29 @@ export const MovieProvider = ({ children }) => {
         return currentMovie || favorite;
       });
 
-      setFavorites(updatedFavorites);
+      if (JSON.stringify(updatedFavorites) !== JSON.stringify(favorites)) {
+        setFavorites(updatedFavorites);
 
-      const updatedUser = { ...currentUser, favorites: updatedFavorites };
-      localStorage.setItem("user", JSON.stringify(updatedUser));
+        const updatedUser = { ...currentUser, favorites: updatedFavorites };
+        localStorage.setItem("user", JSON.stringify(updatedUser));
 
-      const filtered =
-        currentUser.role === "admin"
-          ? updatedFavorites
-          : updatedFavorites.filter((movie) => !movie.isDisable);
+        const filtered =
+          currentUser.role === "admin"
+            ? updatedFavorites
+            : updatedFavorites.filter((movie) => !movie.isDisable);
 
-      setSyncedFavorites(filtered);
+        setSyncedFavorites(filtered);
 
-      await updateUserFavorites(currentUser.id, updatedUser);
+        await new Promise((resolve) => setTimeout(resolve, 500));
+        await updateUserFavorites(currentUser.id, updatedUser);
+      }
     } catch (error) {
-      console.error("Error syncing favorites:", error);
+      // if (error.response && error.response.status === 429) {
+      //   console.warn("API rate limit reached. Changes saved locally only.");
+      // } else {
+      //   console.error("Error syncing favorites:", error);
+      // }
+      throw error;
     }
   }, [currentUser, favorites]);
 
@@ -145,14 +153,27 @@ export const MovieProvider = ({ children }) => {
 
       try {
         const newFavorites = favorites.filter((movie) => movie.id !== movieId);
-        await updateUserFavorites(currentUser.id, {
-          ...currentUser,
-          favorites: newFavorites,
-        });
+
+        // Update local state immediately to improve user experience
         setFavorites(newFavorites);
+
+        // Also update syncedFavorites to prevent flickering
+        const filteredForDisplay =
+          currentUser.role === "admin"
+            ? newFavorites
+            : newFavorites.filter((movie) => !movie.isDisable);
+        setSyncedFavorites(filteredForDisplay);
+
+        // Update localStorage
+        const updatedUser = { ...currentUser, favorites: newFavorites };
+        localStorage.setItem("user", JSON.stringify(updatedUser));
+
+        // Add delay to avoid rate limiting
+        await new Promise((resolve) => setTimeout(resolve, 500));
+        await updateUserFavorites(currentUser.id, updatedUser);
       } catch (error) {
         console.error("Error removing from favorites:", error);
-        throw error;
+        // If API fails, don't revert the UI - keep the local change
       }
     },
     [favorites, currentUser]
