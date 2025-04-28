@@ -17,6 +17,8 @@ const Home = () => {
   useEffect(() => {
     if (movies && movies.length > 0) {
       setFilteredMovies([...movies]);
+      const sortedByIdMovies = [...movies].sort((a, b) => a.id - b.id);
+      setFilteredMovies(sortedByIdMovies);
     }
   }, [movies]);
 
@@ -106,8 +108,6 @@ const Home = () => {
     } else if (sortType === "latest") {
       filteredResults.sort((a, b) => b.year - a.year);
     }
-
-    console.log(sortType);
 
     setFilteredMovies(filteredResults);
   };
