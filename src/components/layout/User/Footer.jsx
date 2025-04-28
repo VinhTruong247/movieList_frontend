@@ -1,5 +1,5 @@
-import React from 'react';
-import './styles/Footer.scss';
+import React from "react";
+import "./styles/Footer.scss";
 
 const Footer = () => {
   return (
@@ -10,13 +10,13 @@ const Footer = () => {
           © {new Date().getFullYear()} Movie Collection. All rights reserved.
         </p>
         <div className="footer-links">
-          <a href="/" className="footer-link">
+          <a href="/about" className="footer-link">
             About
           </a>
-          <a href="/" className="footer-link">
+          <a href="/contact" className="footer-link">
             Contact
           </a>
-          <a href="/" className="footer-link">
+          <a href="/privacy" className="footer-link">
             Privacy
           </a>
         </div>

@@ -153,27 +153,19 @@ export const MovieProvider = ({ children }) => {
 
       try {
         const newFavorites = favorites.filter((movie) => movie.id !== movieId);
-
-        // Update local state immediately to improve user experience
+        s;
         setFavorites(newFavorites);
-
-        // Also update syncedFavorites to prevent flickering
         const filteredForDisplay =
           currentUser.role === "admin"
             ? newFavorites
             : newFavorites.filter((movie) => !movie.isDisable);
         setSyncedFavorites(filteredForDisplay);
-
-        // Update localStorage
         const updatedUser = { ...currentUser, favorites: newFavorites };
         localStorage.setItem("user", JSON.stringify(updatedUser));
-
-        // Add delay to avoid rate limiting
         await new Promise((resolve) => setTimeout(resolve, 500));
         await updateUserFavorites(currentUser.id, updatedUser);
       } catch (error) {
         console.error("Error removing from favorites:", error);
-        // If API fails, don't revert the UI - keep the local change
       }
     },
     [favorites, currentUser]
