@@ -1,5 +1,5 @@
-@use '../../styles/root' as *;
-@use 'sass:color';
+@use "../../styles/root" as *;
+@use "sass:color";
 
 .auth-container {
   min-height: 100vh;
@@ -93,18 +93,8 @@
       color: $text-color;
       cursor: pointer;
 
-      input[type='checkbox'] {
+      input[type="checkbox"] {
         accent-color: $accent-color;
-      }
-    }
-
-    .forgot-password {
-      color: $accent-color;
-      text-decoration: none;
-      transition: color $transition-speed;
-
-      &:hover {
-        color: color.adjust($accent-color, $lightness: -10%);
       }
     }
   }
@@ -174,8 +164,8 @@
     box-shadow: 0 2px 8px rgba($accent-color, 0.1);
   }
 
-  &[type='password'],
-  &[type='text'] {
+  &[type="password"],
+  &[type="text"] {
     margin-bottom: 0;
   }
 }

@@ -102,9 +102,6 @@ const LoginPage = () => {
                   <Field type="checkbox" name="rememberMe" />
                   <span>Remember me</span>
                 </label>
-                <Link to="/forgot-password" className="forgot-password">
-                  Forgot Password?
-                </Link>
               </div>
 
               <button
