@@ -17,6 +17,7 @@ const MovieList = () => {
     message: "",
     type: "",
   });
+  const [processingMovies, setProcessingMovies] = useState([]);
 
   const filteredMovies = useMemo(() => {
     let result = [...movies].sort((a, b) => Number(a.id) - Number(b.id));
@@ -64,6 +65,34 @@ const MovieList = () => {
   const handleEditMovie = (movie) => {
     setEditingMovie(movie);
     setShowForm(true);
+  };
+
+  const handleToggleStatus = async (movie) => {
+    try {
+      setProcessingMovies((prev) => [...prev, movie.id]);
+
+      const updatedMovie = {
+        ...movie,
+        isDisabled: !movie.isDisabled,
+      };
+      await updateMovie(movie.id, updatedMovie);
+      await refreshMovies();
+
+      setNotification({
+        show: true,
+        message: `"${movie.title}" has been ${updatedMovie.isDisabled ? "disabled" : "enabled"}`,
+        type: "success",
+      });
+    } catch (error) {
+      console.error("Error toggling movie status:", error);
+      setNotification({
+        show: true,
+        message: `Error: Failed to update status for "${movie.title}"`,
+        type: "error",
+      });
+    } finally {
+      setProcessingMovies((prev) => prev.filter((id) => id !== movie.id));
+    }
   };
 
   const handleSubmit = async (values, { setSubmitting }) => {
@@ -136,12 +165,16 @@ const MovieList = () => {
               <th>Year</th>
               <th>Rating</th>
               <th>Genre</th>
+              <th>Status</th>
               <th>Actions</th>
             </tr>
           </thead>
           <tbody>
             {paginatedMovies.map((movie) => (
-              <tr key={movie.id}>
+              <tr
+                key={movie.id}
+                className={movie.isDisabled ? "disabled-row" : ""}
+              >
                 <td>{movie.id}</td>
                 <td>{movie.title}</td>
                 <td>{movie.type}</td>
@@ -149,11 +182,32 @@ const MovieList = () => {
                 <td>⭐ {movie.imdb_rating}</td>
                 <td>{movie.genre.join(", ")}</td>
                 <td>
+                  <span
+                    className={`status-badge ${movie.isDisabled ? "disabled" : "active"}`}
+                  >
+                    {movie.isDisabled ? "Disabled" : "Active"}
+                  </span>
+                </td>
+                <td className="actions-cell">
                   <button
                     className="edit-btn"
                     onClick={() => handleEditMovie(movie)}
+                    disabled={processingMovies.includes(movie.id)}
                   >
                     Edit
+                  </button>
+                  <button
+                    className={`toggle-btn ${movie.isDisabled ? "enable" : "disable"}`}
+                    onClick={() => handleToggleStatus(movie)}
+                    disabled={processingMovies.includes(movie.id)}
+                  >
+                    {processingMovies.includes(movie.id) ? (
+                      <span className="loading-spinner"></span>
+                    ) : movie.isDisabled ? (
+                      "Enable"
+                    ) : (
+                      "Disable"
+                    )}
                   </button>
                 </td>
               </tr>

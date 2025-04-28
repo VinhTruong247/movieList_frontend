@@ -124,6 +124,10 @@
       font-weight: 600;
     }
 
+    th:last-child {
+      text-align: center;
+    }
+
     td {
       .edit-btn {
         padding: 0.5rem 1rem;
@@ -134,6 +138,8 @@
         font-weight: 500;
         cursor: pointer;
         transition: all $transition-speed;
+        min-width: 60px;
+        text-align: center;
 
         &:hover {
           background: $primary-color;
@@ -142,6 +148,11 @@
 
         &:active {
           transform: scale(0.98);
+        }
+
+        &:disabled {
+          opacity: 0.7;
+          cursor: not-allowed;
         }
       }
     }
@@ -154,6 +165,81 @@
 
         .edit-btn {
           opacity: 1;
+        }
+      }
+    }
+  }
+
+  .disabled-row {
+    background-color: rgba(0, 0, 0, 0.05);
+    color: #777;
+  }
+
+  .status-badge {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 500;
+
+    &.active {
+      background-color: rgba(46, 204, 113, 0.15);
+      color: #27ae60;
+    }
+
+    &.disabled {
+      background-color: rgba(231, 76, 60, 0.15);
+      color: #e74c3c;
+    }
+  }
+
+  .actions-cell {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    min-width: 160px;
+
+    .toggle-btn {
+      padding: 0.5rem 0.75rem;
+      border: none;
+      border-radius: 4px;
+      font-weight: 500;
+      cursor: pointer;
+      transition:
+        background-color 0.2s,
+        color 0.2s;
+      min-width: 70px;
+      text-align: center;
+
+      &:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+      }
+
+      &.disable {
+        background-color: rgba(231, 76, 60, 0.1);
+        color: #e74c3c;
+
+        &:hover {
+          background-color: rgba(231, 76, 60, 0.2);
+        }
+
+        &:disabled {
+          background-color: rgba(231, 76, 60, 0.05);
+        }
+      }
+
+      &.enable {
+        background-color: rgba(46, 204, 113, 0.1);
+        color: #27ae60;
+
+        &:hover {
+          background-color: rgba(46, 204, 113, 0.2);
+        }
+
+        &:disabled {
+          background-color: rgba(46, 204, 113, 0.05);
         }
       }
     }
@@ -192,6 +278,23 @@
         cursor: not-allowed;
       }
     }
+  }
+}
+
+.loading-spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: #fff;
+  animation: spin 0.8s ease-in-out infinite;
+  vertical-align: middle;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
   }
 }
 
