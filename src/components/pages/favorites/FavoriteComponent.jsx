@@ -2,12 +2,10 @@ import React from "react";
 import { Link } from "react-router";
 import MovieCard from "../home/movieCard/MovieCard";
 
-const FavoriteComponent = ({ favorites }) => {
-  const activeMovies = favorites.filter((movie) => !movie.isDisabled);
-
+const FavoriteComponent = ({ syncedFavorites }) => {
   return (
     <>
-      {activeMovies.length === 0 ? (
+      {syncedFavorites.length === 0 ? (
         <div className="empty-state">
           <h3>No favorite movies yet</h3>
           <p>Start adding movies to your favorites to see them here!</p>
@@ -17,7 +15,7 @@ const FavoriteComponent = ({ favorites }) => {
         </div>
       ) : (
         <div className="favorites-grid">
-          {activeMovies.map((movie) => (
+          {syncedFavorites.map((movie) => (
             <div key={movie.id} className="favorite-item">
               <MovieCard movie={movie} />
             </div>

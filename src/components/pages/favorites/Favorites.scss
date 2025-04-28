@@ -1,5 +1,5 @@
-@use '../../../styles/root' as *;
-@use 'sass:color';
+@use "../../../styles/root" as *;
+@use "sass:color";
 
 .favorites-container {
   max-width: 1200px;
@@ -23,7 +23,7 @@
     box-shadow: 0 4px 15px rgba(44, 62, 80, 0.2);
 
     &::before {
-      content: '';
+      content: "";
       position: absolute;
       top: 0;
       left: 0;
@@ -72,7 +72,7 @@
     padding-bottom: 1rem;
 
     &::after {
-      content: '';
+      content: "";
       position: absolute;
       bottom: 0;
       left: 50%;
@@ -103,7 +103,7 @@
     overflow: hidden;
 
     &::before {
-      content: '❤️';
+      content: "❤️";
       font-size: 8rem;
       position: absolute;
       top: -2rem;

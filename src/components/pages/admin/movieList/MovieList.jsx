@@ -73,14 +73,14 @@ const MovieList = () => {
 
       const updatedMovie = {
         ...movie,
-        isDisabled: !movie.isDisabled,
+        isDisable: !movie.isDisable,
       };
       await updateMovie(movie.id, updatedMovie);
       await refreshMovies();
 
       setNotification({
         show: true,
-        message: `"${movie.title}" has been ${updatedMovie.isDisabled ? "disabled" : "enabled"}`,
+        message: `"${movie.title}" has been ${updatedMovie.isDisable ? "disabled" : "enabled"}`,
         type: "success",
       });
     } catch (error) {
@@ -173,7 +173,7 @@ const MovieList = () => {
             {paginatedMovies.map((movie) => (
               <tr
                 key={movie.id}
-                className={movie.isDisabled ? "disabled-row" : ""}
+                className={movie.isDisable ? "disabled-row" : ""}
               >
                 <td>{movie.id}</td>
                 <td>{movie.title}</td>
@@ -183,9 +183,9 @@ const MovieList = () => {
                 <td>{movie.genre.join(", ")}</td>
                 <td>
                   <span
-                    className={`status-badge ${movie.isDisabled ? "disabled" : "active"}`}
+                    className={`status-badge ${movie.isDisable ? "disabled" : "active"}`}
                   >
-                    {movie.isDisabled ? "Disabled" : "Active"}
+                    {movie.isDisable ? "Disabled" : "Active"}
                   </span>
                 </td>
                 <td className="actions-cell">
@@ -197,13 +197,13 @@ const MovieList = () => {
                     Edit
                   </button>
                   <button
-                    className={`toggle-btn ${movie.isDisabled ? "enable" : "disable"}`}
+                    className={`toggle-btn ${movie.isDisable ? "enable" : "disable"}`}
                     onClick={() => handleToggleStatus(movie)}
                     disabled={processingMovies.includes(movie.id)}
                   >
                     {processingMovies.includes(movie.id) ? (
                       <span className="loading-spinner"></span>
-                    ) : movie.isDisabled ? (
+                    ) : movie.isDisable ? (
                       "Enable"
                     ) : (
                       "Disable"

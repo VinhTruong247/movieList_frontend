@@ -1,18 +1,20 @@
-import React from 'react';
-import { useNavigate } from 'react-router';
-import { useFavorites } from '../../../hooks/useFavorites';
-import FavoriteComponent from './FavoriteComponent';
-import './Favorites.scss';
+import React from "react";
+import { useNavigate } from "react-router";
+import { useFavorites } from "../../../hooks/useFavorites";
+import FavoriteComponent from "./FavoriteComponent";
+import "./Favorites.scss";
 
 const Favorites = () => {
-  const { favorites } = useFavorites();
+  const { syncedFavorites } = useFavorites();
   const navigate = useNavigate();
+
+  console.log("syncedFavorites", syncedFavorites);
 
   return (
     <div className="favorites-container">
       <button
         className="back-button"
-        onClick={() => navigate('/')}
+        onClick={() => navigate("/")}
         title="Back to Home"
       >
         <svg
@@ -29,9 +31,9 @@ const Favorites = () => {
           />
         </svg>
       </button>
-      <h1 className="page-title">Your Favorite Movies</h1>
+      <h2 className="favorites-title">My Favorites</h2>
 
-      <FavoriteComponent favorites={favorites} />
+      <FavoriteComponent syncedFavorites={syncedFavorites} />
     </div>
   );
 };

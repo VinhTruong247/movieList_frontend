@@ -11,6 +11,7 @@ export const MovieProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(getCurrentUser());
   const [favorites, setFavorites] = useState(getCurrentUser()?.favorites || []);
   const [userUpdate, setUserUpdate] = useState(0);
+  const [syncedFavorites, setSyncedFavorites] = useState([]);
 
   useEffect(() => {
     const handleUserChange = () => {
@@ -51,15 +52,66 @@ export const MovieProvider = ({ children }) => {
     loadMoviesBasedOnUserRole(currentUser);
   }, []);
 
+  useEffect(() => {
+    if (favorites.length > 0 && movies.length > 0) {
+      const updated = favorites.map((favorite) => {
+        const currentMovie = movies.find((m) => m.id === favorite.id);
+        return currentMovie || favorite;
+      });
+      const filtered =
+        currentUser?.role === "admin"
+          ? updated
+          : updated.filter((movie) => !movie.isDisable);
+
+      setSyncedFavorites(filtered);
+    } else {
+      setSyncedFavorites([]);
+    }
+  }, [favorites, movies, currentUser]);
+
+  const syncFavoritesWithCompleteData = useCallback(async () => {
+    if (!currentUser || favorites.length === 0) return;
+
+    try {
+      const allMovies = await fetchAllMoviesForAdmin();
+
+      const updatedFavorites = favorites.map((favorite) => {
+        const currentMovie = allMovies.find((m) => m.id === favorite.id);
+        return currentMovie || favorite;
+      });
+
+      setFavorites(updatedFavorites);
+
+      const updatedUser = { ...currentUser, favorites: updatedFavorites };
+      localStorage.setItem("user", JSON.stringify(updatedUser));
+
+      const filtered =
+        currentUser.role === "admin"
+          ? updatedFavorites
+          : updatedFavorites.filter((movie) => !movie.isDisable);
+
+      setSyncedFavorites(filtered);
+
+      await updateUserFavorites(currentUser.id, updatedUser);
+    } catch (error) {
+      console.error("Error syncing favorites:", error);
+    }
+  }, [currentUser, favorites]);
+
   const refreshMovies = useCallback(async () => {
     try {
       await loadMoviesBasedOnUserRole(currentUser);
+      await syncFavoritesWithCompleteData();
       return movies;
     } catch (error) {
       console.error("Error refreshing movies:", error);
       throw error;
     }
-  }, [currentUser]);
+  }, [currentUser, loadMoviesBasedOnUserRole, syncFavoritesWithCompleteData]);
+
+  useEffect(() => {
+    syncFavoritesWithCompleteData();
+  }, [syncFavoritesWithCompleteData, userUpdate]);
 
   useEffect(() => {
     if (currentUser && favorites.length >= 0) {
@@ -120,6 +172,7 @@ export const MovieProvider = ({ children }) => {
         loading,
         error,
         favorites,
+        syncedFavorites,
         currentUser,
         addToFavorites,
         removeFromFavorites,

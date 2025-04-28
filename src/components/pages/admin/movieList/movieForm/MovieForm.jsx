@@ -2,7 +2,6 @@ import React from "react";
 import { Formik, Form, Field } from "formik";
 import * as Yup from "yup";
 import "./MovieForm.scss";
-import { isDisabled } from "@testing-library/user-event/dist/cjs/utils/index.js";
 
 const genres = [
   { id: "1", name: "Action" },
@@ -84,7 +83,7 @@ const MovieForm = ({ movie, onSubmit, onClose }) => {
         country: "",
         poster: "",
         trailer: "",
-        isDisabled: false,
+        isDisable: false,
       };
 
   const handleRuntimeChange = (e, setFieldValue, type) => {

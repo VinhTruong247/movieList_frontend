@@ -6,7 +6,7 @@ export const fetchMovies = async (includeDisabled = false) => {
   try {
     const response = await axios.get(API_URL);
     if (!includeDisabled) {
-      return response.data.filter((movie) => !movie.isDisabled);
+      return response.data.filter((movie) => !movie.isDisable);
     }
 
     return response.data;

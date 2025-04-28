@@ -24,7 +24,7 @@ const MovieDetail = () => {
       try {
         setLoading(true);
         const data = await fetchMovieById(id);
-        if (!data || data.isDisabled) {
+        if (!data || data.isDisable) {
           setMovie(null);
           return;
         }
