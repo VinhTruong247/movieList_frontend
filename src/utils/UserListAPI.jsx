@@ -98,6 +98,39 @@ export const loginUser = async (email, password) => {
   }
 };
 
+export const registerUser = async (username, email, password) => {
+  try {
+    const response = await axios.get(`${API_URL}`);
+    const users = response.data;
+    const emailExists = users.some((user) => user.email === email);
+    if (emailExists) {
+      throw { errors: ["Email already exists"] };
+    }
+
+    const usernameExists = users.some((user) => user.username === username);
+    if (usernameExists) {
+      throw { errors: ["Username already exists"] };
+    }
+
+    const newUser = {
+      id: Date.now().toString(),
+      username,
+      email,
+      password,
+      role: "user",
+      isDisable: false,
+      favorites: [],
+    };
+
+    await axios.post(API_URL, newUser);
+
+    return { success: true };
+  } catch (error) {
+    // console.error('Register error:', error);
+    throw error;
+  }
+};
+
 export const logoutUser = () => {
   try {
     localStorage.removeItem("user");
