@@ -1,5 +1,5 @@
 import React, { createContext, useState, useEffect, useCallback } from "react";
-import { fetchMovies } from "../utils/MovieListAPI";
+import { fetchMovies, fetchAllMoviesForAdmin } from "../utils/MovieListAPI";
 import { getCurrentUser, updateUserFavorites } from "../utils/UserListAPI";
 
 export const MovieContext = createContext();
@@ -21,27 +21,45 @@ export const MovieProvider = ({ children }) => {
       } else {
         setFavorites([]);
       }
+      loadMoviesBasedOnUserRole(user);
     };
+
     handleUserChange();
 
     window.addEventListener("auth-change", handleUserChange);
     return () => window.removeEventListener("auth-change", handleUserChange);
   }, []);
 
-  useEffect(() => {
-    const getMovies = async () => {
-      try {
-        const data = await fetchMovies();
-        setMovies(data);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
+  const loadMoviesBasedOnUserRole = async (user) => {
+    setLoading(true);
+    try {
+      let data;
+      if (user && user.role === "admin") {
+        data = await fetchAllMoviesForAdmin();
+      } else {
+        data = await fetchMovies(false);
       }
-    };
+      setMovies(data);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    getMovies();
+  useEffect(() => {
+    loadMoviesBasedOnUserRole(currentUser);
   }, []);
+
+  const refreshMovies = useCallback(async () => {
+    try {
+      await loadMoviesBasedOnUserRole(currentUser);
+      return movies;
+    } catch (error) {
+      console.error("Error refreshing movies:", error);
+      throw error;
+    }
+  }, [currentUser]);
 
   useEffect(() => {
     if (currentUser && favorites.length >= 0) {
@@ -92,6 +110,7 @@ export const MovieProvider = ({ children }) => {
     const freshUser = getCurrentUser();
     setCurrentUser(freshUser);
     setUserUpdate((prev) => prev + 1);
+    loadMoviesBasedOnUserRole(freshUser);
   }, []);
 
   return (
@@ -105,6 +124,7 @@ export const MovieProvider = ({ children }) => {
         addToFavorites,
         removeFromFavorites,
         refreshUserData,
+        refreshMovies,
         userUpdate,
         setMovies,
       }}

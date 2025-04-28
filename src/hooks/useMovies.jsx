@@ -1,6 +1,5 @@
-import { useContext, useCallback } from "react";
+import { useContext } from "react";
 import { MovieContext } from "../context/MovieContext";
-import { fetchMovies } from "../utils/MovieListAPI";
 
 export const useMovies = () => {
   const context = useContext(MovieContext);
@@ -9,16 +8,7 @@ export const useMovies = () => {
     throw new Error("useMovies must be used within a MovieProvider");
   }
 
-  const refreshMovies = useCallback(async () => {
-    try {
-      const movies = await fetchMovies();
-      context.setMovies(movies);
-      return movies;
-    } catch (error) {
-      console.error("Error refreshing movies:", error);
-      throw error;
-    }
-  }, [context]);
+  const { refreshMovies } = context;
 
   return {
     movies: context.movies,

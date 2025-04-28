@@ -2,11 +2,11 @@ import React, { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router";
 import { Link } from "react-router";
 import { fetchMovieById } from "../../../utils/MovieListAPI";
-import { getCurrentUser } from "../../../utils/UserListAPI";
 import Loader from "../../common/Loader";
 import { useFavorites } from "../../../hooks/useFavorites";
 import TrailerPopup from "./Trailer/TrailerPopup";
 import SimilarMovie from "./SimilarMovie/SimilarMovie";
+import NoMovie from "./NoMovie/NoMovie";
 import "./MovieDetail.scss";
 
 const MovieDetail = () => {
@@ -14,18 +14,26 @@ const MovieDetail = () => {
   const navigate = useNavigate();
   const [movie, setMovie] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const { addToFavorites, removeFromFavorites, isFavorite } = useFavorites();
+  const [error, setError] = useState("");
   const [showTrailer, setShowTrailer] = useState(false);
-  const currentUser = getCurrentUser();
+  const { currentUser } = useFavorites();
+  const { isFavorite, addToFavorites, removeFromFavorites } = useFavorites();
 
   useEffect(() => {
     const getMovie = async () => {
       try {
+        setLoading(true);
         const data = await fetchMovieById(id);
+        if (!data || data.isDisabled) {
+          setMovie(null);
+          return;
+        }
+
         setMovie(data);
+        setError("");
       } catch (err) {
-        setError(err.message);
+        console.error(err);
+        setError("Error loading movie");
       } finally {
         setLoading(false);
       }
@@ -49,11 +57,13 @@ const MovieDetail = () => {
   }, [currentUser, movie, isFavorite, removeFromFavorites, addToFavorites]);
 
   if (loading) return <Loader />;
+
+  if (!movie) return <NoMovie message="This movie is currently unavailable." />;
+
   if (error)
     return <div className="error-message">Error loading movie: {error}</div>;
-  if (!movie) return <div className="error-message">Movie not found</div>;
 
-  const favorite = movie ? isFavorite(movie.id) : false;
+  const favorite = isFavorite(movie.id);
 
   return (
     <div className="movie-detail">
