@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { fetchUsers, updateUser } from '../../../../utils/UserListAPI';
-import './UserList.scss';
+import React, { useState, useEffect, useMemo } from "react";
+import { fetchUsers, updateUser } from "../../../../utils/UserListAPI";
+import "./UserList.scss";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -8,7 +8,7 @@ const UserList = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [searchUser, setSearchUser] = useState('');
+  const [searchUser, setSearchUser] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
@@ -18,11 +18,11 @@ const UserList = () => {
   const loadUsers = async () => {
     try {
       const data = await fetchUsers();
-      const filteredUsers = data.filter((user) => user.role !== 'admin');
+      const filteredUsers = data.filter((user) => user.role !== "admin");
       setUsers(filteredUsers);
       setLoading(false);
     } catch (err) {
-      setError('Failed to load users');
+      setError("Failed to load users");
       setLoading(false);
     }
   };
@@ -57,7 +57,7 @@ const UserList = () => {
   };
 
   const handleToggleDisable = async (user) => {
-    const message = user.isDisable ? 'enable' : 'disable';
+    const message = user.isDisable ? "enable" : "disable";
     if (window.confirm(`Are you sure you want to ${message} this user?`)) {
       try {
         const updatedUser = {
@@ -106,7 +106,7 @@ const UserList = () => {
             {paginatedUsers.map((user) => (
               <tr
                 key={user.id}
-                className={user.isDisable ? 'disabled-row' : ''}
+                className={user.isDisable ? "disabled-row" : ""}
               >
                 <td>{user.id}</td>
                 <td>{user.username}</td>
@@ -114,17 +114,17 @@ const UserList = () => {
                 <td>{user.role}</td>
                 <td>
                   <span
-                    className={`status-badge ${user.isDisable ? 'disabled' : 'active'}`}
+                    className={`status-badge ${user.isDisable ? "disabled" : "active"}`}
                   >
-                    {user.isDisable ? 'Disabled' : 'Active'}
+                    {user.isDisable ? "Disabled" : "Active"}
                   </span>
                 </td>
                 <td>
                   <button
-                    className={`toggle-btn ${user.isDisable ? 'enable' : 'disable'}`}
+                    className={`toggle-btn ${user.isDisable ? "enable" : "disable"}`}
                     onClick={() => handleToggleDisable(user)}
                   >
-                    {user.isDisable ? 'Enable' : 'Disable'}
+                    {user.isDisable ? "Enable" : "Disable"}
                   </button>
                 </td>
               </tr>
@@ -146,7 +146,7 @@ const UserList = () => {
           {[...Array(totalPages)].map((_, index) => (
             <button
               key={index + 1}
-              className={`page-btn ${currentPage === index + 1 ? 'active' : ''}`}
+              className={`page-btn ${currentPage === index + 1 ? "active" : ""}`}
               onClick={() => handlePageChange(index + 1)}
             >
               {index + 1}

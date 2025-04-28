@@ -59,24 +59,30 @@
       font-weight: 600;
     }
 
+    th:last-child,
+    td:last-child {
+      text-align: center;
+    }
+
     .disabled-row {
       background: rgba($text-color, 0.05);
     }
 
     .status-badge {
-      padding: 0.25rem 0.75rem;
-      border-radius: 1rem;
-      font-size: 0.85rem;
+      display: inline-block;
+      padding: 0.25rem 0.5rem;
+      border-radius: 12px;
+      font-size: 0.8rem;
       font-weight: 500;
 
       &.active {
-        background: rgba($success-color, 0.1);
-        color: $success-color;
+        background-color: rgba(46, 204, 113, 0.15);
+        color: #27ae60;
       }
 
       &.disabled {
-        background: rgba($secondary-color, 0.1);
-        color: $secondary-color;
+        background-color: rgba(231, 76, 60, 0.15);
+        color: #e74c3c;
       }
     }
 
