@@ -107,6 +107,8 @@ const Home = () => {
       filteredResults.sort((a, b) => b.year - a.year);
     }
 
+    console.log(sortType);
+
     setFilteredMovies(filteredResults);
   };
 

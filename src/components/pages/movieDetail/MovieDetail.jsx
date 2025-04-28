@@ -5,6 +5,7 @@ import { getCurrentUser } from "../../../utils/UserListAPI";
 import Loader from "../../common/Loader";
 import { useFavorites } from "../../../hooks/useFavorites";
 import TrailerPopup from "./Trailer/TrailerPopup";
+import SimilarMovie from "./SimilarMovie/SimilarMovie";
 import "./MovieDetail.scss";
 
 const MovieDetail = () => {
@@ -119,6 +120,8 @@ const MovieDetail = () => {
           )}
         </div>
       </div>
+
+      <SimilarMovie currentMovie={movie} />
 
       {showTrailer && (
         <TrailerPopup
