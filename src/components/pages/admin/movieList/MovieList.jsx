@@ -1,17 +1,22 @@
-import React, { useState, useMemo, useEffect } from 'react';
-import { useMovies } from '../../../../hooks/useMovies';
-import { createMovie, updateMovie } from '../../../../utils/MovieListAPI';
-import MovieForm from './movieForm/MovieForm';
-import './MovieList.scss';
+import React, { useState, useMemo, useEffect } from "react";
+import { useMovies } from "../../../../hooks/useMovies";
+import { createMovie, updateMovie } from "../../../../utils/MovieListAPI";
+import MovieForm from "./movieForm/MovieForm";
+import "./MovieList.scss";
 
 const ITEMS_PER_PAGE = 10;
 
 const MovieList = () => {
   const { movies, loading, error, refreshMovies } = useMovies();
-  const [searchMovie, setSearchMovie] = useState('');
+  const [searchMovie, setSearchMovie] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [showForm, setShowForm] = useState(false);
   const [editingMovie, setEditingMovie] = useState(null);
+  const [notification, setNotification] = useState({
+    show: false,
+    message: "",
+    type: "",
+  });
 
   const filteredMovies = useMemo(() => {
     let result = [...movies].sort((a, b) => Number(a.id) - Number(b.id));
@@ -37,6 +42,16 @@ const MovieList = () => {
     setCurrentPage(1);
   }, [searchMovie]);
 
+  useEffect(() => {
+    if (notification.show) {
+      const timer = setTimeout(() => {
+        setNotification({ show: false, message: "", type: "" });
+      }, 3000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [notification.show]);
+
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
   };
@@ -55,13 +70,28 @@ const MovieList = () => {
     try {
       if (editingMovie) {
         await updateMovie(editingMovie.id, values);
+        setNotification({
+          show: true,
+          message: `"${values.title}" has been updated successfully`,
+          type: "success",
+        });
       } else {
         await createMovie(values);
+        setNotification({
+          show: true,
+          message: `"${values.title}" has been added successfully`,
+          type: "success",
+        });
       }
       await refreshMovies();
       setShowForm(false);
     } catch (error) {
-      console.error('Error saving movie:', error);
+      console.error("Error saving movie:", error);
+      setNotification({
+        show: true,
+        message: `Error: ${error.message || "Failed to save movie"}`,
+        type: "error",
+      });
     } finally {
       setSubmitting(false);
     }
@@ -72,6 +102,12 @@ const MovieList = () => {
 
   return (
     <div className="movie-list-section">
+      {notification.show && (
+        <div className={`notification ${notification.type}`}>
+          {notification.message}
+        </div>
+      )}
+
       <div className="list-header">
         <h2>Movie Management</h2>
         <div className="header-actions">
@@ -111,7 +147,7 @@ const MovieList = () => {
                 <td>{movie.type}</td>
                 <td>{movie.year}</td>
                 <td>⭐ {movie.imdb_rating}</td>
-                <td>{movie.genre.join(', ')}</td>
+                <td>{movie.genre.join(", ")}</td>
                 <td>
                   <button
                     className="edit-btn"
@@ -139,7 +175,7 @@ const MovieList = () => {
           {[...Array(totalPages)].map((_, index) => (
             <button
               key={index + 1}
-              className={`page-btn ${currentPage === index + 1 ? 'active' : ''}`}
+              className={`page-btn ${currentPage === index + 1 ? "active" : ""}`}
               onClick={() => handlePageChange(index + 1)}
             >
               {index + 1}

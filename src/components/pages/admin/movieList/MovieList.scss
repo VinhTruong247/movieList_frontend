@@ -1,11 +1,47 @@
-@use '../../../../styles/root' as *;
-@use 'sass:color';
+@use "../../../../styles/root" as *;
+@use "sass:color";
 
 .movie-list-section {
   background: white;
   padding: 2rem;
   border-radius: $border-radius;
   box-shadow: $card-shadow;
+
+  .notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 12px 20px;
+    border-radius: 4px;
+    font-weight: 500;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    animation: slide-in 0.3s ease-out forwards;
+    max-width: 350px;
+
+    &.success {
+      background-color: #e8f5e9;
+      color: #2e7d32;
+      border-left: 4px solid #2e7d32;
+    }
+
+    &.error {
+      background-color: #ffebee;
+      color: #c62828;
+      border-left: 4px solid #c62828;
+    }
+  }
+
+  @keyframes slide-in {
+    from {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
 
   .list-header {
     display: flex;
