@@ -1,73 +1,110 @@
-import React from 'react';
-import { Formik, Form, Field } from 'formik';
-import * as Yup from 'yup';
-import './MovieForm.scss';
+import React from "react";
+import { Formik, Form, Field } from "formik";
+import * as Yup from "yup";
+import "./MovieForm.scss";
 
 const genres = [
-  { id: '1', name: 'Action' },
-  { id: '2', name: 'Adventure' },
-  { id: '3', name: 'Animation' },
-  { id: '4', name: 'Biography' },
-  { id: '5', name: 'Comedy' },
-  { id: '6', name: 'Crime' },
-  { id: '7', name: 'Documentary' },
-  { id: '8', name: 'Drama' },
-  { id: '9', name: 'Family' },
-  { id: '10', name: 'Fantasy' },
-  { id: '11', name: 'History' },
-  { id: '12', name: 'Horror' },
-  { id: '13', name: 'Indie' },
-  { id: '14', name: 'Medieval' },
-  { id: '15', name: 'Musical' },
-  { id: '16', name: 'Mystery' },
-  { id: '17', name: 'Romance' },
-  { id: '18', name: 'Sci-Fi' },
-  { id: '19', name: 'Sport' },
-  { id: '20', name: 'Thriller' },
-  { id: '21', name: 'War' },
-  { id: '22', name: 'Western' },
+  { id: "1", name: "Action" },
+  { id: "2", name: "Adventure" },
+  { id: "3", name: "Animation" },
+  { id: "4", name: "Biography" },
+  { id: "5", name: "Comedy" },
+  { id: "6", name: "Crime" },
+  { id: "7", name: "Documentary" },
+  { id: "8", name: "Drama" },
+  { id: "9", name: "Family" },
+  { id: "10", name: "Fantasy" },
+  { id: "11", name: "History" },
+  { id: "12", name: "Horror" },
+  { id: "13", name: "Indie" },
+  { id: "14", name: "Medieval" },
+  { id: "15", name: "Musical" },
+  { id: "16", name: "Mystery" },
+  { id: "17", name: "Romance" },
+  { id: "18", name: "Sci-Fi" },
+  { id: "19", name: "Sport" },
+  { id: "20", name: "Thriller" },
+  { id: "21", name: "War" },
+  { id: "22", name: "Western" },
 ];
 
 const MovieSchema = Yup.object().shape({
-  title: Yup.string().required('Title is required'),
-  type: Yup.string().required('Type is required'),
-  year: Yup.string().required('Year is required'),
-  genre: Yup.array().min(1, 'At least one genre is required'),
-  director: Yup.string().required('Director is required'),
-  imdb_rating: Yup.number().min(0).max(10).required('Rating is required'),
-  description: Yup.string().required('Description is required'),
+  title: Yup.string().required("Title is required"),
+  type: Yup.string().required("Type is required"),
+  year: Yup.string().required("Year is required"),
+  genre: Yup.array().min(1, "At least one genre is required"),
+  director: Yup.string().required("Director is required"),
+  imdb_rating: Yup.number().min(0).max(10).required("Rating is required"),
+  description: Yup.string().required("Description is required"),
   runtime: Yup.string()
-    .required('Runtime is required')
-    .test('valid-runtime', 'Must be a valid number', function (value) {
+    .required("Runtime is required")
+    .test("valid-runtime", "Must be a valid number", function (value) {
       if (!value) return false;
-      const number = parseInt(value.split(' ')[0]);
+      const number = parseInt(value.replace(/[^0-9]/g, ""));
       return !isNaN(number) && number > 0;
     }),
-  language: Yup.string().required('Language is required'),
-  country: Yup.string().required('Country is required'),
-  poster: Yup.string().required('Poster URL is required'),
-  trailer: Yup.string().required('Trailer URL is required'),
+  language: Yup.string().required("Language is required"),
+  country: Yup.string().required("Country is required"),
+  poster: Yup.string().required("Poster URL is required"),
+  trailer: Yup.string().required("Trailer URL is required"),
 });
 
 const MovieForm = ({ movie, onSubmit, onClose }) => {
-  const initialValues = movie || {
-    title: '',
-    type: '',
-    year: new Date().getFullYear().toString(),
-    genre: [],
-    director: '',
-    imdb_rating: '',
-    description: '',
-    runtime: '',
-    language: '',
-    country: '',
-    poster: '',
-    trailer: '',
+  const formatRuntimeForDisplay = (runtime, type) => {
+    if (!runtime) return "";
+    if (
+      typeof runtime === "string" &&
+      (runtime.includes("min") || runtime.includes("episodes"))
+    ) {
+      return runtime;
+    }
+    return type === "Movie" ? `${runtime} min` : `${runtime} episodes`;
   };
 
+  const formatRuntimeForSubmission = (runtime) => {
+    return runtime ? runtime.replace(/[^0-9]/g, "") : "";
+  };
+
+  const initialValues = movie
+    ? {
+        ...movie,
+        runtime: formatRuntimeForDisplay(movie.runtime, movie.type),
+      }
+    : {
+        title: "",
+        type: "",
+        year: new Date().getFullYear().toString(),
+        genre: [],
+        director: "",
+        imdb_rating: "",
+        description: "",
+        runtime: "",
+        language: "",
+        country: "",
+        poster: "",
+        trailer: "",
+      };
+
   const handleRuntimeChange = (e, setFieldValue, type) => {
-    let value = e.target.value.replace(/[^0-9]/g, '');
-    setFieldValue('runtime', value);
+    let numericValue = e.target.value.replace(/[^0-9]/g, "");
+
+    if (numericValue) {
+      const formattedValue =
+        type === "Movie" ? `${numericValue} min` : `${numericValue} episodes`;
+
+      setFieldValue("runtime", formattedValue);
+    } else {
+      setFieldValue("runtime", "");
+    }
+  };
+
+  const handleSubmit = (values, formikBag) => {
+    const processedValues = {
+      ...values,
+      runtime: formatRuntimeForSubmission(values.runtime),
+    };
+
+    onSubmit(processedValues, formikBag);
   };
 
   return (
@@ -76,12 +113,12 @@ const MovieForm = ({ movie, onSubmit, onClose }) => {
         <button className="close-btn" onClick={onClose}>
           ×
         </button>
-        <h2>{movie ? 'Edit Movie' : 'Add New Movie'}</h2>
+        <h2>{movie ? "Edit Movie" : "Add New Movie"}</h2>
 
         <Formik
           initialValues={initialValues}
           validationSchema={MovieSchema}
-          onSubmit={onSubmit}
+          onSubmit={handleSubmit}
         >
           {({ errors, touched, values, setFieldValue }) => (
             <Form className="movie-form">
@@ -104,8 +141,8 @@ const MovieForm = ({ movie, onSubmit, onClose }) => {
                     as="select"
                     name="type"
                     onChange={(e) => {
-                      setFieldValue('type', e.target.value);
-                      setFieldValue('runtime', '');
+                      setFieldValue("type", e.target.value);
+                      setFieldValue("runtime", "");
                     }}
                   >
                     <option value="">Select Type</option>
@@ -132,28 +169,25 @@ const MovieForm = ({ movie, onSubmit, onClose }) => {
                 {values.type && (
                   <div className="form-group runtime-group">
                     <label>
-                      Runtime{' '}
-                      {values.type === 'Movie' ? '(minutes)' : '(episodes)'}
+                      Runtime{" "}
+                      {values.type === "Movie" ? "(minutes)" : "(episodes)"}
                     </label>
-                    <div className="input-group">
-                      <Field name="runtime">
-                        {({ field }) => (
-                          <input
-                            {...field}
-                            type="text"
-                            className="runtime-input"
-                            placeholder={values.type === 'Movie' ? '120' : '12'}
-                            value={field.value}
-                            onChange={(e) =>
-                              handleRuntimeChange(e, setFieldValue, values.type)
-                            }
-                          />
-                        )}
-                      </Field>
-                      <span className="input-suffix">
-                        {values.type === 'Movie' ? 'min' : 'episodes'}
-                      </span>
-                    </div>
+                    <Field name="runtime">
+                      {({ field }) => (
+                        <input
+                          {...field}
+                          type="text"
+                          className="runtime-input"
+                          placeholder={
+                            values.type === "Movie" ? "120 min" : "12 episodes"
+                          }
+                          value={field.value}
+                          onChange={(e) =>
+                            handleRuntimeChange(e, setFieldValue, values.type)
+                          }
+                        />
+                      )}
+                    </Field>
                     {errors.runtime && touched.runtime && (
                       <div className="error">{errors.runtime}</div>
                     )}
@@ -170,13 +204,13 @@ const MovieForm = ({ movie, onSubmit, onClose }) => {
                           checked={values.genre.includes(genre.name)}
                           onChange={(e) => {
                             if (e.target.checked) {
-                              setFieldValue('genre', [
+                              setFieldValue("genre", [
                                 ...values.genre,
                                 genre.name,
                               ]);
                             } else {
                               setFieldValue(
-                                'genre',
+                                "genre",
                                 values.genre.filter((g) => g !== genre.name)
                               );
                             }
@@ -284,7 +318,7 @@ const MovieForm = ({ movie, onSubmit, onClose }) => {
                   Cancel
                 </button>
                 <button type="submit" className="submit-btn">
-                  {movie ? 'Update Movie' : 'Add Movie'}
+                  {movie ? "Update Movie" : "Add Movie"}
                 </button>
               </div>
             </Form>

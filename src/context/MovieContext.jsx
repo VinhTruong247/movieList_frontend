@@ -106,6 +106,7 @@ export const MovieProvider = ({ children }) => {
         removeFromFavorites,
         refreshUserData,
         userUpdate,
+        setMovies,
       }}
     >
       {children}
