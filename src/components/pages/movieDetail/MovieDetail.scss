@@ -1,5 +1,5 @@
-@use '../../../styles/root' as *;
-@use 'sass:color';
+@use "../../../styles/root" as *;
+@use "sass:color";
 
 .movie-detail {
   padding: 2rem;
@@ -181,6 +181,31 @@
 
         &:hover {
           background: rgba($secondary-color, 0.1);
+        }
+      }
+    }
+
+    .favorite-login-message {
+      display: inline-flex;
+      align-items: center;
+      margin-top: 1.5rem;
+      padding: 0.75rem 1.25rem;
+      border-radius: 4px;
+      background-color: rgba(52, 152, 219, 0.1);
+      color: #666;
+      font-size: 0.95rem;
+      border: 1px dashed #ccc;
+
+      .login-link {
+        color: #3498db;
+        font-weight: 600;
+        text-decoration: none;
+        margin-right: 6px;
+        transition: color 0.2s;
+
+        &:hover {
+          color: #2980b9;
+          text-decoration: underline;
         }
       }
     }

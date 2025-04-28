@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router";
+import { Link } from "react-router";
 import { fetchMovieById } from "../../../utils/MovieListAPI";
 import { getCurrentUser } from "../../../utils/UserListAPI";
 import Loader from "../../common/Loader";
@@ -110,13 +111,21 @@ const MovieDetail = () => {
             </div>
           </div>
 
-          {currentUser && currentUser.role !== "admin" && (
+          {currentUser && currentUser.role !== "admin" ? (
             <button
               className={`favorite-button ${favorite ? "is-favorite" : ""}`}
               onClick={handleFavoriteToggle}
             >
               {favorite ? "❤️ Remove from Favorites" : "🤍 Add to Favorites"}
             </button>
+          ) : (
+            currentUser?.role !== "admin" && (
+              <div className="favorite-login-message">
+                <Link to="/login" className="login-link">
+                  Login to add to your favorite list
+                </Link>
+              </div>
+            )
           )}
         </div>
       </div>
