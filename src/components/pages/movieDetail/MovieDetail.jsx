@@ -19,6 +19,24 @@ const MovieDetail = () => {
   const { currentUser } = useFavorites();
   const { isFavorite, addToFavorites, removeFromFavorites } = useFavorites();
 
+  // Format runtime based on movie type
+  const formattedRuntime = (movie) => {
+    if (!movie.runtime) return "";
+
+    // Check if runtime already includes units
+    if (
+      typeof movie.runtime === "string" &&
+      (movie.runtime.includes("min") || movie.runtime.includes("episodes"))
+    ) {
+      return movie.runtime;
+    }
+
+    // Add appropriate units based on movie type
+    return movie.type === "Movie"
+      ? `${movie.runtime} mins`
+      : `${movie.runtime} episodes`;
+  };
+
   useEffect(() => {
     const getMovie = async () => {
       try {
@@ -91,7 +109,7 @@ const MovieDetail = () => {
           <div className="movie-meta">
             <span className="year">📅 {movie.year}</span>
             <span className="rating">⭐ {movie.imdb_rating}/10</span>
-            <span className="runtime">⏱️ {movie.runtime}</span>
+            <span className="runtime">⏱️ {formattedRuntime(movie)}</span>
           </div>
 
           <div className="genre-list">

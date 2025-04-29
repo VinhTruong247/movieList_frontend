@@ -153,7 +153,6 @@ export const MovieProvider = ({ children }) => {
 
       try {
         const newFavorites = favorites.filter((movie) => movie.id !== movieId);
-        s;
         setFavorites(newFavorites);
         const filteredForDisplay =
           currentUser.role === "admin"

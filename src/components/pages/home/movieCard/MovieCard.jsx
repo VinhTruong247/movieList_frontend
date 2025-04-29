@@ -9,6 +9,21 @@ const MovieCard = ({ movie }) => {
   const { currentUser } = useContext(MovieContext);
   const favorite = isFavorite(movie.id);
 
+  const formattedRuntime = () => {
+    if (!movie.runtime) return "";
+
+    if (
+      typeof movie.runtime === "string" &&
+      (movie.runtime.includes("min") || movie.runtime.includes("episodes"))
+    ) {
+      return movie.runtime;
+    }
+
+    return movie.type === "Movie"
+      ? `${movie.runtime} mins`
+      : `${movie.runtime} episodes`;
+  };
+
   const handleFavorite = async (e) => {
     e.preventDefault();
     if (!currentUser) return;
@@ -44,7 +59,7 @@ const MovieCard = ({ movie }) => {
               </span>
             ))}
           </div>
-          <p className="movie-runtime">{movie.runtime}</p>
+          <p className="movie-runtime">{formattedRuntime()}</p>
         </div>
       </Link>
       <div className="movie-actions">

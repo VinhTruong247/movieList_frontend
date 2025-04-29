@@ -36,13 +36,10 @@ const MovieSchema = Yup.object().shape({
   director: Yup.string().required("Director is required"),
   imdb_rating: Yup.number().min(0).max(10).required("Rating is required"),
   description: Yup.string().required("Description is required"),
-  runtime: Yup.string()
-    .required("Runtime is required")
-    .test("valid-runtime", "Must be a valid number", function (value) {
-      if (!value) return false;
-      const number = parseInt(value.replace(/[^0-9]/g, ""));
-      return !isNaN(number) && number > 0;
-    }),
+  runtime: Yup.number()
+    .typeError("Runtime must be a number")
+    .positive("Runtime must be positive")
+    .required("Runtime is required"),
   language: Yup.string().required("Language is required"),
   country: Yup.string().required("Country is required"),
   poster: Yup.string().required("Poster URL is required"),
@@ -50,25 +47,18 @@ const MovieSchema = Yup.object().shape({
 });
 
 const MovieForm = ({ movie, onSubmit, onClose }) => {
-  const formatRuntimeForDisplay = (runtime, type) => {
+  const extractRuntimeValue = (runtime) => {
     if (!runtime) return "";
-    if (
-      typeof runtime === "string" &&
-      (runtime.includes("min") || runtime.includes("episodes"))
-    ) {
-      return runtime;
+    if (typeof runtime === "string") {
+      return parseInt(runtime.replace(/[^0-9]/g, ""), 10) || "";
     }
-    return type === "Movie" ? `${runtime} min` : `${runtime} episodes`;
-  };
-
-  const formatRuntimeForSubmission = (runtime) => {
-    return runtime ? runtime.replace(/[^0-9]/g, "") : "";
+    return runtime;
   };
 
   const initialValues = movie
     ? {
         ...movie,
-        runtime: formatRuntimeForDisplay(movie.runtime, movie.type),
+        runtime: extractRuntimeValue(movie.runtime),
       }
     : {
         title: "",
@@ -86,26 +76,18 @@ const MovieForm = ({ movie, onSubmit, onClose }) => {
         isDisable: false,
       };
 
-  const handleRuntimeChange = (e, setFieldValue, type) => {
-    let numericValue = e.target.value.replace(/[^0-9]/g, "");
+  const handleRuntimeChange = (e, setFieldValue) => {
+    const numericValue = e.target.value.replace(/[^0-9]/g, "");
 
     if (numericValue) {
-      const formattedValue =
-        type === "Movie" ? `${numericValue} min` : `${numericValue} episodes`;
-
-      setFieldValue("runtime", formattedValue);
+      setFieldValue("runtime", parseInt(numericValue, 10));
     } else {
       setFieldValue("runtime", "");
     }
   };
 
   const handleSubmit = (values, formikBag) => {
-    const processedValues = {
-      ...values,
-      runtime: formatRuntimeForSubmission(values.runtime),
-    };
-
-    onSubmit(processedValues, formikBag);
+    onSubmit(values, formikBag);
   };
 
   return (
@@ -179,12 +161,9 @@ const MovieForm = ({ movie, onSubmit, onClose }) => {
                           {...field}
                           type="text"
                           className="runtime-input"
-                          placeholder={
-                            values.type === "Movie" ? "120 min" : "12 episodes"
-                          }
-                          value={field.value}
+                          placeholder={values.type === "Movie" ? "120" : "12"}
                           onChange={(e) =>
-                            handleRuntimeChange(e, setFieldValue, values.type)
+                            handleRuntimeChange(e, setFieldValue)
                           }
                         />
                       )}
