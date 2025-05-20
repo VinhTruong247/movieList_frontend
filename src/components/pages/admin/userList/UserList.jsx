@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { fetchUsers, updateUser } from "../../../../utils/UserListAPI";
+import supabase from "../../../../supabase-client";
 import "./UserList.scss";
 
 const ITEMS_PER_PAGE = 10;
@@ -10,6 +10,7 @@ const UserList = () => {
   const [error, setError] = useState(null);
   const [searchUser, setSearchUser] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [processingUsers, setProcessingUsers] = useState([]);
 
   useEffect(() => {
     loadUsers();
@@ -17,26 +18,32 @@ const UserList = () => {
 
   const loadUsers = async () => {
     try {
-      const data = await fetchUsers();
-      const filteredUsers = data.filter((user) => user.role !== "admin");
-      setUsers(filteredUsers);
+      const { data, error } = await supabase
+        .from("Users")
+        .select("*")
+        .neq("role", "admin");
+
+      if (error) throw error;
+
+      setUsers(data || []);
       setLoading(false);
     } catch (err) {
+      console.error("Failed to load users:", err);
       setError("Failed to load users");
       setLoading(false);
     }
   };
 
   const filteredUsers = useMemo(() => {
-    let result = [...users].sort((a, b) => Number(a.id) - Number(b.id));
+    let result = [...users].sort((a, b) => a.email.localeCompare(b.email));
 
     if (searchUser) {
       const searchQuery = searchUser.toLowerCase();
       result = result.filter(
         (user) =>
-          user.id.toLowerCase().includes(searchQuery) ||
-          user.username.toLowerCase().includes(searchQuery) ||
-          user.email.toLowerCase().includes(searchQuery)
+          (user.id && user.id.toLowerCase().includes(searchQuery)) ||
+          (user.username && user.username.toLowerCase().includes(searchQuery)) ||
+          (user.email && user.email.toLowerCase().includes(searchQuery))
       );
     }
     return result;
@@ -57,17 +64,30 @@ const UserList = () => {
   };
 
   const handleToggleDisable = async (user) => {
-    const message = user.isDisable ? "enable" : "disable";
+    const message = user.isDisabled ? "enable" : "disable";
     if (window.confirm(`Are you sure you want to ${message} this user?`)) {
       try {
-        const updatedUser = {
-          ...user,
-          isDisable: !user.isDisable,
-        };
-        await updateUser(user.id, updatedUser);
-        setUsers(users.map((u) => (u.id === user.id ? updatedUser : u)));
+        setProcessingUsers((prev) => [...prev, user.id]);
+
+        const { error } = await supabase
+          .from("Users")
+          .update({
+            isDisabled: !user.isDisabled,
+          })
+          .eq("id", user.id);
+
+        if (error) throw error;
+
+        setUsers(
+          users.map((u) =>
+            u.id === user.id ? { ...u, isDisabled: !u.isDisabled } : u
+          )
+        );
       } catch (err) {
+        console.error(`Failed to ${message} user:`, err);
         setError(`Failed to ${message} user`);
+      } finally {
+        setProcessingUsers((prev) => prev.filter((id) => id !== user.id));
       }
     }
   };
@@ -94,7 +114,6 @@ const UserList = () => {
         <table className="data-table">
           <thead>
             <tr>
-              <th>ID</th>
               <th>Username</th>
               <th>Email</th>
               <th>Role</th>
@@ -106,25 +125,33 @@ const UserList = () => {
             {paginatedUsers.map((user) => (
               <tr
                 key={user.id}
-                className={user.isDisable ? "disabled-row" : ""}
+                className={user.isDisabled ? "disabled-row" : ""}
               >
-                <td>{user.id}</td>
                 <td>{user.username}</td>
                 <td>{user.email}</td>
                 <td>{user.role}</td>
                 <td>
                   <span
-                    className={`status-badge ${user.isDisable ? "disabled" : "active"}`}
+                    className={`status-badge ${
+                      user.isDisabled ? "disabled" : "active"
+                    }`}
                   >
-                    {user.isDisable ? "Disabled" : "Active"}
+                    {user.isDisabled ? "Disabled" : "Active"}
                   </span>
                 </td>
                 <td>
                   <button
-                    className={`toggle-btn ${user.isDisable ? "enable" : "disable"}`}
+                    className={`toggle-btn ${
+                      user.isDisabled ? "enable" : "disable"
+                    }`}
                     onClick={() => handleToggleDisable(user)}
+                    disabled={processingUsers.includes(user.id)}
                   >
-                    {user.isDisable ? "Enable" : "Disable"}
+                    {processingUsers.includes(user.id)
+                      ? "Processing..."
+                      : user.isDisabled
+                      ? "Enable"
+                      : "Disable"}
                   </button>
                 </td>
               </tr>
@@ -146,7 +173,9 @@ const UserList = () => {
           {[...Array(totalPages)].map((_, index) => (
             <button
               key={index + 1}
-              className={`page-btn ${currentPage === index + 1 ? "active" : ""}`}
+              className={`page-btn ${
+                currentPage === index + 1 ? "active" : ""
+              }`}
               onClick={() => handlePageChange(index + 1)}
             >
               {index + 1}

@@ -1,13 +1,14 @@
 import React, { useState, useMemo, useEffect } from "react";
-import { useMovies } from "../../../../hooks/useMovies";
-import { createMovie, updateMovie } from "../../../../utils/MovieListAPI";
+import { getMovies, addMovie, updateMovie } from "../../../../utils/MovieListAPI";
 import MovieForm from "./movieForm/MovieForm";
 import "./MovieList.scss";
 
 const ITEMS_PER_PAGE = 10;
 
 const MovieList = () => {
-  const { movies, loading, error, refreshMovies } = useMovies();
+  const [movies, setMovies] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [searchMovie, setSearchMovie] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [showForm, setShowForm] = useState(false);
@@ -19,43 +20,52 @@ const MovieList = () => {
   });
   const [processingMovies, setProcessingMovies] = useState([]);
 
+  const fetchMovies = async () => {
+    setLoading(true);
+    try {
+      const data = await getMovies();
+      const formattedMovies = data.map((movie) => ({
+        ...movie,
+        poster: movie.poster_url,
+        trailer: movie.trailer_url,
+        genre: movie.MovieGenres?.map((g) => g.Genres.name) || [],
+        director:
+          movie.MovieDirectors?.map((d) => d.Director.name).join(", ") || "",
+        isDisable: movie.isDisabled,
+      }));
+      setMovies(formattedMovies);
+    } catch (err) {
+      setError("Failed to load movies");
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchMovies();
+  }, []);
+
   const filteredMovies = useMemo(() => {
     let result = [...movies].sort((a, b) => Number(a.id) - Number(b.id));
 
     if (searchMovie) {
       const searchedMovie = searchMovie.toLowerCase();
-      result = result.filter(
-        (movie) =>
-          movie.id.toLowerCase().includes(searchedMovie) ||
-          movie.title.toLowerCase().includes(searchedMovie)
+      result = result.filter((movie) =>
+        movie.title.toLowerCase().includes(searchedMovie)
       );
     }
+
     return result;
   }, [movies, searchMovie]);
 
-  const totalPages = Math.ceil(filteredMovies.length / ITEMS_PER_PAGE);
-  const paginatedMovies = filteredMovies.slice(
-    (currentPage - 1) * ITEMS_PER_PAGE,
-    currentPage * ITEMS_PER_PAGE
-  );
+  const paginatedMovies = useMemo(() => {
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    return filteredMovies.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+  }, [filteredMovies, currentPage]);
 
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [searchMovie]);
-
-  useEffect(() => {
-    if (notification.show) {
-      const timer = setTimeout(() => {
-        setNotification({ show: false, message: "", type: "" });
-      }, 3000);
-
-      return () => clearTimeout(timer);
-    }
-  }, [notification.show]);
-
-  const handlePageChange = (pageNumber) => {
-    setCurrentPage(pageNumber);
-  };
+  const pageCount = Math.ceil(filteredMovies.length / ITEMS_PER_PAGE);
+  const pages = Array.from({ length: pageCount }, (_, i) => i + 1);
 
   const handleAddMovie = () => {
     setEditingMovie(null);
@@ -67,62 +77,57 @@ const MovieList = () => {
     setShowForm(true);
   };
 
-  const handleToggleStatus = async (movie) => {
+  const handleSubmit = async (values, { resetForm, setSubmitting }) => {
     try {
-      setProcessingMovies((prev) => [...prev, movie.id]);
-
-      const updatedMovie = {
-        ...movie,
-        isDisable: !movie.isDisable,
+      setProcessingMovies((prev) => [...prev, values.id]);
+      const movieData = {
+        title: values.title,
+        type: values.type,
+        year: values.year,
+        genre: values.genre,
+        director: values.director,
+        imdb_rating: values.imdb_rating,
+        description: values.description,
+        runtime: values.runtime,
+        language: values.language,
+        country: values.country,
+        posterUrl: values.poster,
+        trailerUrl: values.trailer,
+        isDisabled: values.isDisable || false,
+        genreIds: values.genre?.map((g) => g.id) || [],
+        directorIds: [values.director.id],
       };
-      await updateMovie(movie.id, updatedMovie);
-      await refreshMovies();
 
-      setNotification({
-        show: true,
-        message: `"${movie.title}" has been ${updatedMovie.isDisable ? "disabled" : "enabled"}`,
-        type: "success",
-      });
-    } catch (error) {
-      console.error("Error toggling movie status:", error);
-      setNotification({
-        show: true,
-        message: `Error: Failed to update status for "${movie.title}"`,
-        type: "error",
-      });
-    } finally {
-      setProcessingMovies((prev) => prev.filter((id) => id !== movie.id));
-    }
-  };
-
-  const handleSubmit = async (values, { setSubmitting }) => {
-    try {
       if (editingMovie) {
-        await updateMovie(editingMovie.id, values);
+        await updateMovie(values.id, movieData);
         setNotification({
           show: true,
-          message: `"${values.title}" has been updated successfully`,
+          message: "Movie updated successfully!",
           type: "success",
         });
       } else {
-        await createMovie(values);
+        await addMovie(movieData);
         setNotification({
           show: true,
-          message: `"${values.title}" has been added successfully`,
+          message: "Movie added successfully!",
           type: "success",
         });
       }
-      await refreshMovies();
+
+      resetForm();
       setShowForm(false);
+      fetchMovies();
     } catch (error) {
-      console.error("Error saving movie:", error);
       setNotification({
         show: true,
-        message: `Error: ${error.message || "Failed to save movie"}`,
+        message: `Failed to ${editingMovie ? "update" : "add"} movie: ${
+          error.message
+        }`,
         type: "error",
       });
     } finally {
       setSubmitting(false);
+      setProcessingMovies((prev) => prev.filter((id) => id !== values.id));
     }
   };
 

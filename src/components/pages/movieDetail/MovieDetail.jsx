@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router";
 import { Link } from "react-router";
-import { fetchMovieById } from "../../../utils/MovieListAPI";
+import { getMovieById } from "../../../utils/MovieListAPI"; 
 import Loader from "../../common/Loader";
 import { useFavorites } from "../../../hooks/useFavorites";
 import TrailerPopup from "./Trailer/TrailerPopup";
@@ -16,38 +16,40 @@ const MovieDetail = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [showTrailer, setShowTrailer] = useState(false);
-  const { currentUser } = useFavorites();
-  const { isFavorite, addToFavorites, removeFromFavorites } = useFavorites();
+  const { isFavorite, toggleFavorite, isLoggedIn } = useFavorites();
 
-  // Format runtime based on movie type
   const formattedRuntime = (movie) => {
     if (!movie.runtime) return "";
-
-    // Check if runtime already includes units
     if (
       typeof movie.runtime === "string" &&
       (movie.runtime.includes("min") || movie.runtime.includes("episodes"))
     ) {
       return movie.runtime;
     }
-
-    // Add appropriate units based on movie type
     return movie.type === "Movie"
       ? `${movie.runtime} mins`
       : `${movie.runtime} episodes`;
   };
 
   useEffect(() => {
-    const getMovie = async () => {
+    const fetchMovie = async () => {
       try {
         setLoading(true);
-        const data = await fetchMovieById(id);
-        if (!data || data.isDisable) {
+        const data = await getMovieById(id);
+        if (!data || data.isDisabled) {
           setMovie(null);
           return;
         }
 
-        setMovie(data);
+        const formattedMovie = {
+          ...data,
+          poster: data.poster_url,
+          trailer: data.trailer_url,
+          genre: data.MovieGenres?.map(g => g.Genres.name) || [],
+          director: data.MovieDirectors?.map(d => d.Director.name).join(', ') || ''
+        };
+
+        setMovie(formattedMovie);
         setError("");
       } catch (err) {
         console.error(err);
@@ -57,22 +59,18 @@ const MovieDetail = () => {
       }
     };
 
-    getMovie();
+    fetchMovie();
   }, [id]);
 
   const handleFavoriteToggle = useCallback(async () => {
-    if (!currentUser) return;
+    if (!isLoggedIn) return;
 
     try {
-      if (isFavorite(movie.id)) {
-        await removeFromFavorites(movie.id);
-      } else {
-        await addToFavorites(movie);
-      }
+      await toggleFavorite(movie.id);
     } catch (error) {
       setError("Failed to update favorites");
     }
-  }, [currentUser, movie, isFavorite, removeFromFavorites, addToFavorites]);
+  }, [isLoggedIn, movie, toggleFavorite]);
 
   if (loading) return <Loader />;
 
@@ -139,7 +137,7 @@ const MovieDetail = () => {
             </div>
           </div>
 
-          {currentUser && currentUser.role !== "admin" ? (
+          {isLoggedIn ? (
             <button
               className={`favorite-button ${favorite ? "is-favorite" : ""}`}
               onClick={handleFavoriteToggle}
@@ -147,13 +145,11 @@ const MovieDetail = () => {
               {favorite ? "❤️ Remove from Favorites" : "🤍 Add to Favorites"}
             </button>
           ) : (
-            currentUser?.role !== "admin" && (
-              <div className="favorite-login-message">
-                <Link to="/login" className="login-link">
-                  Login to add to your favorite list
-                </Link>
-              </div>
-            )
+            <div className="favorite-login-message">
+              <Link to="/login" className="login-link">
+                Login to add to your favorite list
+              </Link>
+            </div>
           )}
         </div>
       </div>

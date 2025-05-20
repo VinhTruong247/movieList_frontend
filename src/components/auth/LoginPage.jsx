@@ -21,19 +21,20 @@ const LoginPage = () => {
 
   const handleSubmit = async (values, { setSubmitting }) => {
     try {
-      const response = await loginUser(values.email, values.password);
+      const response = await loginUser({
+        email: values.email,
+        password: values.password,
+      });
 
-      if (response.success) {
-        if (response.user.isDisable) {
-          setError("Your account has been disabled. Please contact support.");
-          return;
-        }
-
-        if (response.user.role === "admin") {
-          navigate("/admin");
-        } else {
-          navigate("/");
-        }
+      if (response.userData.isDisabled) {
+        setError("Your account has been disabled. Please contact support.");
+        return;
+      }
+      localStorage.setItem("user", JSON.stringify(response.userData));
+      if (response.userData.role === "admin") {
+        navigate("/admin");
+      } else {
+        navigate("/");
       }
     } catch (err) {
       setError("Invalid email or password. Please try again.");
@@ -50,7 +51,9 @@ const LoginPage = () => {
 
         {error && (
           <div
-            className={`auth-error ${error.includes("disabled") ? "disabled" : ""}`}
+            className={`auth-error ${
+              error.includes("disabled") ? "disabled" : ""
+            }`}
           >
             {error}
           </div>
@@ -73,7 +76,9 @@ const LoginPage = () => {
                   type="email"
                   name="email"
                   id="email"
-                  className={`form-input ${errors.email && touched.email ? "error" : ""}`}
+                  className={`form-input ${
+                    errors.email && touched.email ? "error" : ""
+                  }`}
                   placeholder="Enter your email"
                 />
                 {errors.email && touched.email && (
@@ -88,7 +93,9 @@ const LoginPage = () => {
                     type="password"
                     name="password"
                     id="password"
-                    className={`form-input ${errors.password && touched.password ? "error" : ""}`}
+                    className={`form-input ${
+                      errors.password && touched.password ? "error" : ""
+                    }`}
                     placeholder="Enter your password"
                   />
                 </div>
@@ -106,7 +113,9 @@ const LoginPage = () => {
 
               <button
                 type="submit"
-                className={`submit-btn ${!values.email || !values.password ? "disabled" : ""}`}
+                className={`submit-btn ${
+                  !values.email || !values.password ? "disabled" : ""
+                }`}
                 disabled={isSubmitting || !values.email || !values.password}
               >
                 {isSubmitting ? "Signing in..." : "Sign In"}

@@ -8,9 +8,13 @@ const Header = () => {
   const navigate = useNavigate();
   const { currentUser, userUpdate } = useContext(MovieContext);
 
-  const handleLogout = () => {
-    logoutUser();
-    navigate("/login");
+  const handleLogout = async () => {
+    try {
+      await logoutUser();
+      localStorage.removeItem('user');
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
   };
 
   return (

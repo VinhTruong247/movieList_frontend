@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router";
 import { Formik, Form, Field } from "formik";
-import { registerUser } from "../../utils/UserListAPI";
+import { signUp } from "../../utils/UserListAPI";
 import { RegisterSchema } from "./Validation";
 import "./RegisterPage.scss";
 
@@ -32,21 +32,18 @@ const RegisterPage = () => {
 
   const handleSubmit = async (values, { setSubmitting }) => {
     try {
-      const response = await registerUser(
-        values.username,
-        values.email,
-        values.password
-      );
+      await signUp({
+        email: values.email,
+        password: values.password,
+        username: values.username,
+        name: values.username,
+      });
 
-      if (response.success) {
-        setSuccess("Registration successful! Redirecting to login...");
-      } else {
-        setError(response.errors || "Registration failed. Please try again.");
-      }
+      setSuccess("Registration successful! Redirecting to login...");
     } catch (err) {
-      if (err.errors && err.errors.includes("Email already exists")) {
+      if (err.message?.includes("email")) {
         setError("This email is already registered. Please use another email.");
-      } else if (err.errors && err.errors.includes("Username already exists")) {
+      } else if (err.message?.includes("username")) {
         setError("This username is already taken. Please choose another one.");
       } else {
         setError("Registration failed. Please try again later.");

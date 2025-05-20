@@ -5,17 +5,15 @@ import { MovieContext } from "../../../../context/MovieContext";
 import "./MovieCard.scss";
 
 const MovieCard = ({ movie }) => {
-  const { addToFavorites, removeFromFavorites, isFavorite } = useFavorites();
+  const { toggleFavorite, isFavorite } = useFavorites();
   const { currentUser } = useContext(MovieContext);
   const favorite = isFavorite(movie.id);
 
   const formattedRuntime = () => {
     if (!movie.runtime) return "";
 
-    if (
-      typeof movie.runtime === "string" &&
-      (movie.runtime.includes("min") || movie.runtime.includes("episodes"))
-    ) {
+    if (typeof movie.runtime === "string" && 
+        (movie.runtime.includes("min") || movie.runtime.includes("episodes"))) {
       return movie.runtime;
     }
 
@@ -29,11 +27,7 @@ const MovieCard = ({ movie }) => {
     if (!currentUser) return;
 
     try {
-      if (favorite) {
-        await removeFromFavorites(movie.id);
-      } else {
-        await addToFavorites(movie);
-      }
+      await toggleFavorite(movie.id);
     } catch (error) {
       console.error("Error updating favorites:", error);
     }
@@ -43,7 +37,7 @@ const MovieCard = ({ movie }) => {
     <div className="movie-card">
       <Link to={`/movie/${movie.id}`} className="movie-link">
         <div className="movie-poster">
-          <img src={movie.poster} alt={movie.title} />
+          <img src={movie.poster_url || movie.poster} alt={movie.title} />
           <div className="movie-type">{movie.type}</div>
         </div>
         <div className="movie-content">
@@ -53,9 +47,9 @@ const MovieCard = ({ movie }) => {
             <span className="movie-year">{movie.year}</span>
           </div>
           <div className="movie-genres">
-            {movie.genre.map((genre, index) => (
-              <span key={index} className="genre-tag">
-                {genre}
+            {movie.MovieGenres?.map(item => (
+              <span key={item.genre_id} className="genre-tag">
+                {item.Genres.name}
               </span>
             ))}
           </div>

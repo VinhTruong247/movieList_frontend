@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { fetchUsers } from '../../../utils/UserListAPI';
+import supabase from '../../../supabase-client';
 import { useMovies } from '../../../hooks/useMovies';
 import UserList from './userList/UserList';
 import MovieList from './movieList/MovieList';
@@ -15,10 +15,16 @@ const AdminPage = () => {
   useEffect(() => {
     const loadUsers = async () => {
       try {
-        const data = await fetchUsers();
-        const filteredUsers = data.filter((user) => user.role !== 'admin');
-        setUsers(filteredUsers);
+        const { data, error } = await supabase
+          .from('Users')
+          .select('*')
+          .neq('role', 'admin');
+          
+        if (error) throw error;
+        
+        setUsers(data || []);
       } catch (err) {
+        console.error('Failed to load users:', err);
         setError('Failed to load users');
       } finally {
         setLoading(false);

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router";
-import { fetchMovies } from "../../../../utils/MovieListAPI";
+import { getMovies } from "../../../../utils/MovieListAPI";
 import Loader from "../../../common/Loader";
 import "./SimilarMovie.scss";
 
@@ -21,7 +21,7 @@ const SimilarMovie = ({ currentMovie }) => {
           return;
         }
 
-        const allMovies = await fetchMovies();
+        const allMovies = await getMovies();
         const filtered = allMovies.filter(
           (movie) =>
             movie.id !== currentMovie.id &&

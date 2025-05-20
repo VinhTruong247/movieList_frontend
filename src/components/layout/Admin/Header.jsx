@@ -1,15 +1,33 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router';
 import { logoutUser, getCurrentUser } from '../../../utils/UserListAPI';
 import './styles/Header.scss';
 
 const AdminHeader = () => {
   const navigate = useNavigate();
-  const currentUser = getCurrentUser();
+  const [userData, setUserData] = useState(null);
 
-  const handleLogout = () => {
-    logoutUser();
-    navigate('/login');
+  useEffect(() => {
+    const loadUser = async () => {
+      try {
+        const user = await getCurrentUser();
+        setUserData(user?.userData);
+      } catch (error) {
+        console.error("Error loading user data:", error);
+      }
+    };
+    
+    loadUser();
+  }, []);
+
+  const handleLogout = async () => {
+    try {
+      await logoutUser();
+      localStorage.removeItem('user');
+      navigate('/login');
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
   };
 
   return (
@@ -26,7 +44,7 @@ const AdminHeader = () => {
             View Site
           </Link>
           <div className="admin-user">
-            <span className="username">Admin: {currentUser?.username}</span>
+            <span className="username">Admin: {userData?.username}</span>
             <button onClick={handleLogout} className="logout-btn">
               Sign Out
             </button>
