@@ -61,9 +61,11 @@ export const getMovies = async (filters = {}) => {
   let query = supabase.from('Movies').select(`
     *,
     MovieGenres (
+      genre_id,
       Genres (id, name)
     ),
     MovieDirectors (
+      director_id,
       Director (id, name)
     ),
     Reviews (id, rating, comment, user_id)
@@ -74,7 +76,7 @@ export const getMovies = async (filters = {}) => {
   if (filters.genre) {
     query = query.filter('MovieGenres.Genres.name', 'eq', filters.genre);
   }
-  
+
   const { data, error } = await query;
   if (error) throw error;
   return data;
@@ -97,7 +99,7 @@ export const getMovieById = async (movieId) => {
     `)
     .eq('id', movieId)
     .single();
-    
+
   if (error) throw error;
   return data;
 };
@@ -120,7 +122,7 @@ export const addMovie = async (movieData) => {
     }])
     .select()
     .single();
-  
+
   if (error) throw error;
 
   if (movieData.genreIds && movieData.genreIds.length > 0) {
@@ -128,11 +130,11 @@ export const addMovie = async (movieData) => {
       movie_id: movie.id,
       genre_id: genreId
     }));
-    
+
     const { error: genreError } = await supabase
       .from('MovieGenres')
       .insert(genreAssociations);
-      
+
     if (genreError) throw genreError;
   }
 
@@ -141,14 +143,14 @@ export const addMovie = async (movieData) => {
       movie_id: movie.id,
       director_id: directorId
     }));
-    
+
     const { error: directorError } = await supabase
       .from('MovieDirectors')
       .insert(directorAssociations);
-      
+
     if (directorError) throw directorError;
   }
-  
+
   return movie;
 };
 
@@ -191,14 +193,14 @@ export const updateMovie = async (movieId, movieData) => {
       
     if (genreError) throw genreError;
   }
-
+  
   const { error: deleteDirectorError } = await supabase
     .from('MovieDirectors')
     .delete()
     .eq('movie_id', movieId);
     
   if (deleteDirectorError) throw deleteDirectorError;
-  
+
   if (movieData.directorIds && movieData.directorIds.length > 0) {
     const directorAssociations = movieData.directorIds.map(directorId => ({
       movie_id: movieId,

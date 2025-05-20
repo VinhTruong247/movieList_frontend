@@ -1,6 +1,7 @@
-import React, { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { getMovies, addMovie, updateMovie } from "../../../../utils/MovieListAPI";
 import MovieForm from "./movieForm/MovieForm";
+import supabase from "../../../../supabase-client";
 import "./MovieList.scss";
 
 const ITEMS_PER_PAGE = 10;
@@ -28,10 +29,10 @@ const MovieList = () => {
         ...movie,
         poster: movie.poster_url,
         trailer: movie.trailer_url,
-        genre: movie.MovieGenres?.map((g) => g.Genres.name) || [],
+        genre: movie.MovieGenres?.map((g) => g.Genres?.name) || [],
         director:
-          movie.MovieDirectors?.map((d) => d.Director.name).join(", ") || "",
-        isDisable: movie.isDisabled,
+          movie.MovieDirectors?.map((d) => d.Director?.name).join(", ") || "",
+        isDisabled: movie.isDisabled,
       }));
       setMovies(formattedMovies);
     } catch (err) {
@@ -46,13 +47,23 @@ const MovieList = () => {
     fetchMovies();
   }, []);
 
+  useEffect(() => {
+    if (notification.show) {
+      const timer = setTimeout(() => {
+        setNotification(prev => ({...prev, show: false}));
+      }, 5000);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [notification.show]);
+
   const filteredMovies = useMemo(() => {
     let result = [...movies].sort((a, b) => Number(a.id) - Number(b.id));
 
     if (searchMovie) {
       const searchedMovie = searchMovie.toLowerCase();
       result = result.filter((movie) =>
-        movie.title.toLowerCase().includes(searchedMovie)
+        movie.title?.toLowerCase().includes(searchedMovie)
       );
     }
 
@@ -65,7 +76,10 @@ const MovieList = () => {
   }, [filteredMovies, currentPage]);
 
   const pageCount = Math.ceil(filteredMovies.length / ITEMS_PER_PAGE);
-  const pages = Array.from({ length: pageCount }, (_, i) => i + 1);
+
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
 
   const handleAddMovie = () => {
     setEditingMovie(null);
@@ -75,6 +89,44 @@ const MovieList = () => {
   const handleEditMovie = (movie) => {
     setEditingMovie(movie);
     setShowForm(true);
+  };
+
+  const handleToggleStatus = async (movie) => {
+    const message = movie.isDisabled ? "enable" : "disable";
+    if (window.confirm(`Are you sure you want to ${message} this movie?`)) {
+      try {
+        setProcessingMovies((prev) => [...prev, movie.id]);
+        
+        const { error } = await supabase
+          .from("Movies")
+          .update({ isDisabled: !movie.isDisabled })
+          .eq("id", movie.id);
+          
+        if (error) throw error;
+
+        setMovies(
+          movies.map((m) =>
+            m.id === movie.id ? { ...m, isDisabled: !movie.isDisabled } : m
+          )
+        );
+        
+        setNotification({
+          show: true,
+          message: `Movie ${message}d successfully!`,
+          type: "success",
+        });
+        
+      } catch (err) {
+        console.error(`Failed to ${message} movie:`, err);
+        setNotification({
+          show: true,
+          message: `Failed to ${message} movie: ${err.message}`,
+          type: "error",
+        });
+      } finally {
+        setProcessingMovies((prev) => prev.filter((id) => id !== movie.id));
+      }
+    }
   };
 
   const handleSubmit = async (values, { resetForm, setSubmitting }) => {
@@ -93,9 +145,9 @@ const MovieList = () => {
         country: values.country,
         posterUrl: values.poster,
         trailerUrl: values.trailer,
-        isDisabled: values.isDisable || false,
-        genreIds: values.genre?.map((g) => g.id) || [],
-        directorIds: [values.director.id],
+        isDisabled: values.isDisabled || false,
+        genreIds: values.genre?.map((g) => g.id || g) || [],
+        directorIds: values.director?.id ? [values.director.id] : [],
       };
 
       if (editingMovie) {
@@ -148,7 +200,7 @@ const MovieList = () => {
           <div className="search-box">
             <input
               type="text"
-              placeholder="Search by ID or Title..."
+              placeholder="Search by Title..."
               value={searchMovie}
               onChange={(e) => setSearchMovie(e.target.value)}
               className="search-input"
@@ -164,7 +216,6 @@ const MovieList = () => {
         <table className="data-table">
           <thead>
             <tr>
-              <th>ID</th>
               <th>Title</th>
               <th>Type</th>
               <th>Year</th>
@@ -178,19 +229,18 @@ const MovieList = () => {
             {paginatedMovies.map((movie) => (
               <tr
                 key={movie.id}
-                className={movie.isDisable ? "disabled-row" : ""}
+                className={movie.isDisabled ? "disabled-row" : ""}
               >
-                <td>{movie.id}</td>
                 <td>{movie.title}</td>
                 <td>{movie.type}</td>
                 <td>{movie.year}</td>
                 <td>⭐ {movie.imdb_rating}</td>
-                <td>{movie.genre.join(", ")}</td>
+                <td>{(movie.genre || []).join(", ")}</td>
                 <td>
                   <span
-                    className={`status-badge ${movie.isDisable ? "disabled" : "active"}`}
+                    className={`status-badge ${movie.isDisabled ? "disabled" : "active"}`}
                   >
-                    {movie.isDisable ? "Disabled" : "Active"}
+                    {movie.isDisabled ? "Disabled" : "Active"}
                   </span>
                 </td>
                 <td className="actions-cell">
@@ -202,13 +252,13 @@ const MovieList = () => {
                     Edit
                   </button>
                   <button
-                    className={`toggle-btn ${movie.isDisable ? "enable" : "disable"}`}
+                    className={`toggle-btn ${movie.isDisabled ? "enable" : "disable"}`}
                     onClick={() => handleToggleStatus(movie)}
                     disabled={processingMovies.includes(movie.id)}
                   >
                     {processingMovies.includes(movie.id) ? (
                       <span className="loading-spinner"></span>
-                    ) : movie.isDisable ? (
+                    ) : movie.isDisabled ? (
                       "Enable"
                     ) : (
                       "Disable"
@@ -221,7 +271,7 @@ const MovieList = () => {
         </table>
       </div>
 
-      {totalPages > 1 && (
+      {pageCount > 1 && (
         <div className="pagination">
           <button
             className="page-btn"
@@ -231,20 +281,20 @@ const MovieList = () => {
             Previous
           </button>
 
-          {[...Array(totalPages)].map((_, index) => (
+          {Array.from({ length: pageCount }, (_, i) => i + 1).map((page) => (
             <button
-              key={index + 1}
-              className={`page-btn ${currentPage === index + 1 ? "active" : ""}`}
-              onClick={() => handlePageChange(index + 1)}
+              key={page}
+              className={`page-btn ${currentPage === page ? "active" : ""}`}
+              onClick={() => handlePageChange(page)}
             >
-              {index + 1}
+              {page}
             </button>
           ))}
 
           <button
             className="page-btn"
             onClick={() => handlePageChange(currentPage + 1)}
-            disabled={currentPage === totalPages}
+            disabled={currentPage === pageCount}
           >
             Next
           </button>

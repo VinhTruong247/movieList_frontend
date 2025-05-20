@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect, useCallback } from "react";
+import { createContext, useState, useEffect, useCallback } from "react";
 import supabase from "../supabase-client";
 import { getCurrentUser } from "../utils/UserListAPI";
 
@@ -13,37 +13,54 @@ export const MovieProvider = ({ children }) => {
   const [syncedFavorites, setSyncedFavorites] = useState([]);
 
   useEffect(() => {
+    let isMounted = true;
+
     const loadUserData = async () => {
       try {
         const userData = await getCurrentUser();
-        setCurrentUser(userData?.userData || null);
+        if (isMounted) {
+          setCurrentUser(userData?.userData || null);
 
-        if (userData?.userData) {
-          await loadUserFavorites(userData.userData.id);
+          if (userData?.userData) {
+            await loadUserFavorites(userData.userData.id);
+          }
         }
       } catch (err) {
         console.error("Error loading user data:", err);
       }
     };
+
     loadUserData();
 
     const { data: authListener } = supabase.auth.onAuthStateChange(
-      async (event) => {
+      async (event, session) => {
+        if (!isMounted) return;
+
         if (event === "SIGNED_IN") {
-          const userData = await getCurrentUser();
-          setCurrentUser(userData?.userData || null);
-          if (userData?.userData) {
-            await loadUserFavorites(userData.userData.id);
+          try {
+            const userData = await getCurrentUser();
+            if (isMounted) {
+              setCurrentUser(userData?.userData || null);
+              if (userData?.userData) {
+                await loadUserFavorites(userData.userData.id);
+              }
+            }
+          } catch (err) {
+            console.error("Error loading user data after sign in:", err);
           }
         } else if (event === "SIGNED_OUT") {
-          setCurrentUser(null);
-          setFavorites([]);
-          setSyncedFavorites([]);
+          if (isMounted) {
+            setCurrentUser(null);
+            setFavorites([]);
+            setSyncedFavorites([]);
+          }
         }
       }
     );
 
     return () => {
+      isMounted = false;
+
       if (authListener && authListener.subscription) {
         authListener.subscription.unsubscribe();
       }

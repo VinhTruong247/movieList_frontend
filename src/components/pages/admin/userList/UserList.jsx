@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo } from "react";
 import supabase from "../../../../supabase-client";
 import "./UserList.scss";
 
@@ -13,26 +13,36 @@ const UserList = () => {
   const [processingUsers, setProcessingUsers] = useState([]);
 
   useEffect(() => {
+    let isMounted = true;
+
+    const loadUsers = async () => {
+      try {
+        const { data, error } = await supabase
+          .from("Users")
+          .select("*")
+          .neq("role", "admin");
+
+        if (error) throw error;
+
+        if (isMounted) {
+          setUsers(data || []);
+          setLoading(false);
+        }
+      } catch (err) {
+        console.error("Failed to load users:", err);
+        if (isMounted) {
+          setError("Failed to load users");
+          setLoading(false);
+        }
+      }
+    };
+
     loadUsers();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
-
-  const loadUsers = async () => {
-    try {
-      const { data, error } = await supabase
-        .from("Users")
-        .select("*")
-        .neq("role", "admin");
-
-      if (error) throw error;
-
-      setUsers(data || []);
-      setLoading(false);
-    } catch (err) {
-      console.error("Failed to load users:", err);
-      setError("Failed to load users");
-      setLoading(false);
-    }
-  };
 
   const filteredUsers = useMemo(() => {
     let result = [...users].sort((a, b) => a.email.localeCompare(b.email));
