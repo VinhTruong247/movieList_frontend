@@ -39,9 +39,13 @@ const Home = () => {
     }
 
     if (selectedGenre !== "all") {
-      filteredResults = filteredResults.filter((movie) =>
-        movie.genre.includes(selectedGenre)
-      );
+      filteredResults = filteredResults.filter((movie) => {
+        if (!movie.MovieGenres || !Array.isArray(movie.MovieGenres))
+          return false;
+        return movie.MovieGenres.some(
+          (mg) => mg.Genres && mg.Genres.name === selectedGenre
+        );
+      });
     }
 
     if (activeMovieType === "Movie") {
@@ -86,9 +90,13 @@ const Home = () => {
     }
 
     if (genreToUse !== "all") {
-      filteredResults = filteredResults.filter((movie) =>
-        movie.genre.includes(genreToUse)
-      );
+      filteredResults = filteredResults.filter((movie) => {
+        if (!movie.MovieGenres || !Array.isArray(movie.MovieGenres))
+          return false;
+        return movie.MovieGenres.some(
+          (mg) => mg.Genres && mg.Genres.name === genreToUse
+        );
+      });
     }
 
     if (movieType === "Movie") {
