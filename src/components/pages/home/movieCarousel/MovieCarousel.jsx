@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router";
 import "./MovieCarousel.scss";
 
@@ -32,10 +32,20 @@ const MovieCarousel = ({ movies }) => {
     );
   };
 
-  // useEffect(() => {
-  //   const timer = setInterval(nextSlide, 5000);
-  //   return () => clearInterval(timer);
-  // });
+  useEffect(() => {
+    const timer = setInterval(nextSlide, 5000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const getGenreNames = (movie) => {
+    if (!movie.MovieGenres || !Array.isArray(movie.MovieGenres)) {
+      return "No genre information";
+    }
+
+    return movie.MovieGenres.filter((mg) => mg.Genres)
+      .map((mg) => mg.Genres.name)
+      .join(", ");
+  };
 
   return (
     <div className="carousel-container">
@@ -44,14 +54,16 @@ const MovieCarousel = ({ movies }) => {
           <div
             key={movie.id}
             className={`carousel-slide ${index === currentSlide ? "active" : ""}`}
-            style={{ backgroundImage: `url(${movie.poster})` }}
+            style={{
+              backgroundImage: `url(${movie.poster_url || movie.poster})`,
+            }}
           >
             <div className="slide-content">
               <h2>{movie.title}</h2>
               <div className="movie-info">
                 <span className="rating">⭐ {movie.imdb_rating}/10</span>
                 <span className="year">{movie.year}</span>
-                <span className="genre">{movie.genre.join(", ")}</span>
+                <span className="genre">{getGenreNames(movie)}</span>
               </div>
               <p className="description">{movie.description}</p>
               <Link
