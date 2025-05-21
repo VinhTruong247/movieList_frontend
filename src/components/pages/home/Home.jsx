@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import MovieCarousel from "./movieCarousel/MovieCarousel";
 import MovieCard from "./movieCard/MovieCard";
 import GenreList from "./movieGenreList/GenreList";
@@ -14,11 +14,19 @@ const Home = () => {
   const [activeMovieType, setActiveMovieType] = useState("all");
   const [activeSortType, setActiveSortType] = useState("all");
 
+  const shuffleArray = (array) => {
+    const newArray = [...array];
+    for (let i = newArray.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+    }
+    return newArray;
+  };
+
   useEffect(() => {
     if (movies && movies.length > 0) {
-      setFilteredMovies([...movies]);
-      const sortedByIdMovies = [...movies].sort((a, b) => a.id - b.id);
-      setFilteredMovies(sortedByIdMovies);
+      const shuffledMovies = shuffleArray(movies);
+      setFilteredMovies(shuffledMovies);
     }
   }, [movies]);
 
@@ -63,7 +71,7 @@ const Home = () => {
     } else if (activeSortType === "latest") {
       filteredResults.sort((a, b) => b.year - a.year);
     } else {
-      filteredResults.sort((a, b) => a.id - b.id);
+      filteredResults = shuffleArray(filteredResults);
     }
 
     setFilteredMovies(filteredResults);
@@ -110,7 +118,7 @@ const Home = () => {
     }
 
     if (sortType === "all") {
-      filteredResults.sort((a, b) => a.id - b.id);
+      filteredResults = shuffleArray(filteredResults);
     } else if (sortType === "top-rated") {
       filteredResults.sort((a, b) => b.imdb_rating - a.imdb_rating);
     } else if (sortType === "latest") {
@@ -167,7 +175,7 @@ const Home = () => {
                   setSelectedGenre("all");
                   setActiveMovieType("all");
                   setActiveSortType("all");
-                  setFilteredMovies([...movies]);
+                  setFilteredMovies(shuffleArray([...movies]));
                 }}
               >
                 Reset Filters
