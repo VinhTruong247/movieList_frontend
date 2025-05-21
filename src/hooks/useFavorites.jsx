@@ -2,30 +2,25 @@ import { useContext, useCallback } from "react";
 import { MovieContext } from "../context/MovieContext";
 
 export const useFavorites = () => {
-  const { 
-    favorites, 
-    currentUser, 
-    toggleFavorite, 
-    isFavorite 
+  const {
+    currentUser,
+    toggleFavorite: ctxToggleFavorite,
+    favorites,
   } = useContext(MovieContext);
 
-  const handleToggleFavorite = useCallback(async (movieId) => {
-    if (!currentUser) {
-      return false;
-    }
-    
-    try {
-      return await toggleFavorite(movieId);
-    } catch (error) {
-      console.error("Error toggling favorite:", error);
-      return false;
-    }
-  }, [currentUser, toggleFavorite]);
+  const isLoggedIn = !!currentUser;
 
-  return { 
-    favorites, 
-    isLoggedIn: !!currentUser, 
-    isFavorite, 
-    toggleFavorite: handleToggleFavorite 
+  const isFavorite = useCallback(
+    (movieId) => {
+      if (!isLoggedIn) return false;
+      return favorites.some((fav) => fav.id === movieId);
+    },
+    [favorites, isLoggedIn]
+  );
+
+  return {
+    toggleFavorite: ctxToggleFavorite,
+    isFavorite,
+    isLoggedIn,
   };
 };

@@ -17,16 +17,22 @@ export const MovieProvider = ({ children }) => {
 
     const loadUserData = async () => {
       try {
+        await loadMoviesBasedOnUserRole(null);
+        setLoading(false);
         const userData = await getCurrentUser();
         if (isMounted) {
           setCurrentUser(userData?.userData || null);
 
           if (userData?.userData) {
             await loadUserFavorites(userData.userData.id);
+          } else {
+            setFavorites([]);
+            setSyncedFavorites([]);
           }
         }
       } catch (err) {
         console.error("Error loading user data:", err);
+        setLoading(false);
       }
     };
 
@@ -71,7 +77,8 @@ export const MovieProvider = ({ children }) => {
     try {
       const { data, error: favError } = await supabase
         .from("Favorites")
-        .select(`
+        .select(
+          `
           movie_id,
           Movies (
             id, 
@@ -81,7 +88,8 @@ export const MovieProvider = ({ children }) => {
             imdb_rating,
             isDisabled
           )
-        `)
+        `
+        )
         .eq("user_id", userId);
 
       if (favError) throw favError;
@@ -103,30 +111,21 @@ export const MovieProvider = ({ children }) => {
   };
 
   const loadMoviesBasedOnUserRole = async (user) => {
-    setLoading(true);
     try {
-      let data;
-      if (user && user.role === "admin") {
-        const { data: allMovies, error } = await supabase
-          .from("Movies")
-          .select("*");
+      let query = supabase.from("Movies").select("*");
 
-        if (error) throw error;
-        data = allMovies;
-      } else {
-        const { data: enabledMovies, error } = await supabase
-          .from("Movies")
-          .select("*")
-          .eq("isDisabled", false);
-
-        if (error) throw error;
-        data = enabledMovies;
+      if (!user || user.role !== "admin") {
+        query = query.eq("isDisabled", false);
       }
+
+      const { data, error } = await query;
+      if (error) throw error;
+
       setMovies(data);
+      setError(null);
     } catch (err) {
+      console.error("Error loading movies:", err);
       setError(err.message);
-    } finally {
-      setLoading(false);
     }
   };
 

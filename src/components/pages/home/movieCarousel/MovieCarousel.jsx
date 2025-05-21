@@ -4,6 +4,18 @@ import "./MovieCarousel.scss";
 
 const MovieCarousel = ({ movies }) => {
   const [currentSlide, setCurrentSlide] = useState(0);
+
+  if (!movies || movies.length === 0) {
+    return (
+      <div className="carousel-container">
+        <div className="carousel-loader">
+          <div className="spinner"></div>
+          <p>Loading featured movies...</p>
+        </div>
+      </div>
+    );
+  }
+
   const featuredMovies = movies
     .sort((a, b) => b.imdb_rating - a.imdb_rating)
     .slice(0, 5);

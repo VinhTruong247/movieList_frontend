@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import { useContext } from "react";
 import { Link } from "react-router";
 import { useFavorites } from "../../../../hooks/useFavorites";
 import { MovieContext } from "../../../../context/MovieContext";
@@ -7,13 +7,15 @@ import "./MovieCard.scss";
 const MovieCard = ({ movie }) => {
   const { toggleFavorite, isFavorite } = useFavorites();
   const { currentUser } = useContext(MovieContext);
-  const favorite = isFavorite(movie.id);
+  const favorite = currentUser ? isFavorite(movie.id) : false;
 
   const formattedRuntime = () => {
     if (!movie.runtime) return "";
 
-    if (typeof movie.runtime === "string" && 
-        (movie.runtime.includes("min") || movie.runtime.includes("episodes"))) {
+    if (
+      typeof movie.runtime === "string" &&
+      (movie.runtime.includes("min") || movie.runtime.includes("episodes"))
+    ) {
       return movie.runtime;
     }
 
@@ -24,7 +26,9 @@ const MovieCard = ({ movie }) => {
 
   const handleFavorite = async (e) => {
     e.preventDefault();
-    if (!currentUser) return;
+    if (!currentUser) {
+      return;
+    }
 
     try {
       await toggleFavorite(movie.id);
@@ -37,7 +41,7 @@ const MovieCard = ({ movie }) => {
     <div className="movie-card">
       <Link to={`/movie/${movie.id}`} className="movie-link">
         <div className="movie-poster">
-          <img src={movie.poster_url || movie.poster} alt={movie.title} />
+          <img src={movie.poster_url} alt={movie.title} />
           <div className="movie-type">{movie.type}</div>
         </div>
         <div className="movie-content">
@@ -47,7 +51,7 @@ const MovieCard = ({ movie }) => {
             <span className="movie-year">{movie.year}</span>
           </div>
           <div className="movie-genres">
-            {movie.MovieGenres?.map(item => (
+            {movie.MovieGenres?.map((item) => (
               <span key={item.genre_id} className="genre-tag">
                 {item.Genres.name}
               </span>
