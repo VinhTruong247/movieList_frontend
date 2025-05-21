@@ -1,13 +1,35 @@
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router";
 import { Formik, Form, Field } from "formik";
-import { loginUser } from "../../utils/UserListAPI";
+import { loginUser, getCurrentUser } from "../../utils/UserListAPI";
 import { LoginSchema } from "./Validation";
 import "./LoginPage.scss";
 
 const LoginPage = () => {
   const navigate = useNavigate();
   const [error, setError] = useState("");
+  const [checkingSession, setCheckingSession] = useState(true);
+
+  useEffect(() => {
+    const checkExistingSession = async () => {
+      try {
+        const userData = await getCurrentUser();
+        if (userData && userData.userData) {
+          if (userData.userData.role === "admin") {
+            navigate("/admin");
+          } else {
+            navigate("/");
+          }
+        }
+      } catch (err) {
+        console.error("Session check error:", err);
+      } finally {
+        setCheckingSession(false);
+      }
+    };
+
+    checkExistingSession();
+  }, [navigate]);
 
   useEffect(() => {
     if (error) {
@@ -42,6 +64,16 @@ const LoginPage = () => {
       setSubmitting(false);
     }
   };
+
+  if (checkingSession) {
+    return (
+      <div className="auth-container">
+        <div className="auth-box checking-session">
+          <p>Checking session...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="auth-container">

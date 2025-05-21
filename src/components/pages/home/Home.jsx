@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import MovieCarousel from "./movieCarousel/MovieCarousel";
 import MovieCard from "./movieCard/MovieCard";
 import GenreList from "./movieGenreList/GenreList";
@@ -14,19 +14,11 @@ const Home = () => {
   const [activeMovieType, setActiveMovieType] = useState("all");
   const [activeSortType, setActiveSortType] = useState("all");
 
-  const shuffleArray = (array) => {
-    const newArray = [...array];
-    for (let i = newArray.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
-    }
-    return newArray;
-  };
-
   useEffect(() => {
     if (movies && movies.length > 0) {
-      const shuffledMovies = shuffleArray(movies);
-      setFilteredMovies(shuffledMovies);
+      setFilteredMovies([...movies]);
+      const sortedByIdMovies = [...movies].sort((a, b) => a.id - b.id);
+      setFilteredMovies(sortedByIdMovies);
     }
   }, [movies]);
 
@@ -47,13 +39,9 @@ const Home = () => {
     }
 
     if (selectedGenre !== "all") {
-      filteredResults = filteredResults.filter((movie) => {
-        if (!movie.MovieGenres || !Array.isArray(movie.MovieGenres))
-          return false;
-        return movie.MovieGenres.some(
-          (mg) => mg.Genres && mg.Genres.name === selectedGenre
-        );
-      });
+      filteredResults = filteredResults.filter((movie) =>
+        movie.genre.includes(selectedGenre)
+      );
     }
 
     if (activeMovieType === "Movie") {
@@ -71,7 +59,7 @@ const Home = () => {
     } else if (activeSortType === "latest") {
       filteredResults.sort((a, b) => b.year - a.year);
     } else {
-      filteredResults = shuffleArray(filteredResults);
+      filteredResults.sort((a, b) => a.id - b.id);
     }
 
     setFilteredMovies(filteredResults);
@@ -98,13 +86,9 @@ const Home = () => {
     }
 
     if (genreToUse !== "all") {
-      filteredResults = filteredResults.filter((movie) => {
-        if (!movie.MovieGenres || !Array.isArray(movie.MovieGenres))
-          return false;
-        return movie.MovieGenres.some(
-          (mg) => mg.Genres && mg.Genres.name === genreToUse
-        );
-      });
+      filteredResults = filteredResults.filter((movie) =>
+        movie.genre.includes(genreToUse)
+      );
     }
 
     if (movieType === "Movie") {
@@ -118,7 +102,7 @@ const Home = () => {
     }
 
     if (sortType === "all") {
-      filteredResults = shuffleArray(filteredResults);
+      filteredResults.sort((a, b) => a.id - b.id);
     } else if (sortType === "top-rated") {
       filteredResults.sort((a, b) => b.imdb_rating - a.imdb_rating);
     } else if (sortType === "latest") {
@@ -175,7 +159,7 @@ const Home = () => {
                   setSelectedGenre("all");
                   setActiveMovieType("all");
                   setActiveSortType("all");
-                  setFilteredMovies(shuffleArray([...movies]));
+                  setFilteredMovies([...movies]);
                 }}
               >
                 Reset Filters
