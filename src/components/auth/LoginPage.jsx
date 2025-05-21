@@ -30,7 +30,7 @@ const LoginPage = () => {
         setError("Your account has been disabled. Please contact support.");
         return;
       }
-      localStorage.setItem("user", JSON.stringify(response.userData));
+
       if (response.userData.role === "admin") {
         navigate("/admin");
       } else {

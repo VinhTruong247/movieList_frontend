@@ -30,24 +30,35 @@ export const signUp = async ({ email, password, username, name }) => {
 
   if (error) throw error;
 
-  const { error: insertError } = await supabase.from("Users").insert([
-    {
-      email,
-      username,
-      name: name || username,
-      role: "user",
-      isDisabled: false,
-    },
-  ]);
+  try {
+    const { error: insertError } = await supabase.from("Users").insert([
+      {
+        email,
+        username,
+        name: name || username,
+        role: "user",
+        isDisabled: false,
+      },
+    ]);
 
-  if (insertError) throw insertError;
+    if (insertError) {
+      console.error("Failed to create user record, cleaning up auth user");
+      throw insertError;
+    }
 
-  return data;
+    return data;
+  } catch (insertError) {
+    throw insertError;
+  }
 };
 
-export const logoutUser = async () => {
+export const logoutUser = async (navigate) => {
   const { error } = await supabase.auth.signOut();
   if (error) throw error;
+  if (navigate) {
+    navigate("/login");
+  }
+
   return { success: true };
 };
 
@@ -57,21 +68,12 @@ export const getCurrentUser = async () => {
       data: { session },
     } = await supabase.auth.getSession();
 
-    // If no session exists, just return null without throwing error
-    if (!session) {
-      return null;
-    }
-
-    const { data: authData, error: authError } = await supabase.auth.getUser();
-
-    if (authError || !authData?.user) {
-      return null;
-    }
+    if (!session) return null;
 
     const { data: userData, error: userError } = await supabase
       .from("Users")
       .select("*")
-      .eq("email", authData.user.email)
+      .eq("email", session.user.email)
       .single();
 
     if (userError) {
@@ -79,7 +81,7 @@ export const getCurrentUser = async () => {
       return null;
     }
 
-    return { userData };
+    return { userData, session };
   } catch (error) {
     console.error("Session error:", error);
     return null;

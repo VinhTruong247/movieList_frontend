@@ -17,22 +17,18 @@ export const MovieProvider = ({ children }) => {
 
     const loadUserData = async () => {
       try {
-        await loadMoviesBasedOnUserRole(null);
-        setLoading(false);
         const userData = await getCurrentUser();
+
         if (isMounted) {
           setCurrentUser(userData?.userData || null);
-
-          if (userData?.userData) {
+          if (userData?.userData?.id) {
             await loadUserFavorites(userData.userData.id);
-          } else {
-            setFavorites([]);
-            setSyncedFavorites([]);
           }
+          setLoading(false);
         }
       } catch (err) {
         console.error("Error loading user data:", err);
-        setLoading(false);
+        if (isMounted) setLoading(false);
       }
     };
 
@@ -42,18 +38,8 @@ export const MovieProvider = ({ children }) => {
       async (event, session) => {
         if (!isMounted) return;
 
-        if (event === "SIGNED_IN") {
-          try {
-            const userData = await getCurrentUser();
-            if (isMounted) {
-              setCurrentUser(userData?.userData || null);
-              if (userData?.userData) {
-                await loadUserFavorites(userData.userData.id);
-              }
-            }
-          } catch (err) {
-            console.error("Error loading user data after sign in:", err);
-          }
+        if (event === "SIGNED_IN" || event === "TOKEN_REFRESHED") {
+          loadUserData();
         } else if (event === "SIGNED_OUT") {
           if (isMounted) {
             setCurrentUser(null);
@@ -66,10 +52,7 @@ export const MovieProvider = ({ children }) => {
 
     return () => {
       isMounted = false;
-
-      if (authListener && authListener.subscription) {
-        authListener.subscription.unsubscribe();
-      }
+      if (authListener) authListener.subscription.unsubscribe();
     };
   }, []);
 
@@ -215,6 +198,19 @@ export const MovieProvider = ({ children }) => {
     }
   }, [currentUser]);
 
+  const checkSessionValidity = useCallback(async () => {
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+
+    if (!session && currentUser) {
+      setCurrentUser(null);
+      setFavorites([]);
+      setSyncedFavorites([]);
+      window.location.href = "/login";
+    }
+  }, [currentUser]);
+
   return (
     <MovieContext.Provider
       value={{
@@ -226,6 +222,7 @@ export const MovieProvider = ({ children }) => {
         toggleFavorite,
         isFavorite,
         refreshMovies,
+        checkSessionValidity,
       }}
     >
       {children}
