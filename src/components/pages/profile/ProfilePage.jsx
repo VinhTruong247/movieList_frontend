@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import { useState, useEffect, useContext } from "react";
 import { Formik, Form, Field } from "formik";
 import { useNavigate } from "react-router";
 import { getCurrentUser, updateUserProfile } from "../../../utils/UserListAPI";
@@ -11,24 +11,34 @@ import "./ProfilePage.scss";
 const ProfilePage = () => {
   const navigate = useNavigate();
   const [userData, setUserData] = useState(null);
-  const { favorites } = useFavorites();
+  const { syncedFavorites, loadingFavorites } = useFavorites();
   const [isEditing, setIsEditing] = useState(false);
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const { refreshMovies } = useContext(MovieContext);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const loadUser = async () => {
       try {
+        setLoading(true);
         const user = await getCurrentUser();
-        if (!user || user.userData?.role === "admin") {
-          navigate("/");
+        if (!user || !user.session) {
+          navigate("/login");
           return;
         }
+
+        if (user.userData?.role === "admin") {
+          navigate("/admin");
+          return;
+        }
+
         setUserData(user.userData);
       } catch (err) {
         console.error("Error loading user data:", err);
-        navigate("/");
+        navigate("/login");
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -53,12 +63,15 @@ const ProfilePage = () => {
       if (refreshMovies) {
         await refreshMovies();
       }
+      setTimeout(() => setSuccessMessage(""), 3000);
     } catch (err) {
       setError("Failed to update profile. Please try again.");
+      setTimeout(() => setError(""), 3000);
     }
   };
 
-  if (!userData) return <div className="loading">Loading...</div>;
+  if (loading) return <div className="loading">Loading...</div>;
+  if (!userData) return <div className="loading">No user data available</div>;
 
   return (
     <div className="profile-container">
@@ -70,7 +83,7 @@ const ProfilePage = () => {
             <h2>Account Information</h2>
             {!isEditing && (
               <button
-                className="edit-btn"
+                className="edit-button"
                 onClick={() => setIsEditing(true)}
               >
                 Edit Profile
@@ -117,14 +130,14 @@ const ProfilePage = () => {
                   <div className="form-actions">
                     <button
                       type="button"
-                      className="cancel-btn"
+                      className="cancel-button"
                       onClick={() => setIsEditing(false)}
                     >
                       Cancel
                     </button>
                     <button
                       type="submit"
-                      className="save-btn"
+                      className="save-button"
                       disabled={isSubmitting}
                     >
                       {isSubmitting ? "Saving..." : "Save Changes"}
@@ -159,9 +172,11 @@ const ProfilePage = () => {
 
         <div className="profile-section">
           <h2>My Favorites</h2>
-          {favorites.length > 0 ? (
+          {loadingFavorites ? (
+            <div className="loading">Loading favorites...</div>
+          ) : syncedFavorites.length > 0 ? (
             <div className="favorites-grid">
-              {favorites.map((movie) => (
+              {syncedFavorites.map((movie) => (
                 <MovieCard key={movie.id} movie={movie} />
               ))}
             </div>

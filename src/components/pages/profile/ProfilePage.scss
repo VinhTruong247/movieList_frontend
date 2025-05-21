@@ -170,6 +170,10 @@
         }
       }
 
+      button {
+        margin: 0.25rem;
+      }
+
       .save-button {
         background: $accent-color;
         color: white;
@@ -212,6 +216,21 @@
           opacity: 0.6;
           cursor: not-allowed;
           background-color: #ccc;
+        }
+      }
+
+      .cancel-button {
+        background: white;
+        color: $accent-color;
+        padding: 0.75rem 1.5rem;
+        border: $accent-color 1px solid;
+        border-radius: $border-radius;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all $transition-speed;
+
+        &:hover {
+          background: color.adjust(white, $lightness: -10%);
         }
       }
 
