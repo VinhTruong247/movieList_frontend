@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router";
 import { getMovies } from "../../../../utils/MovieListAPI";
 import Loader from "../../../common/Loader";
@@ -9,40 +9,65 @@ const SimilarMovie = ({ currentMovie }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const getGenreNames = (movie) => {
+    if (!movie.MovieGenres || !Array.isArray(movie.MovieGenres)) {
+      return [];
+    }
+    return movie.MovieGenres.filter((mg) => mg.Genres).map(
+      (mg) => mg.Genres.name
+    );
+  };
+
   useEffect(() => {
     const getSimilarMovies = async () => {
       try {
-        if (
-          !currentMovie ||
-          !currentMovie.genre ||
-          currentMovie.genre.length === 0
-        ) {
+        if (!currentMovie) {
           setSimilarMovies([]);
+          setLoading(false);
+          return;
+        }
+
+        const currentMovieGenres = getGenreNames(currentMovie);
+
+        if (currentMovieGenres.length === 0) {
+          setSimilarMovies([]);
+          setLoading(false);
           return;
         }
 
         const allMovies = await getMovies();
-        const filtered = allMovies.filter(
-          (movie) =>
-            movie.id !== currentMovie.id &&
-            movie.genre.some((genre) => currentMovie.genre.includes(genre))
-        );
+
+        const filtered = allMovies.filter((movie) => {
+          if (movie.id === currentMovie.id) return false;
+
+          const movieGenres = getGenreNames(movie);
+          return movieGenres.some((genre) =>
+            currentMovieGenres.includes(genre)
+          );
+        });
 
         const sorted = filtered.sort((a, b) => {
-          const aMatches = a.genre.filter((genre) =>
-            currentMovie.genre.includes(genre)
+          const aGenres = getGenreNames(a);
+          const bGenres = getGenreNames(b);
+
+          const aMatches = aGenres.filter((genre) =>
+            currentMovieGenres.includes(genre)
           ).length;
-          const bMatches = b.genre.filter((genre) =>
-            currentMovie.genre.includes(genre)
+
+          const bMatches = bGenres.filter((genre) =>
+            currentMovieGenres.includes(genre)
           ).length;
+
           if (bMatches !== aMatches) {
             return bMatches - aMatches;
           }
           return b.imdb_rating - a.imdb_rating;
         });
+
         setSimilarMovies(sorted.slice(0, 4));
       } catch (err) {
-        setError(err.message);
+        console.error("Error fetching similar movies:", err);
+        setError(err.message || "Failed to load similar movies");
       } finally {
         setLoading(false);
       }
@@ -66,19 +91,34 @@ const SimilarMovie = ({ currentMovie }) => {
             className="similar-movie-card"
           >
             <div className="similar-movie-poster">
-              <img src={movie.poster} alt={movie.title} />
+              <img
+                src={
+                  movie.poster_url ||
+                  "https://via.placeholder.com/150x225?text=No+Image"
+                }
+                alt={movie.title}
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src =
+                    "https://via.placeholder.com/150x225?text=No+Image";
+                }}
+              />
               <div className="movie-type">{movie.type}</div>
             </div>
             <div className="similar-movie-info">
               <h3 className="similar-movie-title">{movie.title}</h3>
               <div className="similar-movie-genre">
-                {movie.genre.slice(0, 2).map((genre, index) => (
-                  <span key={index} className="genre-tag">
-                    {genre}
+                {getGenreNames(movie)
+                  .slice(0, 2)
+                  .map((genre, index) => (
+                    <span key={index} className="genre-tag">
+                      {genre}
+                    </span>
+                  ))}
+                {getGenreNames(movie).length > 2 && (
+                  <span className="more-genres">
+                    +{getGenreNames(movie).length - 2}
                   </span>
-                ))}
-                {movie.genre.length > 2 && (
-                  <span className="more-genres">+{movie.genre.length - 2}</span>
                 )}
               </div>
               <div className="similar-movie-meta">

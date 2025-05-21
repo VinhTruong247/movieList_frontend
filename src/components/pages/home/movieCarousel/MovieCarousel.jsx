@@ -55,7 +55,7 @@ const MovieCarousel = ({ movies }) => {
             key={movie.id}
             className={`carousel-slide ${index === currentSlide ? "active" : ""}`}
             style={{
-              backgroundImage: `url(${movie.poster_url || movie.poster})`,
+              backgroundImage: `url(${movie.banner_url})`,
             }}
           >
             <div className="slide-content">
