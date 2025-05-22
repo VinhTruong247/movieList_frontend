@@ -24,6 +24,14 @@ const MovieList = () => {
     type: "",
   });
   const [processingMovies, setProcessingMovies] = useState([]);
+  const [sortConfig, setSortConfig] = useState({ key: "id", direction: "asc" });
+  const [filters, setFilters] = useState({
+    type: "",
+    status: "",
+    yearFrom: "",
+    yearTo: "",
+  });
+  const [showFilters, setShowFilters] = useState(false);
 
   const fetchMovies = async () => {
     setLoading(true);
@@ -52,8 +60,16 @@ const MovieList = () => {
     }
   }, [notification.show]);
 
+  const requestSort = (key) => {
+    let direction = "asc";
+    if (sortConfig.key === key && sortConfig.direction === "asc") {
+      direction = "desc";
+    }
+    setSortConfig({ key, direction });
+  };
+
   const filteredMovies = useMemo(() => {
-    let result = [...movies].sort((a, b) => Number(a.id) - Number(b.id));
+    let result = [...movies];
 
     if (searchMovie) {
       const searchedMovie = searchMovie.toLowerCase();
@@ -62,8 +78,42 @@ const MovieList = () => {
       );
     }
 
+    if (filters.type) {
+      result = result.filter((movie) => movie.type === filters.type);
+    }
+
+    if (filters.status) {
+      if (filters.status === "active") {
+        result = result.filter((movie) => !movie.isDisabled);
+      } else if (filters.status === "disabled") {
+        result = result.filter((movie) => movie.isDisabled);
+      }
+    }
+
+    if (filters.yearFrom) {
+      result = result.filter(
+        (movie) => movie.year >= parseInt(filters.yearFrom)
+      );
+    }
+
+    if (filters.yearTo) {
+      result = result.filter((movie) => movie.year <= parseInt(filters.yearTo));
+    }
+
+    if (sortConfig.key) {
+      result.sort((a, b) => {
+        if (a[sortConfig.key] < b[sortConfig.key]) {
+          return sortConfig.direction === "asc" ? -1 : 1;
+        }
+        if (a[sortConfig.key] > b[sortConfig.key]) {
+          return sortConfig.direction === "asc" ? 1 : -1;
+        }
+        return 0;
+      });
+    }
+
     return result;
-  }, [movies, searchMovie]);
+  }, [movies, searchMovie, sortConfig, filters]);
 
   const paginatedMovies = useMemo(() => {
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
@@ -123,6 +173,25 @@ const MovieList = () => {
     }
   };
 
+  const handleFilterChange = (e) => {
+    const { name, value } = e.target;
+    setFilters((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+    setCurrentPage(1);
+  };
+
+  const resetFilters = () => {
+    setFilters({
+      type: "",
+      status: "",
+      yearFrom: "",
+      yearTo: "",
+    });
+    setCurrentPage(1);
+  };
+
   const handleSubmit = async (values, { resetForm, setSubmitting }) => {
     try {
       setProcessingMovies((prev) => [...prev, values.id]);
@@ -176,6 +245,13 @@ const MovieList = () => {
     }
   };
 
+  const getSortIndicator = (key) => {
+    if (sortConfig.key === key) {
+      return sortConfig.direction === "asc" ? " ▲" : " ▼";
+    }
+    return "";
+  };
+
   if (loading) return <div className="loading">Loading...</div>;
   if (error) return <div className="error-message">{error}</div>;
 
@@ -199,110 +275,203 @@ const MovieList = () => {
               className="search-input"
             />
           </div>
+          <button
+            className="filter-btn"
+            onClick={() => setShowFilters(!showFilters)}
+          >
+            {showFilters ? "Hide Filters" : "Show Filters"}
+          </button>
           <button className="add-btn" onClick={handleAddMovie}>
             Add Movie
           </button>
         </div>
       </div>
 
+      {showFilters && (
+        <div className="filter-panel">
+          <div className="filter-group">
+            <label>Movie Type</label>
+            <select
+              name="type"
+              value={filters.type}
+              onChange={handleFilterChange}
+            >
+              <option value="">All Types</option>
+              <option value="Movie">Movie</option>
+              <option value="TV Series">TV Series</option>
+              <option value="Documentary">Documentary</option>
+            </select>
+          </div>
+          <div className="filter-group">
+            <label>Status</label>
+            <select
+              name="status"
+              value={filters.status}
+              onChange={handleFilterChange}
+            >
+              <option value="">All Status</option>
+              <option value="active">Active</option>
+              <option value="disabled">Disabled</option>
+            </select>
+          </div>
+          <div className="filter-group">
+            <label>Year From</label>
+            <input
+              type="number"
+              name="yearFrom"
+              value={filters.yearFrom}
+              onChange={handleFilterChange}
+              placeholder="From"
+            />
+          </div>
+          <div className="filter-group">
+            <label>Year To</label>
+            <input
+              type="number"
+              name="yearTo"
+              value={filters.yearTo}
+              onChange={handleFilterChange}
+              placeholder="To"
+            />
+          </div>
+          <button className="reset-filter-btn" onClick={resetFilters}>
+            Reset Filters
+          </button>
+        </div>
+      )}
+
       <div className="table-container">
         <table className="data-table">
           <thead>
             <tr>
               <th>Image</th>
-              <th>Title</th>
-              <th>Type</th>
-              <th>Year</th>
-              <th>Rating</th>
-              <th>Status</th>
+              <th onClick={() => requestSort("title")} className="sortable">
+                Title{getSortIndicator("title")}
+              </th>
+              <th onClick={() => requestSort("type")} className="sortable">
+                Type{getSortIndicator("type")}
+              </th>
+              <th onClick={() => requestSort("year")} className="sortable">
+                Year{getSortIndicator("year")}
+              </th>
+              <th
+                onClick={() => requestSort("imdb_rating")}
+                className="sortable"
+              >
+                Rating{getSortIndicator("imdb_rating")}
+              </th>
+              <th
+                onClick={() => requestSort("isDisabled")}
+                className="sortable"
+              >
+                Status{getSortIndicator("isDisabled")}
+              </th>
               <th>Actions</th>
             </tr>
           </thead>
           <tbody>
-            {paginatedMovies.map((movie) => (
-              <tr
-                key={movie.id}
-                className={movie.isDisabled ? "disabled-row" : ""}
-              >
-                <td className="poster-cell">
-                  {movie.poster_url ? (
-                    <img
-                      src={movie.poster_url}
-                      alt={`${movie.title} poster`}
-                      className="movie-thumbnail"
-                    />
-                  ) : (
-                    <div className="no-poster">No Image</div>
-                  )}
-                </td>
-                <td>{movie.title}</td>
-                <td>{movie.type}</td>
-                <td>{movie.year}</td>
-                <td>⭐ {movie.imdb_rating}</td>
-                <td>
-                  <span
-                    className={`status-badge ${movie.isDisabled ? "disabled" : "active"}`}
-                  >
-                    {movie.isDisabled ? "Disabled" : "Active"}
-                  </span>
-                </td>
-                <td>
-                  <button
-                    className="edit-btn"
-                    onClick={() => handleEditMovie(movie)}
-                    disabled={processingMovies.includes(movie.id)}
-                  >
-                    Edit
-                  </button>
-                  <button
-                    className={`toggle-btn ${movie.isDisabled ? "enable" : "disable"}`}
-                    onClick={() => handleToggleStatus(movie)}
-                    disabled={processingMovies.includes(movie.id)}
-                  >
-                    {processingMovies.includes(movie.id) ? (
-                      <span className="loading-spinner"></span>
-                    ) : movie.isDisabled ? (
-                      "Enable"
+            {paginatedMovies.length > 0 ? (
+              paginatedMovies.map((movie) => (
+                <tr
+                  key={movie.id}
+                  className={movie.isDisabled ? "disabled-row" : ""}
+                >
+                  <td className="poster-cell">
+                    {movie.poster_url ? (
+                      <img
+                        src={movie.poster_url}
+                        alt={`${movie.title} poster`}
+                        className="movie-thumbnail"
+                      />
                     ) : (
-                      "Disable"
+                      <div className="no-poster">No Image</div>
                     )}
-                  </button>
+                  </td>
+                  <td>{movie.title}</td>
+                  <td>{movie.type}</td>
+                  <td>{movie.year}</td>
+                  <td>⭐ {movie.imdb_rating}</td>
+                  <td>
+                    <span
+                      className={`status-badge ${
+                        movie.isDisabled ? "disabled" : "active"
+                      }`}
+                    >
+                      {movie.isDisabled ? "Disabled" : "Active"}
+                    </span>
+                  </td>
+                  <td>
+                    <button
+                      className="edit-btn"
+                      onClick={() => handleEditMovie(movie)}
+                      disabled={processingMovies.includes(movie.id)}
+                    >
+                      Edit
+                    </button>
+                    <button
+                      className={`toggle-btn ${
+                        movie.isDisabled ? "enable" : "disable"
+                      }`}
+                      onClick={() => handleToggleStatus(movie)}
+                      disabled={processingMovies.includes(movie.id)}
+                    >
+                      {processingMovies.includes(movie.id) ? (
+                        <span className="loading-spinner"></span>
+                      ) : movie.isDisabled ? (
+                        "Enable"
+                      ) : (
+                        "Disable"
+                      )}
+                    </button>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="7" className="no-results">
+                  No movies found matching your criteria
                 </td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
       </div>
 
-      {pageCount > 1 && (
-        <div className="pagination">
-          <button
-            className="page-btn"
-            onClick={() => handlePageChange(currentPage - 1)}
-            disabled={currentPage === 1}
-          >
-            Previous
-          </button>
-
-          {Array.from({ length: pageCount }, (_, i) => i + 1).map((page) => (
-            <button
-              key={page}
-              className={`page-btn ${currentPage === page ? "active" : ""}`}
-              onClick={() => handlePageChange(page)}
-            >
-              {page}
-            </button>
-          ))}
-
-          <button
-            className="page-btn"
-            onClick={() => handlePageChange(currentPage + 1)}
-            disabled={currentPage === pageCount}
-          >
-            Next
-          </button>
+      <div className="table-footer">
+        <div className="results-count">
+          Showing {paginatedMovies.length} of {filteredMovies.length} movies
         </div>
-      )}
+
+        {pageCount > 1 && (
+          <div className="pagination">
+            <button
+              className="page-btn"
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+            >
+              Previous
+            </button>
+
+            {Array.from({ length: pageCount }, (_, i) => i + 1).map((page) => (
+              <button
+                key={page}
+                className={`page-btn ${currentPage === page ? "active" : ""}`}
+                onClick={() => handlePageChange(page)}
+              >
+                {page}
+              </button>
+            ))}
+
+            <button
+              className="page-btn"
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={currentPage === pageCount}
+            >
+              Next
+            </button>
+          </div>
+        )}
+      </div>
 
       {showForm && (
         <MovieForm
