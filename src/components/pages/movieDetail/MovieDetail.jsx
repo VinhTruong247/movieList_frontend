@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router";
 import { Link } from "react-router";
-import { getMovieById } from "../../../utils/MovieListAPI"; 
+import { getMovieById } from "../../../utils/MovieListAPI";
 import Loader from "../../common/Loader";
 import { useFavorites } from "../../../hooks/useFavorites";
 import TrailerPopup from "./Trailer/TrailerPopup";
@@ -43,10 +43,9 @@ const MovieDetail = () => {
 
         const formattedMovie = {
           ...data,
-          poster: data.poster_url,
-          trailer: data.trailer_url,
-          genre: data.MovieGenres?.map(g => g.Genres.name) || [],
-          director: data.MovieDirectors?.map(d => d.Director.name).join(', ') || ''
+          genre: data.MovieGenres?.map((g) => g.Genres.name) || [],
+          director:
+            data.MovieDirectors?.map((d) => d.Directors.name).join(", ") || "",
         };
 
         setMovie(formattedMovie);
@@ -90,7 +89,7 @@ const MovieDetail = () => {
       <div className="detail-content">
         <div className="poster-section">
           <div className="movie-poster">
-            <img src={movie.poster} alt={movie.title} />
+            <img src={movie.poster_url} alt={movie.title} />
             <div className="movie-type">{movie.type}</div>
           </div>
           <button
@@ -158,7 +157,7 @@ const MovieDetail = () => {
 
       {showTrailer && (
         <TrailerPopup
-          trailerUrl={movie.trailer}
+          trailerUrl={movie.trailer_url}
           onClose={() => setShowTrailer(false)}
         />
       )}

@@ -1,5 +1,4 @@
-import React from 'react';
-import './TrailerPopup.scss';
+import "./TrailerPopup.scss";
 
 const TrailerPopup = ({ trailerUrl, onClose }) => {
   const getYouTubeVideoId = (url) => {
