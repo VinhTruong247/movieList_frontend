@@ -214,7 +214,6 @@ const MovieList = () => {
               <th>Type</th>
               <th>Year</th>
               <th>Rating</th>
-              <th>Genre</th>
               <th>Status</th>
               <th>Actions</th>
             </tr>
@@ -240,7 +239,6 @@ const MovieList = () => {
                 <td>{movie.type}</td>
                 <td>{movie.year}</td>
                 <td>⭐ {movie.imdb_rating}</td>
-                <td>{(movie.genre || []).join(", ")}</td>
                 <td>
                   <span
                     className={`status-badge ${movie.isDisabled ? "disabled" : "active"}`}

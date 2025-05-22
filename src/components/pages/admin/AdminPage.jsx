@@ -1,31 +1,31 @@
-import React, { useState, useEffect } from 'react';
-import supabase from '../../../supabase-client';
-import { useMovies } from '../../../hooks/useMovies';
-import UserList from './userList/UserList';
-import MovieList from './movieList/MovieList';
-import './AdminPage.scss';
+import { useState, useEffect } from "react";
+import supabase from "../../../supabase-client";
+import { useMovies } from "../../../hooks/useMovies";
+import UserList from "./userList/UserList";
+import MovieList from "./movieList/MovieList";
+import "./AdminPage.scss";
 
 const AdminPage = () => {
   const [users, setUsers] = useState([]);
   const { movies } = useMovies();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [activeTab, setActiveTab] = useState('users');
+  const [activeSection, setActiveSection] = useState("dashboard");
 
   useEffect(() => {
     const loadUsers = async () => {
       try {
         const { data, error } = await supabase
-          .from('Users')
-          .select('*')
-          .neq('role', 'admin');
-          
+          .from("Users")
+          .select("*")
+          .neq("role", "admin");
+
         if (error) throw error;
-        
+
         setUsers(data || []);
       } catch (err) {
-        console.error('Failed to load users:', err);
-        setError('Failed to load users');
+        console.error("Failed to load users:", err);
+        setError("Failed to load users");
       } finally {
         setLoading(false);
       }
@@ -34,44 +34,68 @@ const AdminPage = () => {
     loadUsers();
   }, []);
 
+  const renderContent = () => {
+    switch (activeSection) {
+      case "users":
+        return <UserList />;
+      case "movies":
+        return <MovieList />;
+      default:
+        return (
+          <>
+            <div className="dashboard-header">
+              <h1>Admin Dashboard</h1>
+            </div>
+            <div className="stats-grid">
+              <div className="stat-card">
+                <h3>Total Users</h3>
+                <p>{users.length}</p>
+              </div>
+              <div className="stat-card">
+                <h3>Total Movies</h3>
+                <p>{movies.length}</p>
+              </div>
+            </div>
+          </>
+        );
+    }
+  };
+
   if (loading) return <div className="loading">Loading...</div>;
   if (error) return <div className="error-message">{error}</div>;
 
   return (
-    <div className="admin-dashboard">
-      <div className="dashboard-header">
-        <h1>Admin Dashboard</h1>
-      </div>
-
-      <div className="stats-grid">
-        <div className="stat-card">
-          <h3>Total Users</h3>
-          <p>{users.length}</p>
+    <div className="admin-container">
+      <div className="side-menu">
+        <div className="menu-header">
+          <h2>Admin Panel</h2>
         </div>
-        <div className="stat-card">
-          <h3>Total Movies</h3>
-          <p>{movies.length}</p>
-        </div>
+        <nav className="menu-items">
+          <button
+            className={`menu-item ${activeSection === "dashboard" ? "active" : ""}`}
+            onClick={() => setActiveSection("dashboard")}
+          >
+            <span className="icon">📊</span>
+            Dashboard
+          </button>
+          <button
+            className={`menu-item ${activeSection === "users" ? "active" : ""}`}
+            onClick={() => setActiveSection("users")}
+          >
+            <span className="icon">👥</span>
+            User Management
+          </button>
+          <button
+            className={`menu-item ${activeSection === "movies" ? "active" : ""}`}
+            onClick={() => setActiveSection("movies")}
+          >
+            <span className="icon">🎬</span>
+            Movie Management
+          </button>
+        </nav>
       </div>
 
-      <div className="content-tabs">
-        <button
-          className={`tab-button ${activeTab === 'users' ? 'active' : ''}`}
-          onClick={() => setActiveTab('users')}
-        >
-          User Management
-        </button>
-        <button
-          className={`tab-button ${activeTab === 'movies' ? 'active' : ''}`}
-          onClick={() => setActiveTab('movies')}
-        >
-          Movie Management
-        </button>
-      </div>
-
-      <div className="tab-content">
-        {activeTab === 'users' ? <UserList /> : <MovieList />}
-      </div>
+      <div className="admin-content">{renderContent()}</div>
     </div>
   );
 };
