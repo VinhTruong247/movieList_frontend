@@ -16,7 +16,6 @@ const Home = () => {
 
   useEffect(() => {
     if (movies && movies.length > 0) {
-      setFilteredMovies([...movies]);
       const sortedByIdMovies = [...movies].sort((a, b) => a.id - b.id);
       setFilteredMovies(sortedByIdMovies);
     }
@@ -30,39 +29,7 @@ const Home = () => {
   const handleSearch = (event) => {
     const query = event.target.value;
     setSearchQuery(query);
-    let filteredResults = [...movies];
-
-    if (query) {
-      filteredResults = filteredResults.filter((movie) =>
-        movie.title.toLowerCase().includes(query.toLowerCase())
-      );
-    }
-
-    if (selectedGenre !== "all") {
-      filteredResults = filteredResults.filter((movie) =>
-        movie.genre.includes(selectedGenre)
-      );
-    }
-
-    if (activeMovieType === "Movie") {
-      filteredResults = filteredResults.filter(
-        (movie) => movie.type === "Movie"
-      );
-    } else if (activeMovieType === "TV Series") {
-      filteredResults = filteredResults.filter(
-        (movie) => movie.type === "TV Series"
-      );
-    }
-
-    if (activeSortType === "top-rated") {
-      filteredResults.sort((a, b) => b.imdb_rating - a.imdb_rating);
-    } else if (activeSortType === "latest") {
-      filteredResults.sort((a, b) => b.year - a.year);
-    } else {
-      filteredResults.sort((a, b) => a.id - b.id);
-    }
-
-    setFilteredMovies(filteredResults);
+    filterAndSortMovies(activeMovieType, activeSortType, selectedGenre, query);
   };
 
   const handleMovieTypeFilter = (type) => {
@@ -75,20 +42,35 @@ const Home = () => {
     filterAndSortMovies(activeMovieType, sortType);
   };
 
-  const filterAndSortMovies = (movieType, sortType, genreOverride = null) => {
+  const filterAndSortMovies = (
+    movieType,
+    sortType,
+    genreOverride = null,
+    searchOverride = null
+  ) => {
+    if (!movies || !movies.length) return;
+
     let filteredResults = [...movies];
     const genreToUse = genreOverride !== null ? genreOverride : selectedGenre;
+    const searchToUse = searchOverride !== null ? searchOverride : searchQuery;
 
-    if (searchQuery) {
+    if (searchToUse) {
       filteredResults = filteredResults.filter((movie) =>
-        movie.title.toLowerCase().includes(searchQuery.toLowerCase())
+        movie.title?.toLowerCase().includes(searchToUse.toLowerCase())
       );
     }
 
     if (genreToUse !== "all") {
-      filteredResults = filteredResults.filter((movie) =>
-        movie.genre.includes(genreToUse)
-      );
+      filteredResults = filteredResults.filter((movie) => {
+        if (!movie.MovieGenres || !Array.isArray(movie.MovieGenres)) {
+          return false;
+        }
+
+        return movie.MovieGenres.some(
+          (genreItem) =>
+            genreItem.Genres && genreItem.Genres.name === genreToUse
+        );
+      });
     }
 
     if (movieType === "Movie") {

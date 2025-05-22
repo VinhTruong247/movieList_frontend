@@ -1,30 +1,6 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { getAllGenres } from "../../../../utils/GenresAPI";
 import "./GenreList.scss";
-
-const genres = [
-  { id: "1", name: "Action" },
-  { id: "2", name: "Adventure" },
-  { id: "3", name: "Animation" },
-  { id: "4", name: "Biography" },
-  { id: "5", name: "Comedy" },
-  { id: "6", name: "Crime" },
-  { id: "7", name: "Documentary" },
-  { id: "8", name: "Drama" },
-  { id: "9", name: "Family" },
-  { id: "10", name: "Fantasy" },
-  { id: "11", name: "History" },
-  { id: "12", name: "Horror" },
-  { id: "13", name: "Indie" },
-  { id: "14", name: "Medieval" },
-  { id: "15", name: "Musical" },
-  { id: "16", name: "Mystery" },
-  { id: "17", name: "Romance" },
-  { id: "18", name: "Sci-Fi" },
-  { id: "19", name: "Sport" },
-  { id: "20", name: "Thriller" },
-  { id: "21", name: "War" },
-  { id: "22", name: "Western" },
-];
 
 const GenreList = ({
   selectedGenre,
@@ -34,6 +10,27 @@ const GenreList = ({
   onMovieTypeChange,
   onSortTypeChange,
 }) => {
+  const [genres, setGenres] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchGenres = async () => {
+      try {
+        setLoading(true);
+        const data = await getAllGenres();
+        setGenres(data);
+      } catch (err) {
+        console.error("Failed to load genres:", err);
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchGenres();
+  }, []);
+
   return (
     <div className="genre-list-container">
       <h3 className="filter-title">Movie Type</h3>
@@ -88,15 +85,22 @@ const GenreList = ({
         >
           All Genres
         </button>
-        {genres.map((genre) => (
-          <button
-            key={genre.id}
-            className={`genre-item ${selectedGenre === genre.name ? "active" : ""}`}
-            onClick={() => onGenreSelect(genre.name)}
-          >
-            {genre.name}
-          </button>
-        ))}
+
+        {loading ? (
+          <div className="genre-loading">Loading genres...</div>
+        ) : error ? (
+          <div className="genre-error">Error loading genres</div>
+        ) : (
+          genres.map((genre) => (
+            <button
+              key={genre.id}
+              className={`genre-item ${selectedGenre === genre.name ? "active" : ""}`}
+              onClick={() => onGenreSelect(genre.name)}
+            >
+              {genre.name}
+            </button>
+          ))
+        )}
       </div>
     </div>
   );
