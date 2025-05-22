@@ -1,5 +1,9 @@
 import { useState, useMemo, useEffect } from "react";
-import { getMovies, addMovie, updateMovie } from "../../../../utils/MovieListAPI";
+import {
+  getMovies,
+  addMovie,
+  updateMovie,
+} from "../../../../utils/MovieListAPI";
 import MovieForm from "./movieForm/MovieForm";
 import supabase from "../../../../supabase-client";
 import "./MovieList.scss";
@@ -25,16 +29,7 @@ const MovieList = () => {
     setLoading(true);
     try {
       const data = await getMovies();
-      const formattedMovies = data.map((movie) => ({
-        ...movie,
-        poster: movie.poster_url,
-        trailer: movie.trailer_url,
-        genre: movie.MovieGenres?.map((g) => g.Genres?.name) || [],
-        director:
-          movie.MovieDirectors?.map((d) => d.Director?.name).join(", ") || "",
-        isDisabled: movie.isDisabled,
-      }));
-      setMovies(formattedMovies);
+      setMovies(data);
     } catch (err) {
       setError("Failed to load movies");
       console.error(err);
@@ -50,9 +45,9 @@ const MovieList = () => {
   useEffect(() => {
     if (notification.show) {
       const timer = setTimeout(() => {
-        setNotification(prev => ({...prev, show: false}));
+        setNotification((prev) => ({ ...prev, show: false }));
       }, 5000);
-      
+
       return () => clearTimeout(timer);
     }
   }, [notification.show]);
@@ -96,12 +91,12 @@ const MovieList = () => {
     if (window.confirm(`Are you sure you want to ${message} this movie?`)) {
       try {
         setProcessingMovies((prev) => [...prev, movie.id]);
-        
+
         const { error } = await supabase
           .from("Movies")
           .update({ isDisabled: !movie.isDisabled })
           .eq("id", movie.id);
-          
+
         if (error) throw error;
 
         setMovies(
@@ -109,13 +104,12 @@ const MovieList = () => {
             m.id === movie.id ? { ...m, isDisabled: !movie.isDisabled } : m
           )
         );
-        
+
         setNotification({
           show: true,
           message: `Movie ${message}d successfully!`,
           type: "success",
         });
-        
       } catch (err) {
         console.error(`Failed to ${message} movie:`, err);
         setNotification({
@@ -134,17 +128,16 @@ const MovieList = () => {
       setProcessingMovies((prev) => [...prev, values.id]);
       const movieData = {
         title: values.title,
-        type: values.type,
         year: values.year,
-        genre: values.genre,
-        director: values.director,
         imdb_rating: values.imdb_rating,
         description: values.description,
+        type: values.type,
         runtime: values.runtime,
         language: values.language,
         country: values.country,
-        posterUrl: values.poster,
-        trailerUrl: values.trailer,
+        posterUrl: values.poster_url,
+        bannerUrl: values.banner_url,
+        trailerUrl: values.trailer_url,
         isDisabled: values.isDisabled || false,
         genreIds: values.genre?.map((g) => g.id || g) || [],
         directorIds: values.director?.id ? [values.director.id] : [],
@@ -216,6 +209,7 @@ const MovieList = () => {
         <table className="data-table">
           <thead>
             <tr>
+              <th>Image</th>
               <th>Title</th>
               <th>Type</th>
               <th>Year</th>
@@ -231,6 +225,17 @@ const MovieList = () => {
                 key={movie.id}
                 className={movie.isDisabled ? "disabled-row" : ""}
               >
+                <td className="poster-cell">
+                  {movie.poster_url ? (
+                    <img
+                      src={movie.poster_url}
+                      alt={`${movie.title} poster`}
+                      className="movie-thumbnail"
+                    />
+                  ) : (
+                    <div className="no-poster">No Image</div>
+                  )}
+                </td>
                 <td>{movie.title}</td>
                 <td>{movie.type}</td>
                 <td>{movie.year}</td>
@@ -243,7 +248,7 @@ const MovieList = () => {
                     {movie.isDisabled ? "Disabled" : "Active"}
                   </span>
                 </td>
-                <td className="actions-cell">
+                <td>
                   <button
                     className="edit-btn"
                     onClick={() => handleEditMovie(movie)}

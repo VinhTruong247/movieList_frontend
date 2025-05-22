@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router';
-import './NotFound.scss';
+import { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router";
+import "./NotFound.scss";
 
 const NotFound = () => {
   const navigate = useNavigate();
@@ -12,7 +12,7 @@ const NotFound = () => {
     }, 1000);
 
     const redirect = setTimeout(() => {
-      navigate('/');
+      navigate("/");
     }, 15000);
 
     return () => {

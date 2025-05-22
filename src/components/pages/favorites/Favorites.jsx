@@ -1,12 +1,19 @@
-import React from "react";
 import { useNavigate } from "react-router";
+import { useContext } from "react";
 import { useFavorites } from "../../../hooks/useFavorites";
+import { MovieContext } from "../../../context/MovieContext";
 import FavoriteComponent from "./FavoriteComponent";
+import NotFound from "../../common/NotFound";
 import "./Favorites.scss";
 
 const Favorites = () => {
   const { syncedFavorites } = useFavorites();
   const navigate = useNavigate();
+  const { currentUser } = useContext(MovieContext);
+
+  if (currentUser?.role === "admin") {
+    return <NotFound />;
+  }
 
   return (
     <div className="favorites-container">

@@ -51,8 +51,9 @@ const UserList = () => {
       const searchQuery = searchUser.toLowerCase();
       result = result.filter(
         (user) =>
-          (user.id && user.id.toLowerCase().includes(searchQuery)) ||
-          (user.username && user.username.toLowerCase().includes(searchQuery)) ||
+          (user.username &&
+            user.username.toLowerCase().includes(searchQuery)) ||
+          (user.name && user.name.toLowerCase().includes(searchQuery)) ||
           (user.email && user.email.toLowerCase().includes(searchQuery))
       );
     }
@@ -112,7 +113,7 @@ const UserList = () => {
         <div className="search-box">
           <input
             type="text"
-            placeholder="Search by ID, Username, or Email..."
+            placeholder="Search by Username, Name or Email..."
             value={searchUser}
             onChange={(e) => setSearchUser(e.target.value)}
             className="search-input"
@@ -126,6 +127,7 @@ const UserList = () => {
             <tr>
               <th>Username</th>
               <th>Email</th>
+              <th>Name</th>
               <th>Role</th>
               <th>Status</th>
               <th>Actions</th>
@@ -137,8 +139,9 @@ const UserList = () => {
                 key={user.id}
                 className={user.isDisabled ? "disabled-row" : ""}
               >
-                <td>{user.username}</td>
+                <td>{user.username ? user.username : <em>Unidentified</em>}</td>
                 <td>{user.email}</td>
+                <td>{user.name ? user.name : <em>Unidentified</em>}</td>
                 <td>{user.role}</td>
                 <td>
                   <span
@@ -160,8 +163,8 @@ const UserList = () => {
                     {processingUsers.includes(user.id)
                       ? "Processing..."
                       : user.isDisabled
-                      ? "Enable"
-                      : "Disable"}
+                        ? "Enable"
+                        : "Disable"}
                   </button>
                 </td>
               </tr>

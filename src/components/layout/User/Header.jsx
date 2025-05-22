@@ -30,7 +30,7 @@ const Header = () => {
           </Link>
 
           <div className="nav-links">
-            {currentUser && (
+            {currentUser && currentUser.role !== "admin" && (
               <Link to="/favorites" className="nav-link favorites-link">
                 <span className="icon">❤️</span>
                 <span className="text">Favorites</span>
@@ -42,7 +42,12 @@ const Header = () => {
 
             {currentUser ? (
               <div className="user-menu">
-                <span className="username">Welcome, {currentUser?.name}</span>
+                <span className="username">
+                  Welcome,{" "}
+                  {currentUser?.name ??
+                    currentUser?.username ??
+                    currentUser?.role}
+                </span>
                 {currentUser.role === "admin" ? (
                   <Link to="/admin" className="nav-link admin-link">
                     Admin Dashboard
