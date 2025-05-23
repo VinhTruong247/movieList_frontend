@@ -3,7 +3,7 @@ import {
   getMovies,
   addMovie,
   updateMovie,
-} from "../../../../utils/MovieListAPI";
+} from "../../../../services/MovieListAPI";
 import MovieForm from "./movieForm/MovieForm";
 import supabase from "../../../../supabase-client";
 import "./MovieList.scss";

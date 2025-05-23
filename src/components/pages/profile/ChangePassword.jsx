@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Formik, Form, Field } from "formik";
 import { PasswordChangeSchema } from "../../auth/Validation";
-import { updateUser, verifyPassword } from "../../../utils/UserListAPI";
+import { updateUser, verifyPassword } from "../../../services/UserListAPI";
 import "./ChangePassword.scss";
 
 const ChangePassword = ({ currentUser, onSuccess, onError }) => {

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router";
 import { Formik, Form, Field } from "formik";
-import { signUp } from "../../utils/UserListAPI";
+import { signUp } from "../../services/UserListAPI";
 import { RegisterSchema } from "./Validation";
 import "./RegisterPage.scss";
 

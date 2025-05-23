@@ -1,7 +1,10 @@
 import { useState, useEffect, useContext } from "react";
 import { Formik, Form, Field } from "formik";
 import { useNavigate } from "react-router";
-import { getCurrentUser, updateUserProfile } from "../../../utils/UserListAPI";
+import {
+  getCurrentUser,
+  updateUserProfile,
+} from "../../../services/UserListAPI";
 import { useFavorites } from "../../../hooks/useFavorites";
 import MovieCard from "../home/movieCard/MovieCard";
 import { ProfileSchema } from "../../auth/Validation";

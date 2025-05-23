@@ -1,7 +1,7 @@
- import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Outlet, Navigate } from "react-router";
 import AdminHeader from "./Header";
-import { getCurrentUser } from "../../../utils/UserListAPI";
+import { getCurrentUser } from "../../../services/UserListAPI";
 import "./AdminLayout.scss";
 
 const AdminLayout = () => {

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router";
 import { Formik, Form, Field } from "formik";
-import { loginUser, getCurrentUser } from "../../utils/UserListAPI";
+import { loginUser, getCurrentUser } from "../../services/UserListAPI";
 import { LoginSchema } from "./Validation";
 import "./LoginPage.scss";
 

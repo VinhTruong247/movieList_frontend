@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { getAllGenres } from "../../../../utils/GenresAPI";
+import { getAllGenres } from "../../../../services/GenresAPI";
 import "./GenreList.scss";
 
 const GenreList = ({

@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router';
-import { logoutUser, getCurrentUser } from '../../../utils/UserListAPI';
-import './styles/Header.scss';
+import React, { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router";
+import { logoutUser, getCurrentUser } from "../../../services/UserListAPI";
+import "./styles/Header.scss";
 
 const AdminHeader = () => {
   const navigate = useNavigate();
@@ -16,15 +16,15 @@ const AdminHeader = () => {
         console.error("Error loading user data:", error);
       }
     };
-    
+
     loadUser();
   }, []);
 
   const handleLogout = async () => {
     try {
       await logoutUser();
-      localStorage.removeItem('user');
-      navigate('/login');
+      localStorage.removeItem("user");
+      navigate("/login");
     } catch (error) {
       console.error("Logout failed:", error);
     }

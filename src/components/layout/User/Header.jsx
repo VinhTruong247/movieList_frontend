@@ -2,7 +2,7 @@ import { useContext } from "react";
 import { Link, useNavigate } from "react-router";
 import { MovieContext } from "../../../context/MovieContext";
 import { useFavorites } from "../../../hooks/useFavorites";
-import { logoutUser } from "../../../utils/UserListAPI";
+import { logoutUser } from "../../../services/UserListAPI";
 import "./styles/Header.scss";
 
 const Header = () => {

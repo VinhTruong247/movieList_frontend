@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Formik, Form, Field } from "formik";
 import * as Yup from "yup";
 import supabase from "../../../../../supabase-client";
-import { getAllGenres } from "../../../../../utils/GenresAPI";
+import { getAllGenres } from "../../../../../services/GenresAPI";
 import "./MovieForm.scss";
 
 const MovieSchema = Yup.object().shape({
