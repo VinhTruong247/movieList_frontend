@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
-import { getMovies } from "../../../../utils/MovieListAPI";
+import { getMovies } from "../../../../services/MovieListAPI";
 import Loader from "../../../common/Loader";
 import "./SimilarMovie.scss";
 

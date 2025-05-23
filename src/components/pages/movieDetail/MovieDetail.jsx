@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router";
 import { Link } from "react-router";
-import { getMovieById } from "../../../utils/MovieListAPI";
+import { getMovieById } from "../../../services/MovieListAPI";
 import Loader from "../../common/Loader";
 import { useFavorites } from "../../../hooks/useFavorites";
 import TrailerPopup from "./Trailer/TrailerPopup";

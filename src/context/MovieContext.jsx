@@ -1,6 +1,6 @@
 import { createContext, useState, useEffect, useCallback } from "react";
 import supabase from "../supabase-client";
-import { getCurrentUser } from "../utils/UserListAPI";
+import { getCurrentUser } from "../services/UserListAPI";
 
 export const MovieContext = createContext();
 
@@ -118,28 +118,29 @@ export const MovieProvider = ({ children }) => {
     } else {
       loadMoviesBasedOnUserRole(null);
     }
-  }, [currentUser]);
+  }, [currentUser?.role]);
 
   const toggleFavorite = useCallback(
     async (movieId) => {
       if (!currentUser) return;
 
       try {
-        const { data: existingFav, error: checkError } = await supabase
-          .from("Favorites")
-          .select("*")
-          .eq("movie_id", movieId)
-          .eq("user_id", currentUser.id);
-        if (checkError) throw checkError;
-        if (existingFav && existingFav.length > 0) {
-          const { error: deleteError } = await supabase
-            .from("Favorites")
-            .delete()
-            .eq("movie_id", movieId)
-            .eq("user_id", currentUser.id);
-
-          if (deleteError) throw deleteError;
-
+        const movieExists = movies.find((movie) => movie.id === movieId);
+        const { data, error } = await supabase.rpc("toggle_favorite", {
+          p_movie_id: movieId,
+          p_user_id: currentUser.id,
+        });
+        if (error) throw error;
+        if (data.action === "added") {
+          const newFavorites = [...favorites, movieExists];
+          setFavorites(newFavorites);
+          setSyncedFavorites(
+            currentUser.role === "admin" || !movieExists.isDisabled
+              ? [...syncedFavorites, movieExists]
+              : syncedFavorites
+          );
+          return true;
+        } else {
           const newFavorites = favorites.filter((fav) => fav.id !== movieId);
           setFavorites(newFavorites);
           setSyncedFavorites(
@@ -148,38 +149,13 @@ export const MovieProvider = ({ children }) => {
               : newFavorites.filter((movie) => !movie.isDisabled)
           );
           return false;
-        } else {
-          const { error: insertError } = await supabase
-            .from("Favorites")
-            .insert([
-              {
-                movie_id: movieId,
-                user_id: currentUser.id,
-              },
-            ]);
-
-          if (insertError) throw insertError;
-          const { data: movieData, error: movieError } = await supabase
-            .from("Movies")
-            .select("*")
-            .eq("id", movieId)
-            .single();
-
-          if (movieError) throw movieError;
-          const newFavorites = [...favorites, movieData];
-          setFavorites(newFavorites);
-
-          if (currentUser.role === "admin" || !movieData.isDisabled) {
-            setSyncedFavorites([...syncedFavorites, movieData]);
-          }
-          return true;
         }
       } catch (error) {
         console.error("Error toggling favorite:", error);
         throw error;
       }
     },
-    [currentUser, favorites, syncedFavorites]
+    [currentUser, favorites, syncedFavorites, movies]
   );
 
   const isFavorite = useCallback(

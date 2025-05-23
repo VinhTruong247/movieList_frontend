@@ -1,7 +1,6 @@
 import { useContext, useCallback, useEffect, useState } from "react";
 import { MovieContext } from "../context/MovieContext";
-import { getUserFavorites } from "../utils/FarvoritesAPI";
-import { getMovieById } from "../utils/MovieListAPI";
+import { getUserFavorites } from "../services/FarvoritesAPI";
 
 export const useFavorites = () => {
   const {
@@ -17,58 +16,35 @@ export const useFavorites = () => {
   const isLoggedIn = !!currentUser;
 
   useEffect(() => {
-    const syncFavorites = async () => {
-      if (isLoggedIn && currentUser?.id) {
+    if (
+      !loading &&
+      isLoggedIn &&
+      currentUser?.id &&
+      (!favorites || favorites.length === 0)
+    ) {
+      const syncFavorites = async () => {
         setLoadingFavorites(true);
         try {
-          let favoritesToProcess = [];
-
-          if (!favorites || favorites.length === 0) {
-            const userFavorites = await getUserFavorites(currentUser.id);
-            favoritesToProcess = userFavorites
-              .map((fav) => {
-                return fav.Movies || { id: fav.movie_id };
-              })
-              .filter(Boolean);
-          } else {
-            favoritesToProcess = favorites;
+          const userFavorites = await getUserFavorites(currentUser.id);
+          if (userFavorites && userFavorites.length > 0) {
+            const formattedFavorites = userFavorites.map((item) => ({
+              id: item.movie_id,
+              ...item.Movies,
+            }));
+            setSyncedFavorites(formattedFavorites);
           }
-          const needDetailsMovies = favoritesToProcess.filter(
-            (movie) => !movie.overview || !movie.genres
-          );
-          const completeMovies = favoritesToProcess.filter(
-            (movie) => movie.overview && movie.genres
-          );
-          const fetchedDetails = await Promise.all(
-            needDetailsMovies.map(async (movie) => {
-              try {
-                const details = await getMovieById(movie.id);
-                return { ...movie, ...details };
-              } catch (error) {
-                console.error(
-                  `Error fetching details for movie ${movie.id}:`,
-                  error
-                );
-                return movie;
-              }
-            })
-          );
-
-          setSyncedFavorites([...completeMovies, ...fetchedDetails]);
         } catch (error) {
           console.error("Error syncing favorites:", error);
         } finally {
           setLoadingFavorites(false);
         }
-      } else {
-        setSyncedFavorites([]);
-      }
-    };
+      };
 
-    if (!loading) {
       syncFavorites();
+    } else {
+      setSyncedFavorites(favorites);
     }
-  }, [currentUser, favorites, isLoggedIn, loading]);
+  }, [loading, isLoggedIn, currentUser?.id, favorites]);
 
   const isFavorite = useCallback(
     (movieId) => {
