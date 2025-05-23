@@ -41,11 +41,29 @@ const GenreList = () => {
   const fetchGenres = async () => {
     setLoading(true);
     try {
-      // Create a stored procedure that returns all genres with their counts in one call
-      const { data, error } = await supabase.rpc('get_all_genres_with_counts');
-      
-      if (error) throw error;
-      setGenres(data || []);
+      const { data: genresData, error: genresError } = await supabase
+        .from("Genres")
+        .select("*")
+        .order("name");
+
+      if (genresError) throw genresError;
+      const { data: movieCountsData, error: movieCountsError } =
+        await supabase.rpc("get_genres_with_movie_count");
+
+      if (movieCountsError) throw movieCountsError;
+      const movieCountMap = {};
+
+      if (movieCountsData) {
+        movieCountsData.forEach((item) => {
+          movieCountMap[item.genre_id] = item.movie_count;
+        });
+      }
+      const genresWithCounts = genresData.map((genre) => ({
+        ...genre,
+        movieCount: movieCountMap[genre.id] || 0,
+      }));
+
+      setGenres(genresWithCounts);
     } catch (err) {
       console.error("Error fetching genres:", err);
       setError("Failed to load genres");
@@ -75,6 +93,7 @@ const GenreList = () => {
           .eq("id", genre.id);
 
         if (error) throw error;
+
         setGenres(
           genres.map((g) =>
             g.id === genre.id ? { ...g, isDisabled: !genre.isDisabled } : g
@@ -107,7 +126,9 @@ const GenreList = () => {
             isDisabled: values.isDisabled || false,
           })
           .eq("id", editingGenre.id);
+
         if (error) throw error;
+
         setGenres(
           genres.map((g) =>
             g.id === editingGenre.id
@@ -135,6 +156,7 @@ const GenreList = () => {
           .select();
 
         if (error) throw error;
+
         setGenres([...genres, { ...data[0], movieCount: 0 }]);
 
         setNotification({
@@ -160,8 +182,6 @@ const GenreList = () => {
 
   if (loading) return <div className="loading">Loading genres...</div>;
   if (error) return <div className="error-message">{error}</div>;
-
-  console.log("Genres:", genres);
 
   return (
     <div className="genre-list-section">
@@ -248,7 +268,7 @@ const GenreList = () => {
               <th>Name</th>
               <th>Status</th>
               <th>Movies</th>
-              <th className="actions-cell">Actions</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -261,9 +281,7 @@ const GenreList = () => {
                   <td>{genre.name}</td>
                   <td>
                     <span
-                      className={`status-badge ${
-                        genre.isDisabled ? "disabled" : "active"
-                      }`}
+                      className={`status-badge ${genre.isDisabled ? "disabled" : "active"}`}
                     >
                       {genre.isDisabled ? "Disabled" : "Active"}
                     </span>

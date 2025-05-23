@@ -36,6 +36,7 @@ const MovieList = () => {
     yearFrom: "",
     yearTo: "",
   });
+  const [formData, setFormData] = useState({ genres: [], directors: [] });
 
   const fetchMovies = async () => {
     setLoading(true);
@@ -130,7 +131,27 @@ const MovieList = () => {
     setCurrentPage(pageNumber);
   };
 
-  const handleAddMovie = () => {
+  const handleAddMovie = async () => {
+    // Only fetch form data when needed
+    if (formData.genres.length === 0 || formData.directors.length === 0) {
+      setLoading(true);
+      try {
+        const [genresData, { data: directorsData }] = await Promise.all([
+          getAllGenres(),
+          supabase.from("Directors").select("*").order("name"),
+        ]);
+
+        setFormData({
+          genres: genresData || [],
+          directors: directorsData || [],
+        });
+      } catch (err) {
+        console.error("Error loading form data:", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+
     setEditingMovie(null);
     setShowForm(true);
   };
@@ -560,6 +581,7 @@ const MovieList = () => {
             setShowForm(false);
             setEditingMovie(null);
           }}
+          formData={formData}
         />
       )}
     </div>

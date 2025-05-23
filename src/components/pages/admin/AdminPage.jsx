@@ -14,26 +14,30 @@ const AdminPage = () => {
   const [activeSection, setActiveSection] = useState("dashboard");
 
   useEffect(() => {
-    const loadUsers = async () => {
-      try {
-        const { data, error } = await supabase
-          .from("Users")
-          .select("*")
-          .neq("role", "admin");
+    if (activeSection === "dashboard" || activeSection === "users") {
+      const loadUsers = async () => {
+        try {
+          const query =
+            activeSection === "dashboard"
+              ? supabase.from("Users").select("id").neq("role", "admin")
+              : supabase.from("Users").select("*").neq("role", "admin");
 
-        if (error) throw error;
+          const { data, error } = await query;
 
-        setUsers(data || []);
-      } catch (err) {
-        console.error("Failed to load users:", err);
-        setError("Failed to load users");
-      } finally {
-        setLoading(false);
-      }
-    };
+          if (error) throw error;
 
-    loadUsers();
-  }, []);
+          setUsers(data || []);
+        } catch (err) {
+          console.error("Failed to load users:", err);
+          setError("Failed to load users");
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      loadUsers();
+    }
+  }, [activeSection]);
 
   const renderContent = () => {
     switch (activeSection) {
