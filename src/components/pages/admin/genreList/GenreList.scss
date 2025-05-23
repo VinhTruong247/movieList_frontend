@@ -53,16 +53,22 @@
     }
 
     .add-btn {
-      background-color: $accent-color;
-      color: #fff;
+      padding: 0.75rem 1.5rem;
+      background: $accent-color;
+      color: white;
       border: none;
-      padding: 0.6rem 1rem;
       border-radius: $border-radius;
+      font-weight: 500;
       cursor: pointer;
-      transition: background-color $transition-speed;
+      transition: all $transition-speed;
 
       &:hover {
-        background-color: rgba($accent-color, 0.1);
+        background: color.adjust($accent-color, $lightness: -8%);
+        transform: translateY(-1px);
+      }
+
+      &:active {
+        transform: translateY(0);
       }
     }
   }
@@ -144,12 +150,17 @@
         }
 
         .submit-btn {
-          background-color: $accent-color;
+          background: $accent-color;
           border: none;
           color: white;
 
           &:hover:not(:disabled) {
-            background-color: rgba($accent-color, 0.1);
+            background: color.adjust($accent-color, $lightness: -8%);
+            transform: translateY(-1px);
+          }
+
+          &:active {
+            transform: translateY(0);
           }
         }
       }
@@ -165,21 +176,22 @@
 
       th,
       td {
-        padding: 0.8rem;
+        padding: 1rem;
         text-align: left;
-        border-bottom: 1px solid #eaeaea;
+        border-bottom: 1px solid rgba($primary-color, 0.1);
       }
 
       th {
-        background-color: #f7f7f7;
-        color: $primary-color;
+        background: rgba($accent-color, 0.1);
         font-weight: 600;
-        position: sticky;
-        top: 0;
       }
 
-      tr:hover {
-        background-color: #f9f9f9;
+      tr {
+        transition: background-color $transition-speed;
+
+        &:hover {
+          background-color: rgba($accent-color, 0.02);
+        }
       }
 
       .no-data {
@@ -195,14 +207,19 @@
 
       .actions-cell {
         white-space: nowrap;
+        text-align: center;
 
         button {
           margin-right: 0.5rem;
-          padding: 0.4rem 0.8rem;
-          border-radius: 4px;
+          padding: 0.5rem 0.75rem;
+          border-radius: $border-radius;
           cursor: pointer;
           font-size: 0.9rem;
           transition: all $transition-speed;
+          font-weight: 500;
+          min-width: 70px;
+          text-align: center;
+          border: none;
 
           &:last-child {
             margin-right: 0;
@@ -215,25 +232,86 @@
         }
 
         .edit-btn {
-          background-color: #e2f0fd;
-          border: 1px solid #90c8f2;
-          color: #0d6efd;
+          background-color: rgba($primary-color, 0.1);
+          color: $primary-color;
 
           &:hover:not(:disabled) {
-            background-color: #cce5fd;
+            background: $primary-color;
+            color: white;
+          }
+
+          &:active {
+            transform: scale(0.98);
           }
         }
 
-        .delete-btn {
-          background-color: #fee2e2;
-          border: 1px solid #f8a9a9;
-          color: #dc3545;
+        .enable-btn {
+          background-color: rgba(46, 204, 113, 0.1);
+          color: #27ae60;
 
           &:hover:not(:disabled) {
-            background-color: #fcd2d2;
+            background-color: rgba(46, 204, 113, 0.2);
+          }
+        }
+
+        .disable-btn {
+          background-color: rgba(231, 76, 60, 0.1);
+          color: #e74c3c;
+
+          &:hover:not(:disabled) {
+            background-color: rgba(231, 76, 60, 0.2);
           }
         }
       }
+    }
+  }
+
+  .status-badge {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    text-align: center;
+    min-width: 80px;
+
+    &.active {
+      background-color: rgba(46, 204, 113, 0.15);
+      color: #27ae60;
+    }
+
+    &.disabled {
+      background-color: rgba(231, 76, 60, 0.15);
+      color: #e74c3c;
+    }
+  }
+
+  .disabled-row {
+    background-color: rgba(0, 0, 0, 0.05);
+    color: #777;
+  }
+
+  .form-group.status-toggle {
+    margin: 1rem 0;
+    display: flex;
+    flex-direction: column;
+
+    label {
+      display: flex;
+      align-items: center;
+      font-weight: 500;
+      cursor: pointer;
+
+      input[type="checkbox"] {
+        margin-right: 0.5rem;
+        width: auto;
+      }
+    }
+
+    small {
+      margin-top: 0.25rem;
+      color: #777;
+      font-size: 0.8rem;
     }
   }
 }

@@ -9,6 +9,7 @@ const GenreSchema = Yup.object().shape({
     .min(3, "Genre name must be at least 3 characters")
     .max(30, "Genre name must be less than 30 characters")
     .required("Genre name is required"),
+  isDisabled: Yup.boolean(),
 });
 
 const GenreList = () => {
@@ -40,15 +41,9 @@ const GenreList = () => {
   const fetchGenres = async () => {
     setLoading(true);
     try {
-      const { data, error } = await supabase
-        .from("Genres")
-        .select(
-          `*, 
-          MovieGenres(count)
-        `
-        )
-        .order("name");
-
+      // Create a stored procedure that returns all genres with their counts in one call
+      const { data, error } = await supabase.rpc('get_all_genres_with_counts');
+      
       if (error) throw error;
       setGenres(data || []);
     } catch (err) {
@@ -69,37 +64,33 @@ const GenreList = () => {
     setShowForm(true);
   };
 
-  const handleDeleteGenre = async (genreId, movieCount) => {
-    if (movieCount > 0) {
-      setNotification({
-        show: true,
-        message: `Cannot delete genre: it's used by ${movieCount} movies`,
-        type: "error",
-      });
-      return;
-    }
+  const handleToggleStatus = async (genre) => {
+    const action = genre.isDisabled ? "enable" : "disable";
 
-    if (window.confirm("Are you sure you want to delete this genre?")) {
+    if (window.confirm(`Are you sure you want to ${action} this genre?`)) {
       try {
         const { error } = await supabase
           .from("Genres")
-          .delete()
-          .eq("id", genreId);
+          .update({ isDisabled: !genre.isDisabled })
+          .eq("id", genre.id);
 
         if (error) throw error;
-
-        setGenres(genres.filter((g) => g.id !== genreId));
+        setGenres(
+          genres.map((g) =>
+            g.id === genre.id ? { ...g, isDisabled: !genre.isDisabled } : g
+          )
+        );
 
         setNotification({
           show: true,
-          message: "Genre deleted successfully",
+          message: `Genre ${action}d successfully`,
           type: "success",
         });
       } catch (err) {
-        console.error("Error deleting genre:", err);
+        console.error(`Error ${action}ing genre:`, err);
         setNotification({
           show: true,
-          message: `Failed to delete genre: ${err.message}`,
+          message: `Failed to ${action} genre: ${err.message}`,
           type: "error",
         });
       }
@@ -113,6 +104,7 @@ const GenreList = () => {
           .from("Genres")
           .update({
             name: values.name,
+            isDisabled: values.isDisabled || false,
           })
           .eq("id", editingGenre.id);
         if (error) throw error;
@@ -122,6 +114,7 @@ const GenreList = () => {
               ? {
                   ...g,
                   name: values.name,
+                  isDisabled: values.isDisabled || false,
                 }
               : g
           )
@@ -137,12 +130,12 @@ const GenreList = () => {
           .from("Genres")
           .insert({
             name: values.name,
+            isDisabled: false,
           })
           .select();
 
         if (error) throw error;
-
-        setGenres([...genres, { ...data[0], MovieGenres: [] }]);
+        setGenres([...genres, { ...data[0], movieCount: 0 }]);
 
         setNotification({
           show: true,
@@ -168,6 +161,8 @@ const GenreList = () => {
   if (loading) return <div className="loading">Loading genres...</div>;
   if (error) return <div className="error-message">{error}</div>;
 
+  console.log("Genres:", genres);
+
   return (
     <div className="genre-list-section">
       {notification.show && (
@@ -189,11 +184,12 @@ const GenreList = () => {
           <Formik
             initialValues={{
               name: editingGenre?.name || "",
+              isDisabled: editingGenre?.isDisabled || false,
             }}
             validationSchema={GenreSchema}
             onSubmit={handleSubmit}
           >
-            {({ errors, touched, isSubmitting }) => (
+            {({ errors, touched, isSubmitting, values }) => (
               <Form className="genre-form">
                 <div className="form-group">
                   <label htmlFor="name">Genre Name</label>
@@ -207,6 +203,16 @@ const GenreList = () => {
                     <div className="error">{errors.name}</div>
                   )}
                 </div>
+
+                {editingGenre && (
+                  <div className="form-group status-toggle">
+                    <label>
+                      <Field type="checkbox" name="isDisabled" />
+                      Disable this genre
+                    </label>
+                    <small>Disabled genres won't appear in user searches</small>
+                  </div>
+                )}
 
                 <div className="form-actions">
                   <button
@@ -240,16 +246,29 @@ const GenreList = () => {
           <thead>
             <tr>
               <th>Name</th>
+              <th>Status</th>
               <th>Movies</th>
-              <th>Actions</th>
+              <th className="actions-cell">Actions</th>
             </tr>
           </thead>
           <tbody>
             {genres.length > 0 ? (
               genres.map((genre) => (
-                <tr key={genre.id}>
+                <tr
+                  key={genre.id}
+                  className={genre.isDisabled ? "disabled-row" : ""}
+                >
                   <td>{genre.name}</td>
-                  <td>{genre.MovieGenres?.length || 0} movie(s)</td>
+                  <td>
+                    <span
+                      className={`status-badge ${
+                        genre.isDisabled ? "disabled" : "active"
+                      }`}
+                    >
+                      {genre.isDisabled ? "Disabled" : "Active"}
+                    </span>
+                  </td>
+                  <td>{genre.movieCount || 0} movie(s)</td>
                   <td className="actions-cell">
                     <button
                       onClick={() => handleEditGenre(genre)}
@@ -258,24 +277,19 @@ const GenreList = () => {
                       Edit
                     </button>
                     <button
-                      onClick={() =>
-                        handleDeleteGenre(
-                          genre.id,
-                          genre.MovieGenres?.length || 0
-                        )
+                      onClick={() => handleToggleStatus(genre)}
+                      className={
+                        genre.isDisabled ? "enable-btn" : "disable-btn"
                       }
-                      className="delete-btn"
-                      disabled={genre.MovieGenres?.length > 0}
                     >
-                      Delete
+                      {genre.isDisabled ? "Enable" : "Disable"}
                     </button>
                   </td>
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan="3" className="no-data-row">
-                  {" "}
+                <td colSpan="4" className="no-data-row">
                   No genres found. Add your first genre!
                 </td>
               </tr>
