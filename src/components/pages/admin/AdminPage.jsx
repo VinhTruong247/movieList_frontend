@@ -3,6 +3,7 @@ import supabase from "../../../supabase-client";
 import { useMovies } from "../../../hooks/useMovies";
 import UserList from "./userList/UserList";
 import MovieList from "./movieList/MovieList";
+import GenreList from "./genreList/GenreList";
 import "./AdminPage.scss";
 
 const AdminPage = () => {
@@ -40,6 +41,8 @@ const AdminPage = () => {
         return <UserList />;
       case "movies":
         return <MovieList />;
+      case "genres":
+        return <GenreList />;
       default:
         return (
           <>
@@ -91,6 +94,13 @@ const AdminPage = () => {
           >
             <span className="icon">🎬</span>
             Movie Management
+          </button>
+          <button
+            className={`menu-item ${activeSection === "genres" ? "active" : ""}`}
+            onClick={() => setActiveSection("genres")}
+          >
+            <span className="icon">🏷️</span>
+            Genre Management
           </button>
         </nav>
       </div>

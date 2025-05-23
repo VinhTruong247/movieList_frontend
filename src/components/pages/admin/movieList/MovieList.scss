@@ -30,6 +30,38 @@
       color: #c62828;
       border-left: 4px solid #c62828;
     }
+
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    border-radius: 4px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+
+    &::before {
+      margin-right: 8px;
+      font-size: 1.2rem;
+    }
+
+    &.success {
+      background-color: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+
+      &::before {
+        content: "✓";
+      }
+    }
+
+    &.error {
+      background-color: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+
+      &::before {
+        content: "✕";
+      }
+    }
   }
 
   @keyframes slide-in {
@@ -326,55 +358,73 @@
   display: flex;
   flex-wrap: wrap;
   gap: 1rem;
-  align-items: flex-end;
+  align-items: flex-start;
   border: 1px solid #e1e4e8;
-}
 
-.filter-group {
-  display: flex;
-  flex-direction: column;
-  min-width: 180px;
+  .filter-group {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-width: 180px;
+    margin-bottom: 20px;
 
-  label {
-    font-size: 0.85rem;
-    margin-bottom: 0.4rem;
-    color: #555;
+    label {
+      font-size: 0.85rem;
+      margin-bottom: 0.4rem;
+      color: #555;
+    }
+
+    select,
+    input {
+      padding: 0.5rem;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+      font-size: 0.9rem;
+    }
+
+    .input-error {
+      border: 1px solid #dc3545;
+      background-color: #fff8f8;
+    }
+
+    .error-text {
+      color: #dc3545;
+      font-size: 0.75rem;
+      margin-top: 4px;
+      position: static;
+      width: 100%;
+      font-weight: 500;
+    }
   }
 
-  select,
-  input {
-    padding: 0.5rem;
-    border-radius: 4px;
+  .reset-filter-btn {
+    background-color: #f0f0f0;
+    color: #333;
     border: 1px solid #ccc;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
     font-size: 0.9rem;
+    align-self: flex-end;
+    margin-bottom: 20px;
+
+    &:hover {
+      background-color: #e0e0e0;
+    }
   }
-}
 
-.reset-filter-btn {
-  background-color: #f0f0f0;
-  color: #333;
-  border: 1px solid #ccc;
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 0.9rem;
+  .filter-btn {
+    background-color: #f0f0f0;
+    color: #333;
+    border: 1px solid #ccc;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    margin-right: 10px;
+    cursor: pointer;
 
-  &:hover {
-    background-color: #e0e0e0;
-  }
-}
-
-.filter-btn {
-  background-color: #f0f0f0;
-  color: #333;
-  border: 1px solid #ccc;
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
-  margin-right: 10px;
-  cursor: pointer;
-
-  &:hover {
-    background-color: #e0e0e0;
+    &:hover {
+      background-color: #e0e0e0;
+    }
   }
 }
 

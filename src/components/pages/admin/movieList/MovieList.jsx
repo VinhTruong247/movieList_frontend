@@ -32,6 +32,10 @@ const MovieList = () => {
     yearTo: "",
   });
   const [showFilters, setShowFilters] = useState(false);
+  const [filterErrors, setFilterErrors] = useState({
+    yearFrom: "",
+    yearTo: "",
+  });
 
   const fetchMovies = async () => {
     setLoading(true);
@@ -179,13 +183,80 @@ const MovieList = () => {
       ...prev,
       [name]: value,
     }));
+    validateField(name, value);
     setCurrentPage(1);
+  };
+
+  const validateField = (name, value) => {
+    const errors = { ...filterErrors };
+    if (!value) {
+      errors[name] = "";
+      setFilterErrors(errors);
+      return;
+    }
+
+    const currentYear = new Date().getFullYear();
+    const containsNonNumeric = /[^\d]/.test(value);
+
+    if ((name === "yearFrom" || name === "yearTo") && containsNonNumeric) {
+      errors[name] = "Please enter numbers only";
+      setFilterErrors(errors);
+      return;
+    }
+
+    if (name === "yearFrom") {
+      const yearNum = parseInt(value);
+
+      if (isNaN(yearNum)) {
+        errors.yearFrom = "Please enter a valid year";
+      } else if (yearNum < 1888) {
+        errors.yearFrom = "Year must be 1888 or later";
+      } else if (yearNum > currentYear + 10) {
+        errors.yearFrom = `Year cannot be more than ${currentYear + 10}`;
+      } else if (filters.yearTo && yearNum > parseInt(filters.yearTo)) {
+        errors.yearFrom = "From year cannot exceed To year";
+      } else {
+        errors.yearFrom = "";
+      }
+      if (filters.yearTo && parseInt(filters.yearTo) < yearNum) {
+        errors.yearTo = "To year must be after From year";
+      } else if (filters.yearTo) {
+        errors.yearTo = "";
+      }
+    }
+
+    if (name === "yearTo") {
+      const yearNum = parseInt(value);
+
+      if (isNaN(yearNum)) {
+        errors.yearTo = "Please enter a valid year";
+      } else if (yearNum < 1888) {
+        errors.yearTo = "Year must be 1888 or later";
+      } else if (yearNum > currentYear + 10) {
+        errors.yearTo = `Year cannot be more than ${currentYear + 10}`;
+      } else if (filters.yearFrom && yearNum < parseInt(filters.yearFrom)) {
+        errors.yearTo = "To year must be after From year";
+      } else {
+        errors.yearTo = "";
+      }
+      if (filters.yearFrom && parseInt(filters.yearFrom) > yearNum) {
+        errors.yearFrom = "From year cannot exceed To year";
+      } else if (filters.yearFrom) {
+        errors.yearFrom = "";
+      }
+    }
+
+    setFilterErrors(errors);
   };
 
   const resetFilters = () => {
     setFilters({
       type: "",
       status: "",
+      yearFrom: "",
+      yearTo: "",
+    });
+    setFilterErrors({
       yearFrom: "",
       yearTo: "",
     });
@@ -322,7 +393,11 @@ const MovieList = () => {
               value={filters.yearFrom}
               onChange={handleFilterChange}
               placeholder="From"
+              className={filterErrors.yearFrom ? "input-error" : ""}
             />
+            {filterErrors.yearFrom && (
+              <div className="error-text">{filterErrors.yearFrom}</div>
+            )}
           </div>
           <div className="filter-group">
             <label>Year To</label>
@@ -332,7 +407,11 @@ const MovieList = () => {
               value={filters.yearTo}
               onChange={handleFilterChange}
               placeholder="To"
+              className={filterErrors.yearTo ? "input-error" : ""}
             />
+            {filterErrors.yearTo && (
+              <div className="error-text">{filterErrors.yearTo}</div>
+            )}
           </div>
           <button className="reset-filter-btn" onClick={resetFilters}>
             Reset Filters
