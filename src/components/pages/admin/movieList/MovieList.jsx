@@ -132,7 +132,6 @@ const MovieList = () => {
   };
 
   const handleAddMovie = async () => {
-    // Only fetch form data when needed
     if (formData.genres.length === 0 || formData.directors.length === 0) {
       setLoading(true);
       try {
