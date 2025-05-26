@@ -4,6 +4,7 @@ import { useMovies } from "../../../hooks/useMovies";
 import UserList from "./userList/UserList";
 import MovieList from "./movieList/MovieList";
 import GenreList from "./genreList/GenreList";
+import DirectorList from "./directorList/DirectorList";
 import "./AdminPage.scss";
 
 const AdminPage = () => {
@@ -47,6 +48,10 @@ const AdminPage = () => {
         return <MovieList />;
       case "genres":
         return <GenreList />;
+      case "directors":
+        return <DirectorList />;
+      case "actors":
+        return <ActorList />;
       default:
         return (
           <>
@@ -97,14 +102,28 @@ const AdminPage = () => {
             onClick={() => setActiveSection("movies")}
           >
             <span className="icon">🎬</span>
-            Movie Management
+            Movie List
           </button>
           <button
             className={`menu-item ${activeSection === "genres" ? "active" : ""}`}
             onClick={() => setActiveSection("genres")}
           >
             <span className="icon">🏷️</span>
-            Genre Management
+            Genre List
+          </button>
+          <button
+            className={`menu-item ${activeSection === "directors" ? "active" : ""}`}
+            onClick={() => setActiveSection("directors")}
+          >
+            <span className="icon">📣</span>
+            Director List
+          </button>
+          <button
+            className={`menu-item ${activeSection === "actors" ? "active" : ""}`}
+            onClick={() => setActiveSection("actors")}
+          >
+            <span className="icon">🎭</span>
+            Actor List
           </button>
         </nav>
       </div>
