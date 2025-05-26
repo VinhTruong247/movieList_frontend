@@ -1,4 +1,4 @@
-import { useContext, useState, useEffect } from "react";
+import { useContext, useState } from "react";
 import { MovieContext } from "../context/MovieContext";
 
 export const useFavorites = () => {
@@ -13,10 +13,15 @@ export const useFavorites = () => {
   const [loadingFavorites, setLoadingFavorites] = useState(false);
   const isLoggedIn = !!currentUser;
 
+  const isFavorite = (movieId) => {
+    return favorites.some((fav) => fav.id === movieId);
+  };
+
   return {
     favorites: contextSyncedFavorites,
     syncedFavorites: contextSyncedFavorites,
     toggleFavorite: ctxToggleFavorite,
+    isFavorite,
     isLoggedIn,
     loadingFavorites: contextLoading || loadingFavorites,
   };

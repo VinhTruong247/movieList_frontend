@@ -1,0 +1,153 @@
+@use "../../../../../styles/root" as *;
+@use "sass:color";
+
+.genre-form-container {
+  background-color: #f8f9fa;
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin-bottom: 2rem;
+  border: 1px solid #e1e4e8;
+  
+  h3 {
+    margin-top: 0;
+    margin-bottom: 1rem;
+    color: $primary-color;
+    font-size: 1.25rem;
+  }
+  
+  .genre-form {
+    .form-group {
+      margin-bottom: 1.25rem;
+      
+      label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+        font-size: 0.9rem;
+        color: #444;
+      }
+      
+      input[type="text"] {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-size: 0.95rem;
+        transition: all $transition-speed;
+        
+        &:focus {
+          outline: none;
+          border-color: $accent-color;
+          box-shadow: 0 0 0 2px rgba($accent-color, 0.1);
+        }
+      }
+      
+      .error-message {
+        color: #e74c3c;
+        font-size: 0.8rem;
+        margin-top: 0.4rem;
+        font-weight: 500;
+      }
+      
+      &.status-toggle {
+        margin-top: 1.5rem;
+        
+        .checkbox-label {
+          display: flex;
+          align-items: center;
+          cursor: pointer;
+          
+          input[type="checkbox"] {
+            margin-right: 0.5rem;
+            width: auto;
+            cursor: pointer;
+            height: 16px;
+            width: 16px;
+          }
+          
+          .label-text {
+            font-weight: 500;
+            font-size: 0.9rem;
+          }
+        }
+        
+        small {
+          display: block;
+          margin-top: 0.25rem;
+          color: #777;
+          font-size: 0.8rem;
+          margin-left: 1.6rem;
+        }
+      }
+    }
+    
+    .form-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.75rem;
+      margin-top: 2rem;
+      
+      button {
+        padding: 0.6rem 1.2rem;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: 500;
+        transition: all $transition-speed;
+        
+        &:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+        }
+      }
+      
+      .cancel-btn {
+        background-color: #f0f0f0;
+        border: 1px solid #ddd;
+        color: #666;
+        
+        &:hover:not(:disabled) {
+          background-color: #e0e0e0;
+        }
+      }
+      
+      .submit-btn {
+        background: $accent-color;
+        border: none;
+        color: white;
+        
+        &:hover:not(:disabled) {
+          background: color.adjust($accent-color, $lightness: -8%);
+          transform: translateY(-1px);
+        }
+        
+        &:active {
+          transform: translateY(0);
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .genre-form-container {
+    padding: 1rem;
+    
+    .genre-form {
+      .form-actions {
+        flex-direction: column;
+        
+        button {
+          width: 100%;
+        }
+        
+        .cancel-btn {
+          order: 2;
+        }
+        
+        .submit-btn {
+          order: 1;
+        }
+      }
+    }
+  }
+}

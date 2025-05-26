@@ -1,16 +1,7 @@
 import { useState, useEffect } from "react";
-import { Formik, Form, Field } from "formik";
-import * as Yup from "yup";
 import supabase from "../../../../supabase-client";
+import GenreForm from "./genreForm/GenreForm";
 import "./GenreList.scss";
-
-const GenreSchema = Yup.object().shape({
-  name: Yup.string()
-    .min(3, "Genre name must be at least 3 characters")
-    .max(30, "Genre name must be less than 30 characters")
-    .required("Genre name is required"),
-  isDisabled: Yup.boolean(),
-});
 
 const GenreList = () => {
   const [genres, setGenres] = useState([]);
@@ -199,66 +190,12 @@ const GenreList = () => {
       </div>
 
       {showForm && (
-        <div className="genre-form-container">
-          <h3>{editingGenre ? "Edit Genre" : "Add New Genre"}</h3>
-          <Formik
-            initialValues={{
-              name: editingGenre?.name || "",
-              isDisabled: editingGenre?.isDisabled || false,
-            }}
-            validationSchema={GenreSchema}
-            onSubmit={handleSubmit}
-          >
-            {({ errors, touched, isSubmitting, values }) => (
-              <Form className="genre-form">
-                <div className="form-group">
-                  <label htmlFor="name">Genre Name</label>
-                  <Field
-                    id="name"
-                    name="name"
-                    type="text"
-                    placeholder="Enter genre name"
-                  />
-                  {errors.name && touched.name && (
-                    <div className="error">{errors.name}</div>
-                  )}
-                </div>
-
-                {editingGenre && (
-                  <div className="form-group status-toggle">
-                    <label>
-                      <Field type="checkbox" name="isDisabled" />
-                      Disable this genre
-                    </label>
-                    <small>Disabled genres won't appear in user searches</small>
-                  </div>
-                )}
-
-                <div className="form-actions">
-                  <button
-                    type="button"
-                    onClick={() => setShowForm(false)}
-                    className="cancel-btn"
-                    disabled={isSubmitting}
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    className="submit-btn"
-                    disabled={isSubmitting}
-                  >
-                    {isSubmitting
-                      ? "Saving..."
-                      : editingGenre
-                        ? "Update Genre"
-                        : "Add Genre"}
-                  </button>
-                </div>
-              </Form>
-            )}
-          </Formik>
-        </div>
+        <GenreForm
+          genre={editingGenre}
+          onSubmit={handleSubmit}
+          onCancel={() => setShowForm(false)}
+          isSubmitting={false}
+        />
       )}
 
       <div className="table-container">

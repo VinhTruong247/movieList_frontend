@@ -186,6 +186,10 @@
         font-weight: 600;
       }
 
+      th:last-child {
+        text-align: center;
+      }
+
       tr {
         transition: background-color $transition-speed;
 
