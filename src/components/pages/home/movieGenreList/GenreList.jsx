@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { getAllGenres } from "../../../../services/GenresAPI";
+import { MovieContext } from "../../../../context/MovieContext";
 import "./GenreList.scss";
 
 const GenreList = ({
@@ -13,12 +14,14 @@ const GenreList = ({
   const [genres, setGenres] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { currentUser } = useContext(MovieContext);
+  const isAdmin = currentUser?.role === "admin";
 
   useEffect(() => {
     const fetchGenres = async () => {
       try {
         setLoading(true);
-        const data = await getAllGenres();
+        const data = await getAllGenres(isAdmin);
         setGenres(data);
       } catch (err) {
         console.error("Failed to load genres:", err);
@@ -29,7 +32,7 @@ const GenreList = ({
     };
 
     fetchGenres();
-  }, []);
+  }, [isAdmin]);
 
   return (
     <div className="genre-list-container">
@@ -94,10 +97,15 @@ const GenreList = ({
           genres.map((genre) => (
             <button
               key={genre.id}
-              className={`genre-item ${selectedGenre === genre.name ? "active" : ""}`}
+              className={`genre-item ${
+                selectedGenre === genre.name ? "active" : ""
+              } ${isAdmin && genre.isDisabled ? "disabled-item" : ""}`}
               onClick={() => onGenreSelect(genre.name)}
             >
               {genre.name}
+              {isAdmin && genre.isDisabled && (
+                <span className="admin-disabled"> (disabled)</span>
+              )}
             </button>
           ))
         )}

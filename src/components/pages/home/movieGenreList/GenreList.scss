@@ -104,6 +104,30 @@
           transform: translateX(5px);
         }
       }
+
+      &.disabled-item {
+        opacity: 0.7;
+        font-style: italic;
+        position: relative;
+
+        &::after {
+          content: "";
+          position: absolute;
+          left: 0;
+          right: 0;
+          top: 50%;
+          height: 1px;
+          background-color: rgba(231, 76, 60, 0.5);
+          pointer-events: none;
+        }
+
+        .admin-disabled {
+          font-size: 0.75rem;
+          color: #e74c3c;
+          display: inline-block;
+          margin-left: 0.25rem;
+        }
+      }
     }
   }
 }

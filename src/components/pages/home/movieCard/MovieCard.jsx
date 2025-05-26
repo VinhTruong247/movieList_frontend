@@ -5,7 +5,7 @@ import { MovieContext } from "../../../../context/MovieContext";
 import "./MovieCard.scss";
 
 const MovieCard = ({ movie }) => {
-  const { toggleFavorite, isFavorite } = useFavorites();
+  const { toggleFavorite, isFavorite, isAdmin } = useFavorites();
   const { currentUser } = useContext(MovieContext);
   const favorite = currentUser ? isFavorite(movie.id) : false;
 
@@ -51,9 +51,22 @@ const MovieCard = ({ movie }) => {
             <span className="movie-year">{movie.year}</span>
           </div>
           <div className="movie-genres">
-            {movie.MovieGenres?.map((item) => (
-              <span key={item.genre_id} className="genre-tag">
-                {item.Genres.name}
+            {movie.MovieGenres?.filter(
+              (genre) => isAdmin || !genre.Genres?.isDisabled
+            ).map((genre) => (
+              <span
+                key={genre.genre_id}
+                className={`genre-badge ${isAdmin && genre.Genres?.isDisabled ? "disabled-genre" : ""}`}
+              >
+                {genre.Genres?.name}
+                {isAdmin && genre.Genres?.isDisabled && (
+                  <span
+                    key={`disabled-${genre.genre_id}`}
+                    className="disabled-indicator"
+                  >
+                    (disabled)
+                  </span>
+                )}
               </span>
             ))}
           </div>

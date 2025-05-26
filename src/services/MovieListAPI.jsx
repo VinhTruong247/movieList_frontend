@@ -2,12 +2,12 @@ import supabase from "../supabase-client";
 
 const movieCache = new Map();
 
-export const getMovies = async (filters = {}) => {
+export const getMovies = async (filters = {}, isAdmin = false) => {
   let query = supabase.from("Movies").select(`
     *,
     MovieGenres (
       genre_id,
-      Genres (id, name)
+      Genres (id, name, isDisabled)
     ),
     MovieActors (
       actor_id,
@@ -22,8 +22,19 @@ export const getMovies = async (filters = {}) => {
 
   if (filters.title) query = query.ilike("title", `%${filters.title}%`);
   if (filters.year) query = query.eq("year", filters.year);
+  
   if (filters.genre) {
-    query = query.filter("MovieGenres.Genres.name", "eq", filters.genre);
+    if (isAdmin) {
+      query = query.filter("MovieGenres.Genres.name", "eq", filters.genre);
+    } else {
+      query = query
+        .filter("MovieGenres.Genres.name", "eq", filters.genre)
+        .filter("MovieGenres.Genres.isDisabled", "eq", false);
+    }
+  }
+
+  if (!isAdmin) {
+    query = query.eq("isDisabled", false);
   }
 
   const { data, error } = await query;
@@ -31,7 +42,7 @@ export const getMovies = async (filters = {}) => {
   return data;
 };
 
-export const getMovieById = async (movieId) => {
+export const getMovieById = async (movieId, isAdmin = false) => {
   const cached = movieCache.get(movieId);
   if (cached) {
     return cached;
@@ -42,7 +53,7 @@ export const getMovieById = async (movieId) => {
       `
       *,
       MovieGenres (
-        Genres (id, name)
+        Genres (id, name, isDisabled)
       ),
       MovieDirectors (
         Directors (id, name)

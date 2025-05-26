@@ -16,7 +16,7 @@ const MovieDetail = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [showTrailer, setShowTrailer] = useState(false);
-  const { isFavorite, toggleFavorite, isLoggedIn } = useFavorites();
+  const { isFavorite, toggleFavorite, isLoggedIn, isAdmin } = useFavorites();
 
   const formattedRuntime = (movie) => {
     if (!movie.runtime) return "";
@@ -110,9 +110,22 @@ const MovieDetail = () => {
           </div>
 
           <div className="genre-list">
-            {movie.genre.map((genre, index) => (
-              <span key={index} className="genre-tag">
-                {genre}
+            {movie.MovieGenres?.filter(
+              (genre) => isAdmin || !genre.Genres?.isDisabled
+            ).map((genre) => (
+              <span
+                key={genre.genre_id}
+                className={`genre-badge ${isAdmin && genre.Genres?.isDisabled ? "disabled-genre" : ""}`}
+              >
+                {genre.Genres?.name}
+                {isAdmin && genre.Genres?.isDisabled && (
+                  <span
+                    key={`disabled-${genre.genre_id}`}
+                    className="disabled-indicator"
+                  >
+                    (disabled)
+                  </span>
+                )}
               </span>
             ))}
           </div>
