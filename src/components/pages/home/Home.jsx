@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import MovieCarousel from "./movieCarousel/MovieCarousel";
 import MovieCard from "./movieCard/MovieCard";
 import GenreList from "./movieGenreList/GenreList";
@@ -16,8 +16,12 @@ const Home = () => {
 
   useEffect(() => {
     if (movies && movies.length > 0) {
-      const sortedByIdMovies = [...movies].sort((a, b) => a.id - b.id);
-      setFilteredMovies(sortedByIdMovies);
+      const sortedMovies = [...movies].sort((a, b) => {
+        const idA = parseInt(a.id.replace(/-/g, ""), 16) || 0;
+        const idB = parseInt(b.id.replace(/-/g, ""), 16) || 0;
+        return idA - idB;
+      });
+      setFilteredMovies(sortedMovies);
     }
   }, [movies]);
 
@@ -68,7 +72,9 @@ const Home = () => {
 
         return movie.MovieGenres.some(
           (genreItem) =>
-            genreItem.Genres && genreItem.Genres.name === genreToUse
+            genreItem.Genres &&
+            genreItem.Genres.name === genreToUse &&
+            !genreItem.Genres.isDisabled
         );
       });
     }
@@ -84,14 +90,36 @@ const Home = () => {
     }
 
     if (sortType === "all") {
-      filteredResults.sort((a, b) => a.id - b.id);
+      filteredResults.sort((a, b) => {
+        const idA = parseInt(a.id.replace(/-/g, ""), 16) || 0;
+        const idB = parseInt(b.id.replace(/-/g, ""), 16) || 0;
+        return idA - idB;
+      });
     } else if (sortType === "top-rated") {
-      filteredResults.sort((a, b) => b.imdb_rating - a.imdb_rating);
+      filteredResults.sort(
+        (a, b) => (b.imdb_rating || 0) - (a.imdb_rating || 0)
+      );
     } else if (sortType === "latest") {
-      filteredResults.sort((a, b) => b.year - a.year);
+      filteredResults.sort((a, b) => (b.year || 0) - (a.year || 0));
     }
 
     setFilteredMovies(filteredResults);
+  };
+
+  const resetFilters = () => {
+    setSearchQuery("");
+    setSelectedGenre("all");
+    setActiveMovieType("all");
+    setActiveSortType("all");
+
+    if (movies && movies.length > 0) {
+      const sortedMovies = [...movies].sort((a, b) => {
+        const idA = parseInt(a.id.replace(/-/g, ""), 16) || 0;
+        const idB = parseInt(b.id.replace(/-/g, ""), 16) || 0;
+        return idA - idB;
+      });
+      setFilteredMovies(sortedMovies);
+    }
   };
 
   if (loading) return <Loader />;
@@ -134,16 +162,7 @@ const Home = () => {
             <div className="no-movies-found">
               <h3>No movies found</h3>
               <p>Try adjusting your search criteria or filters</p>
-              <button
-                className="reset-filters-btn"
-                onClick={() => {
-                  setSearchQuery("");
-                  setSelectedGenre("all");
-                  setActiveMovieType("all");
-                  setActiveSortType("all");
-                  setFilteredMovies([...movies]);
-                }}
-              >
+              <button className="reset-filters-btn" onClick={resetFilters}>
                 Reset Filters
               </button>
             </div>
