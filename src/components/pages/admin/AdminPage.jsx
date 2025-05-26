@@ -5,6 +5,7 @@ import UserList from "./userList/UserList";
 import MovieList from "./movieList/MovieList";
 import GenreList from "./genreList/GenreList";
 import DirectorList from "./directorList/DirectorList";
+import ActorList from "./actorList/ActorList";
 import "./AdminPage.scss";
 
 const AdminPage = () => {
@@ -95,35 +96,35 @@ const AdminPage = () => {
             onClick={() => setActiveSection("users")}
           >
             <span className="icon">👥</span>
-            User Management
+            Users Management
           </button>
           <button
             className={`menu-item ${activeSection === "movies" ? "active" : ""}`}
             onClick={() => setActiveSection("movies")}
           >
             <span className="icon">🎬</span>
-            Movie List
+            Movies List
           </button>
           <button
             className={`menu-item ${activeSection === "genres" ? "active" : ""}`}
             onClick={() => setActiveSection("genres")}
           >
             <span className="icon">🏷️</span>
-            Genre List
+            Genres List
           </button>
           <button
             className={`menu-item ${activeSection === "directors" ? "active" : ""}`}
             onClick={() => setActiveSection("directors")}
           >
             <span className="icon">📣</span>
-            Director List
+            Directors List
           </button>
           <button
             className={`menu-item ${activeSection === "actors" ? "active" : ""}`}
             onClick={() => setActiveSection("actors")}
           >
             <span className="icon">🎭</span>
-            Actor List
+            Actors List
           </button>
         </nav>
       </div>
