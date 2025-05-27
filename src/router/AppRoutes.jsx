@@ -9,6 +9,7 @@ import AdminPage from "../components/pages/admin/AdminPage";
 import ProfilePage from "../components/pages/profile/ProfilePage";
 import NotAuthen from "../components/common/NotAuthen";
 import NotFound from "../components/common/NotFound";
+import NotLogin from "../components/common/NotLogin";
 import { Navigate } from "react-router";
 
 const AppRoutes = [
@@ -56,6 +57,10 @@ const AppRoutes = [
   {
     path: "/not-authen",
     element: <NotAuthen />,
+  },
+  {
+    path: "/not-login",
+    element: <NotLogin />,
   },
   {
     path: "/404",

@@ -1,5 +1,5 @@
-@use '../../styles/root' as *;
-@use 'sass:color';
+@use "../../styles/root" as *;
+@use "sass:color";
 
 .not-found-container {
   min-height: 100vh;
@@ -12,73 +12,81 @@
     rgba($primary-color, 0.1),
     rgba($accent-color, 0.1)
   );
-}
 
-.not-found-content {
-  background: white;
-  padding: 3rem;
-  border-radius: $border-radius;
-  box-shadow: $card-shadow;
-  text-align: center;
-  max-width: 480px;
-  width: 100%;
+  .not-found-content {
+    background: white;
+    padding: 3rem;
+    border-radius: $border-radius;
+    box-shadow: $card-shadow;
+    text-align: center;
+    max-width: 480px;
+    width: 100%;
 
-  h1 {
-    font-size: 6rem;
-    color: $primary-color;
-    margin-bottom: 1rem;
-    font-weight: 700;
-  }
+    h1 {
+      font-size: 6rem;
+      color: $primary-color;
+      margin-bottom: 1rem;
+      font-weight: 700;
+    }
 
-  .error-message {
-    font-size: 1.5rem;
-    color: $secondary-color;
-    margin-bottom: 1rem;
-  }
+    .error-message {
+      font-size: 1.5rem;
+      color: $secondary-color;
+      margin-bottom: 1rem;
+    }
 
-  .countdown {
-    color: $text-color;
-    font-size: 0.9rem;
-    margin: 1rem 0;
-    font-style: italic;
-  }
+    .countdown {
+      color: $text-color;
+      font-size: 0.9rem;
+      margin: 1rem 0;
+      font-style: italic;
+    }
 
-  .helper-text {
-    color: $text-color;
-    margin-bottom: 2rem;
-  }
+    .helper-text {
+      color: $text-color;
+      margin-bottom: 2rem;
+    }
 
-  .action-buttons {
-    display: flex;
-    justify-content: center;
+    .action-buttons {
+      display: flex;
+      justify-content: center;
 
-    .home-button {
-      padding: 0.75rem 1.5rem;
-      border-radius: $border-radius;
-      font-weight: 500;
-      text-decoration: none;
-      transition: all $transition-speed;
-      background: $accent-color;
-      color: white;
-      border: 2px solid $accent-color;
+      .home-button {
+        padding: 0.75rem 1.5rem;
+        border-radius: $border-radius;
+        font-weight: 500;
+        text-decoration: none;
+        transition: all $transition-speed;
+        background: $accent-color;
+        color: white;
+        border: 2px solid $accent-color;
 
-      &:hover {
-        background: color.adjust($accent-color, $lightness: -10%);
+        &:hover {
+          background-color: darken($accent-color, 10%);
+        }
       }
     }
   }
 }
 
-@media (max-width: 480px) {
+@media (max-width: 600px) {
   .not-found-container {
     padding: 1rem;
-  }
+    .not-found-content {
+      padding: 2rem;
 
-  .not-found-content {
-    padding: 2rem;
+      h1 {
+        font-size: 4rem;
+      }
 
-    h1 {
-      font-size: 4rem;
+      .action-buttons {
+        flex-direction: column;
+
+        .home-button,
+        .login-button {
+          width: 100%;
+        }
+      }
     }
   }
 }

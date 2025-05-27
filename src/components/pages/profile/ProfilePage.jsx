@@ -27,7 +27,7 @@ const ProfilePage = () => {
         setLoading(true);
         const user = await getCurrentUser();
         if (!user || !user.session) {
-          navigate("/login");
+          navigate("/not-login");
           return;
         }
 

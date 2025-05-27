@@ -1,5 +1,5 @@
-@use '../../styles/root' as *;
-@use 'sass:color';
+@use "../../styles/root" as *;
+@use "sass:color";
 
 .not-authen-container {
   min-height: 100vh;
@@ -82,7 +82,7 @@
   }
 }
 
-@media (max-width: 480px) {
+@media (max-width: 600px) {
   .not-authen-container {
     padding: 1rem;
   }
@@ -94,8 +94,17 @@
       font-size: 2rem;
     }
 
+    .error-message {
+      font-size: 1.2rem;
+    }
+
     .action-buttons {
       flex-direction: column;
+
+      .home-button,
+      .login-button {
+        width: 100%;
+      }
     }
   }
 }
