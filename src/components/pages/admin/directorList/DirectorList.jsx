@@ -1,7 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import supabase from "../../../../supabase-client";
 import DirectorForm from "./directorForm/DirectorForm";
-import "./DirectorList.scss";
+import "../ListStyle.scss";
 
 const DirectorList = () => {
   const [directors, setDirectors] = useState([]);
@@ -14,6 +14,21 @@ const DirectorList = () => {
     message: "",
     type: "",
   });
+
+  const [searchQuery, setSearchQuery] = useState("");
+  const [showFilters, setShowFilters] = useState(false);
+  const [filters, setFilters] = useState({
+    status: "",
+    moviesMin: "",
+    moviesMax: "",
+  });
+  const [filterErrors, setFilterErrors] = useState({
+    moviesMin: "",
+    moviesMax: "",
+  });
+
+  const ITEMS_PER_PAGE = 10;
+  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
     fetchDirectors();
@@ -59,6 +74,122 @@ const DirectorList = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const filteredDirectors = useMemo(() => {
+    let result = [...directors];
+    if (searchQuery) {
+      const searchedText = searchQuery.toLowerCase();
+      result = result.filter((director) =>
+        director.name?.toLowerCase().includes(searchedText)
+      );
+    }
+    if (filters.status) {
+      if (filters.status === "active") {
+        result = result.filter((director) => !director.isDisabled);
+      } else if (filters.status === "disabled") {
+        result = result.filter((director) => director.isDisabled);
+      }
+    }
+    if (filters.moviesMin) {
+      const minCount = parseInt(filters.moviesMin);
+      result = result.filter((director) => director.movieCount >= minCount);
+    }
+    if (filters.moviesMax) {
+      const maxCount = parseInt(filters.moviesMax);
+      result = result.filter((director) => director.movieCount <= maxCount);
+    }
+
+    return result;
+  }, [directors, searchQuery, filters]);
+  const paginatedDirectors = useMemo(() => {
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    return filteredDirectors.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+  }, [filteredDirectors, currentPage]);
+
+  const pageCount = Math.ceil(filteredDirectors.length / ITEMS_PER_PAGE);
+
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
+
+  const handleFilterChange = (e) => {
+    const { name, value } = e.target;
+    setFilters((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+
+    validateField(name, value);
+    setCurrentPage(1);
+  };
+
+  const validateField = (name, value) => {
+    const errors = { ...filterErrors };
+    if (!value) {
+      errors[name] = "";
+      setFilterErrors(errors);
+      return;
+    }
+    if (name === "moviesMin" || name === "moviesMax") {
+      if (!/^\d+$/.test(value)) {
+        errors[name] = "Please enter numbers only";
+        setFilterErrors(errors);
+        return;
+      }
+      const numValue = parseInt(value);
+      if (name === "moviesMin") {
+        if (numValue < 0) {
+          errors.moviesMin = "Minimum cannot be negative";
+        } else if (
+          filters.moviesMax &&
+          numValue > parseInt(filters.moviesMax)
+        ) {
+          errors.moviesMin = "Minimum cannot exceed maximum";
+        } else {
+          errors.moviesMin = "";
+        }
+        if (filters.moviesMax && parseInt(filters.moviesMax) < numValue) {
+          errors.moviesMax = "Maximum must be greater than minimum";
+        } else if (filters.moviesMax) {
+          errors.moviesMax = "";
+        }
+      }
+
+      if (name === "moviesMax") {
+        if (numValue < 0) {
+          errors.moviesMax = "Maximum cannot be negative";
+        } else if (
+          filters.moviesMin &&
+          numValue < parseInt(filters.moviesMin)
+        ) {
+          errors.moviesMax = "Maximum must be greater than minimum";
+        } else {
+          errors.moviesMax = "";
+        }
+        if (filters.moviesMin && parseInt(filters.moviesMin) > numValue) {
+          errors.moviesMin = "Minimum cannot exceed maximum";
+        } else if (filters.moviesMin) {
+          errors.moviesMin = "";
+        }
+      }
+    }
+
+    setFilterErrors(errors);
+  };
+
+  const resetFilters = () => {
+    setSearchQuery("");
+    setFilters({
+      status: "",
+      moviesMin: "",
+      moviesMax: "",
+    });
+    setFilterErrors({
+      moviesMin: "",
+      moviesMax: "",
+    });
+    setCurrentPage(1);
   };
 
   const handleAddDirector = () => {
@@ -178,7 +309,7 @@ const DirectorList = () => {
   if (error) return <div className="error-message">{error}</div>;
 
   return (
-    <div className="director-list-section">
+    <div className="list-section">
       {notification.show && (
         <div className={`notification ${notification.type}`}>
           {notification.message}
@@ -187,10 +318,77 @@ const DirectorList = () => {
 
       <div className="list-header">
         <h2>Director Management</h2>
-        <button onClick={handleAddDirector} className="add-btn">
-          Add New Director
-        </button>
+        <div className="header-actions">
+          <div className="search-box">
+            <input
+              type="text"
+              placeholder="Search by Name..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="search-input"
+            />
+          </div>
+          <button
+            className="filter-btn"
+            onClick={() => setShowFilters(!showFilters)}
+          >
+            {showFilters ? "Hide Filters" : "Show Filters"}
+          </button>
+          <button onClick={handleAddDirector} className="add-btn">
+            Add New Director
+          </button>
+        </div>
       </div>
+
+      {showFilters && (
+        <div className="filter-panel">
+          <div className="filter-group">
+            <label>Status</label>
+            <select
+              name="status"
+              value={filters.status}
+              onChange={handleFilterChange}
+            >
+              <option value="">All Status</option>
+              <option value="active">Active</option>
+              <option value="disabled">Disabled</option>
+            </select>
+          </div>
+          <div className="filter-group">
+            <label>Min Movies</label>
+            <input
+              type="number"
+              name="moviesMin"
+              value={filters.moviesMin}
+              onChange={handleFilterChange}
+              placeholder="Min"
+              min="0"
+              className={filterErrors.moviesMin ? "input-error" : ""}
+            />
+            {filterErrors.moviesMin && (
+              <div className="error-text">{filterErrors.moviesMin}</div>
+            )}
+          </div>
+          <div className="filter-group">
+            <label>Max Movies</label>
+            <input
+              type="number"
+              name="moviesMax"
+              value={filters.moviesMax}
+              onChange={handleFilterChange}
+              placeholder="Max"
+              min="0"
+              className={filterErrors.moviesMax ? "input-error" : ""}
+            />
+            {filterErrors.moviesMax && (
+              <div className="error-text">{filterErrors.moviesMax}</div>
+            )}
+          </div>
+          <button className="reset-filter-btn" onClick={resetFilters}>
+            Reset Filters
+          </button>
+        </div>
+      )}
 
       {showForm && (
         <DirectorForm
@@ -202,7 +400,7 @@ const DirectorList = () => {
       )}
 
       <div className="table-container">
-        <table className="directors-table">
+        <table className="table-data">
           <thead>
             <tr>
               <th>Name</th>
@@ -212,8 +410,8 @@ const DirectorList = () => {
             </tr>
           </thead>
           <tbody>
-            {directors.length > 0 ? (
-              directors.map((director) => (
+            {paginatedDirectors.length > 0 ? (
+              paginatedDirectors.map((director) => (
                 <tr
                   key={director.id}
                   className={director.isDisabled ? "disabled-row" : ""}
@@ -250,13 +448,52 @@ const DirectorList = () => {
             ) : (
               <tr>
                 <td colSpan="4" className="no-data-row">
-                  No directors found. Add your first director!
+                  {directors.length > 0
+                    ? "No directors found matching your criteria"
+                    : "No directors found. Add your first director!"}
                 </td>
               </tr>
             )}
           </tbody>
         </table>
       </div>
+
+      {filteredDirectors.length > ITEMS_PER_PAGE && (
+        <div className="table-footer">
+          <div className="results-count">
+            Showing {paginatedDirectors.length} of {filteredDirectors.length}{" "}
+            directors
+          </div>
+
+          <div className="pagination">
+            <button
+              className="page-btn"
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+            >
+              Previous
+            </button>
+
+            {Array.from({ length: pageCount }, (_, i) => i + 1).map((page) => (
+              <button
+                key={page}
+                className={`page-btn ${currentPage === page ? "active" : ""}`}
+                onClick={() => handlePageChange(page)}
+              >
+                {page}
+              </button>
+            ))}
+
+            <button
+              className="page-btn"
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={currentPage === pageCount}
+            >
+              Next
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

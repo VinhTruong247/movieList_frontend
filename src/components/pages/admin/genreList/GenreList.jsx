@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import supabase from "../../../../supabase-client";
 import GenreForm from "./genreForm/GenreForm";
-import "./GenreList.scss";
+import "../ListStyle.scss";
 
 const GenreList = () => {
   const [genres, setGenres] = useState([]);
@@ -304,7 +304,7 @@ const GenreList = () => {
   if (error) return <div className="error-message">{error}</div>;
 
   return (
-    <div className="genre-list-section">
+    <div className="list-section">
       {notification.show && (
         <div className={`notification ${notification.type}`}>
           {notification.message}
@@ -395,7 +395,7 @@ const GenreList = () => {
       )}
 
       <div className="table-container">
-        <table className="genres-table">
+        <table className="table-data">
           <thead>
             <tr>
               <th>Name</th>
@@ -453,7 +453,6 @@ const GenreList = () => {
         </table>
       </div>
 
-      {/* Pagination controls */}
       {filteredGenres.length > ITEMS_PER_PAGE && (
         <div className="table-footer">
           <div className="results-count">

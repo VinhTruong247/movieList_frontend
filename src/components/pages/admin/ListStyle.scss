@@ -1,7 +1,7 @@
-@use "../../../../styles/root" as *;
+@use "../../../styles/root" as *;
 @use "sass:color";
 
-.genre-list-section {
+.list-section {
   background: white;
   padding: 2rem;
   border-radius: $border-radius;
@@ -184,20 +184,20 @@
   .table-container {
     overflow-x: auto;
 
-    .genres-table {
+    .table-data {
       width: 100%;
       border-collapse: collapse;
-
-      th,
-      td {
-        padding: 1rem;
-        text-align: left;
-        border-bottom: 1px solid rgba($primary-color, 0.1);
-      }
 
       th {
         background: rgba($accent-color, 0.1);
         font-weight: 600;
+        padding: 1rem;
+        text-align: left;
+        border-bottom: 1px solid rgba($primary-color, 0.1);
+
+        &:last-child {
+          text-align: center;
+        }
 
         &.sortable {
           cursor: pointer;
@@ -214,6 +214,16 @@
 
         &:hover {
           background-color: rgba($accent-color, 0.02);
+        }
+      }
+
+      td {
+        padding: 1rem;
+        text-align: left;
+        border-bottom: 1px solid rgba($primary-color, 0.1);
+
+        &:last-child {
+          text-align: center;
         }
       }
 
@@ -358,135 +368,135 @@
     background-color: rgba(0, 0, 0, 0.05);
     color: #777;
   }
+}
 
-  .genre-form-container {
-    background-color: #f8f9fa;
-    padding: 1.5rem;
-    border-radius: 8px;
-    margin-bottom: 2rem;
-    border: 1px solid #e1e4e8;
+.form-container {
+  background-color: #f8f9fa;
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin-bottom: 2rem;
+  border: 1px solid #e1e4e8;
 
-    h3 {
-      margin-top: 0;
-      margin-bottom: 1rem;
-      color: $primary-color;
-      font-size: 1.25rem;
-    }
+  h3 {
+    margin-top: 0;
+    margin-bottom: 1rem;
+    color: $primary-color;
+    font-size: 1.25rem;
+  }
 
-    .genre-form {
-      .form-group {
-        margin-bottom: 1.25rem;
+  .form-list {
+    .form-group {
+      margin-bottom: 1.25rem;
 
-        label {
-          display: block;
-          margin-bottom: 0.5rem;
-          font-weight: 500;
-          font-size: 0.9rem;
-          color: #444;
-        }
+      label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+        font-size: 0.9rem;
+        color: #444;
+      }
 
-        input[type="text"],
-        textarea {
-          width: 100%;
-          padding: 0.75rem;
-          border: 1px solid #ccc;
-          border-radius: 4px;
-          font-size: 0.95rem;
-          transition: all $transition-speed;
+      input[type="text"],
+      textarea {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-size: 0.95rem;
+        transition: all $transition-speed;
 
-          &:focus {
-            outline: none;
-            border-color: $accent-color;
-            box-shadow: 0 0 0 2px rgba($accent-color, 0.1);
-          }
-        }
-
-        textarea {
-          resize: vertical;
-          min-height: 100px;
-        }
-
-        .error-message {
-          color: #e74c3c;
-          font-size: 0.8rem;
-          margin-top: 0.4rem;
-          font-weight: 500;
-        }
-
-        &.status-toggle {
-          margin-top: 1.5rem;
-
-          .checkbox-label {
-            display: flex;
-            align-items: center;
-            cursor: pointer;
-
-            input[type="checkbox"] {
-              margin-right: 0.5rem;
-              width: auto;
-              cursor: pointer;
-              height: 16px;
-              width: 16px;
-            }
-
-            .label-text {
-              font-weight: 500;
-              font-size: 0.9rem;
-            }
-          }
-
-          small {
-            display: block;
-            margin-top: 0.25rem;
-            color: #777;
-            font-size: 0.8rem;
-            margin-left: 1.6rem;
-          }
+        &:focus {
+          outline: none;
+          border-color: $accent-color;
+          box-shadow: 0 0 0 2px rgba($accent-color, 0.1);
         }
       }
 
-      .form-actions {
-        display: flex;
-        justify-content: flex-end;
-        gap: 0.75rem;
-        margin-top: 2rem;
+      textarea {
+        resize: vertical;
+        min-height: 100px;
+      }
 
-        button {
-          padding: 0.6rem 1.2rem;
-          border-radius: 4px;
+      .error-message {
+        color: #e74c3c;
+        font-size: 0.8rem;
+        margin-top: 0.4rem;
+        font-weight: 500;
+      }
+
+      &.status-toggle {
+        margin-top: 1.5rem;
+
+        .checkbox-label {
+          display: flex;
+          align-items: center;
           cursor: pointer;
-          font-weight: 500;
-          transition: all $transition-speed;
 
-          &:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
+          input[type="checkbox"] {
+            margin-right: 0.5rem;
+            width: auto;
+            cursor: pointer;
+            height: 16px;
+            width: 16px;
+          }
+
+          .label-text {
+            font-weight: 500;
+            font-size: 0.9rem;
           }
         }
 
-        .cancel-btn {
-          background-color: #f0f0f0;
-          border: 1px solid #ddd;
-          color: #666;
+        small {
+          display: block;
+          margin-top: 0.25rem;
+          color: #777;
+          font-size: 0.8rem;
+          margin-left: 1.6rem;
+        }
+      }
+    }
 
-          &:hover:not(:disabled) {
-            background-color: #e0e0e0;
-          }
+    .form-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.75rem;
+      margin-top: 2rem;
+
+      button {
+        padding: 0.6rem 1.2rem;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: 500;
+        transition: all $transition-speed;
+
+        &:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+        }
+      }
+
+      .cancel-btn {
+        background-color: #f0f0f0;
+        border: 1px solid #ddd;
+        color: #666;
+
+        &:hover:not(:disabled) {
+          background-color: #e0e0e0;
+        }
+      }
+
+      .submit-btn {
+        background: $accent-color;
+        border: none;
+        color: white;
+
+        &:hover:not(:disabled) {
+          background: color.adjust($accent-color, $lightness: -8%);
+          transform: translateY(-1px);
         }
 
-        .submit-btn {
-          background: $accent-color;
-          border: none;
-          color: white;
-
-          &:hover:not(:disabled) {
-            background: color.adjust($accent-color, $lightness: -8%);
-            transform: translateY(-1px);
-          }
-
-          &:active {
-            transform: translateY(0);
-          }
+        &:active {
+          transform: translateY(0);
         }
       }
     }
@@ -505,7 +515,7 @@
 }
 
 @media (max-width: 768px) {
-  .genre-list-section {
+  .list-section {
     padding: 1.5rem;
 
     .list-header {
@@ -545,7 +555,7 @@
     }
 
     .table-container {
-      .genres-table {
+      .table-data {
         td,
         th {
           padding: 0.75rem;
@@ -573,25 +583,24 @@
         justify-content: center;
       }
     }
+  }
 
-    .genre-form-container {
-      padding: 1rem;
+  .form-container {
+    padding: 1rem;
+    .form-list {
+      .form-actions {
+        flex-direction: column;
 
-      .genre-form {
-        .form-actions {
-          flex-direction: column;
+        button {
+          width: 100%;
+        }
 
-          button {
-            width: 100%;
-          }
+        .cancel-btn {
+          order: 2;
+        }
 
-          .cancel-btn {
-            order: 2;
-          }
-
-          .submit-btn {
-            order: 1;
-          }
+        .submit-btn {
+          order: 1;
         }
       }
     }

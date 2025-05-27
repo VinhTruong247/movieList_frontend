@@ -1,34 +1,32 @@
-import React from 'react';
-import { Formik, Form, Field, ErrorMessage } from 'formik';
-import * as Yup from 'yup';
-import './GenreForm.scss';
+import { Formik, Form, Field, ErrorMessage } from "formik";
+import * as Yup from "yup";
 
 const GenreSchema = Yup.object().shape({
   name: Yup.string()
-    .min(3, 'Genre name must be at least 3 characters')
-    .max(30, 'Genre name must be less than 30 characters')
-    .required('Genre name is required'),
-  isDisabled: Yup.boolean()
+    .min(3, "Genre name must be at least 3 characters")
+    .max(30, "Genre name must be less than 30 characters")
+    .required("Genre name is required"),
+  isDisabled: Yup.boolean(),
 });
 
 const GenreForm = ({ genre, onSubmit, onCancel, isSubmitting }) => {
   const isEditMode = !!genre;
-  
+
   const initialValues = {
-    name: genre?.name || '',
-    isDisabled: genre?.isDisabled || false
+    name: genre?.name || "",
+    isDisabled: genre?.isDisabled || false,
   };
 
   return (
-    <div className="genre-form-container">
-      <h3>{isEditMode ? 'Edit Genre' : 'Add New Genre'}</h3>
+    <div className="form-container">
+      <h3>{isEditMode ? "Edit Genre" : "Add New Genre"}</h3>
       <Formik
         initialValues={initialValues}
         validationSchema={GenreSchema}
         onSubmit={onSubmit}
       >
         {({ errors, touched, values }) => (
-          <Form className="genre-form">
+          <Form className="form-list">
             <div className="form-group">
               <label htmlFor="name">Genre Name</label>
               <Field
@@ -38,7 +36,11 @@ const GenreForm = ({ genre, onSubmit, onCancel, isSubmitting }) => {
                 placeholder="Enter genre name"
                 autoFocus
               />
-              <ErrorMessage name="name" component="div" className="error-message" />
+              <ErrorMessage
+                name="name"
+                component="div"
+                className="error-message"
+              />
             </div>
 
             {isEditMode && (
@@ -66,10 +68,10 @@ const GenreForm = ({ genre, onSubmit, onCancel, isSubmitting }) => {
                 disabled={isSubmitting}
               >
                 {isSubmitting
-                  ? 'Saving...'
+                  ? "Saving..."
                   : isEditMode
-                    ? 'Update Genre'
-                    : 'Add Genre'}
+                    ? "Update Genre"
+                    : "Add Genre"}
               </button>
             </div>
           </Form>

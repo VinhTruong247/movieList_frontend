@@ -1,6 +1,5 @@
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
-import "../DirectorList.scss";
 
 const DirectorSchema = Yup.object().shape({
   name: Yup.string()
@@ -21,7 +20,7 @@ const DirectorForm = ({ director, onSubmit, onCancel, isSubmitting }) => {
   };
 
   return (
-    <div className="director-form-container">
+    <div className="form-container">
       <h3>{isEditMode ? "Edit Director" : "Add New Director"}</h3>
       <Formik
         initialValues={initialValues}
@@ -29,7 +28,7 @@ const DirectorForm = ({ director, onSubmit, onCancel, isSubmitting }) => {
         onSubmit={onSubmit}
       >
         {({ errors, touched, values }) => (
-          <Form className="director-form">
+          <Form className="form-list">
             <div className="form-group">
               <label htmlFor="name">Director Name</label>
               <Field

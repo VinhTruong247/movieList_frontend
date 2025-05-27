@@ -20,7 +20,7 @@ const ActorForm = ({ actor, onSubmit, onCancel, isSubmitting }) => {
   };
 
   return (
-    <div className="actor-form-container">
+    <div className="form-container">
       <h3>{isEditMode ? "Edit Actor" : "Add New Actor"}</h3>
       <Formik
         initialValues={initialValues}
@@ -28,7 +28,7 @@ const ActorForm = ({ actor, onSubmit, onCancel, isSubmitting }) => {
         onSubmit={onSubmit}
       >
         {({ errors, touched, values }) => (
-          <Form className="actor-form">
+          <Form className="form-list">
             <div className="form-group">
               <label htmlFor="name">Actor Name</label>
               <Field

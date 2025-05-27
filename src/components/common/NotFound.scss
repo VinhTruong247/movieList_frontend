@@ -62,7 +62,7 @@
         border: 2px solid $accent-color;
 
         &:hover {
-          background-color: darken($accent-color, 10%);
+          background-color: color.adjust($accent-color, $lightness: -10%);
         }
       }
     }
