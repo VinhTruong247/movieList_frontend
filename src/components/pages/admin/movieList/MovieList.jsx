@@ -1,21 +1,12 @@
-import { useState, useMemo, useEffect } from "react";
-import {
-  getMovies,
-  addMovie,
-  updateMovie,
-} from "../../../../services/MovieListAPI";
-import MovieForm from "./movieForm/MovieForm";
+import { useState, useEffect, useMemo } from "react";
 import supabase from "../../../../supabase-client";
-import "./MovieList.scss";
-
-const ITEMS_PER_PAGE = 10;
+import MovieFormPopup from "./movieForm/MovieFormPopup";
+import "../ListStyle.scss";
 
 const MovieList = () => {
   const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [searchMovie, setSearchMovie] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
   const [showForm, setShowForm] = useState(false);
   const [editingMovie, setEditingMovie] = useState(null);
   const [notification, setNotification] = useState({
@@ -23,33 +14,25 @@ const MovieList = () => {
     message: "",
     type: "",
   });
-  const [processingMovies, setProcessingMovies] = useState([]);
-  const [sortConfig, setSortConfig] = useState({ key: "id", direction: "asc" });
-  const [filters, setFilters] = useState({
-    type: "",
-    status: "",
-    yearFrom: "",
-    yearTo: "",
-  });
-  const [showFilters, setShowFilters] = useState(false);
-  const [filterErrors, setFilterErrors] = useState({
-    yearFrom: "",
-    yearTo: "",
-  });
-  const [formData, setFormData] = useState({ genres: [], directors: [] });
 
-  const fetchMovies = async () => {
-    setLoading(true);
-    try {
-      const data = await getMovies();
-      setMovies(data);
-    } catch (err) {
-      setError("Failed to load movies");
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const [searchQuery, setSearchQuery] = useState("");
+  const [showFilters, setShowFilters] = useState(false);
+  const [filters, setFilters] = useState({
+    status: "",
+    yearMin: "",
+    yearMax: "",
+    ratingMin: "",
+    ratingMax: "",
+  });
+  const [filterErrors, setFilterErrors] = useState({
+    yearMin: "",
+    yearMax: "",
+    ratingMin: "",
+    ratingMax: "",
+  });
+
+  const ITEMS_PER_PAGE = 10;
+  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
     fetchMovies();
@@ -65,28 +48,59 @@ const MovieList = () => {
     }
   }, [notification.show]);
 
-  const requestSort = (key) => {
-    let direction = "asc";
-    if (sortConfig.key === key && sortConfig.direction === "asc") {
-      direction = "desc";
+  const fetchMovies = async () => {
+    setLoading(true);
+    try {
+      const moviesData = await supabase
+        .from("Movies")
+        .select(
+          `
+          *,
+          MovieGenres(
+            genre_id,
+            Genres(id, name)
+          ),
+          MovieDirectors(
+            director_id,
+            Directors(id, name)
+          )
+        `
+        )
+        .order("title");
+
+      if (moviesData.error) throw moviesData.error;
+
+      const processedMovies = moviesData.data.map((movie) => {
+        return {
+          ...movie,
+          genres:
+            movie.MovieGenres?.map((mg) => mg.Genres?.name)
+              .filter(Boolean)
+              .join(", ") || "",
+          directors:
+            movie.MovieDirectors?.map((md) => md.Directors?.name)
+              .filter(Boolean)
+              .join(", ") || "",
+        };
+      });
+
+      setMovies(processedMovies);
+    } catch (err) {
+      console.error("Error fetching movies:", err);
+      setError("Failed to load movies");
+    } finally {
+      setLoading(false);
     }
-    setSortConfig({ key, direction });
   };
 
   const filteredMovies = useMemo(() => {
     let result = [...movies];
-
-    if (searchMovie) {
-      const searchedMovie = searchMovie.toLowerCase();
+    if (searchQuery) {
+      const searchedText = searchQuery.toLowerCase();
       result = result.filter((movie) =>
-        movie.title?.toLowerCase().includes(searchedMovie)
+        movie.title?.toLowerCase().includes(searchedText)
       );
     }
-
-    if (filters.type) {
-      result = result.filter((movie) => movie.type === filters.type);
-    }
-
     if (filters.status) {
       if (filters.status === "active") {
         result = result.filter((movie) => !movie.isDisabled);
@@ -94,31 +108,28 @@ const MovieList = () => {
         result = result.filter((movie) => movie.isDisabled);
       }
     }
-
-    if (filters.yearFrom) {
+    if (filters.yearMin) {
+      const minYear = parseInt(filters.yearMin);
+      result = result.filter((movie) => parseInt(movie.year) >= minYear);
+    }
+    if (filters.yearMax) {
+      const maxYear = parseInt(filters.yearMax);
+      result = result.filter((movie) => parseInt(movie.year) <= maxYear);
+    }
+    if (filters.ratingMin) {
+      const minRating = parseFloat(filters.ratingMin);
       result = result.filter(
-        (movie) => movie.year >= parseInt(filters.yearFrom)
+        (movie) => parseFloat(movie.imdb_rating) >= minRating
       );
     }
-
-    if (filters.yearTo) {
-      result = result.filter((movie) => movie.year <= parseInt(filters.yearTo));
+    if (filters.ratingMax) {
+      const maxRating = parseFloat(filters.ratingMax);
+      result = result.filter(
+        (movie) => parseFloat(movie.imdb_rating) <= maxRating
+      );
     }
-
-    if (sortConfig.key) {
-      result.sort((a, b) => {
-        if (a[sortConfig.key] < b[sortConfig.key]) {
-          return sortConfig.direction === "asc" ? -1 : 1;
-        }
-        if (a[sortConfig.key] > b[sortConfig.key]) {
-          return sortConfig.direction === "asc" ? 1 : -1;
-        }
-        return 0;
-      });
-    }
-
     return result;
-  }, [movies, searchMovie, sortConfig, filters]);
+  }, [movies, searchQuery, filters]);
 
   const paginatedMovies = useMemo(() => {
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
@@ -131,26 +142,135 @@ const MovieList = () => {
     setCurrentPage(pageNumber);
   };
 
-  const handleAddMovie = async () => {
-    if (formData.genres.length === 0 || formData.directors.length === 0) {
-      setLoading(true);
-      try {
-        const [genresData, { data: directorsData }] = await Promise.all([
-          getAllGenres(),
-          supabase.from("Directors").select("*").order("name"),
-        ]);
+  const handleFilterChange = (e) => {
+    const { name, value } = e.target;
+    setFilters((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+    validateField(name, value);
+    setCurrentPage(1);
+  };
 
-        setFormData({
-          genres: genresData || [],
-          directors: directorsData || [],
-        });
-      } catch (err) {
-        console.error("Error loading form data:", err);
-      } finally {
-        setLoading(false);
+  const validateField = (name, value) => {
+    const errors = { ...filterErrors };
+
+    if (!value) {
+      errors[name] = "";
+      setFilterErrors(errors);
+      return;
+    }
+
+    if (name === "yearMin" || name === "yearMax") {
+      if (!/^\d+$/.test(value)) {
+        errors[name] = "Please enter numbers only";
+        setFilterErrors(errors);
+        return;
+      }
+      const numValue = parseInt(value);
+      if (name === "yearMin") {
+        if (numValue < 1900) {
+          errors.yearMin = "Year must be 1900 or later";
+        } else if (filters.yearMax && numValue > parseInt(filters.yearMax)) {
+          errors.yearMin = "Minimum cannot exceed maximum";
+        } else {
+          errors.yearMin = "";
+        }
+        if (filters.yearMax && parseInt(filters.yearMax) < numValue) {
+          errors.yearMax = "Maximum must be greater than minimum";
+        } else if (filters.yearMax) {
+          errors.yearMax = "";
+        }
+      }
+
+      if (name === "yearMax") {
+        const currentYear = new Date().getFullYear();
+        if (numValue > currentYear + 5) {
+          errors.yearMax = `Year must be ${currentYear + 5} or earlier`;
+        } else if (filters.yearMin && numValue < parseInt(filters.yearMin)) {
+          errors.yearMax = "Maximum must be greater than minimum";
+        } else {
+          errors.yearMax = "";
+        }
+        if (filters.yearMin && parseInt(filters.yearMin) > numValue) {
+          errors.yearMin = "Minimum cannot exceed maximum";
+        } else if (filters.yearMin) {
+          errors.yearMin = "";
+        }
       }
     }
 
+    if (name === "ratingMin" || name === "ratingMax") {
+      if (!/^\d*\.?\d*$/.test(value)) {
+        errors[name] = "Please enter valid numbers";
+        setFilterErrors(errors);
+        return;
+      }
+
+      const numValue = parseFloat(value);
+      if (name === "ratingMin") {
+        if (numValue < 0) {
+          errors.ratingMin = "Rating cannot be negative";
+        } else if (numValue > 10) {
+          errors.ratingMin = "Rating cannot exceed 10";
+        } else if (
+          filters.ratingMax &&
+          numValue > parseFloat(filters.ratingMax)
+        ) {
+          errors.ratingMin = "Minimum cannot exceed maximum";
+        } else {
+          errors.ratingMin = "";
+        }
+        if (filters.ratingMax && parseFloat(filters.ratingMax) < numValue) {
+          errors.ratingMax = "Maximum must be greater than minimum";
+        } else if (filters.ratingMax) {
+          errors.ratingMax = "";
+        }
+      }
+
+      if (name === "ratingMax") {
+        if (numValue < 0) {
+          errors.ratingMax = "Rating cannot be negative";
+        } else if (numValue > 10) {
+          errors.ratingMax = "Rating cannot exceed 10";
+        } else if (
+          filters.ratingMin &&
+          numValue < parseFloat(filters.ratingMin)
+        ) {
+          errors.ratingMax = "Maximum must be greater than minimum";
+        } else {
+          errors.ratingMax = "";
+        }
+        if (filters.ratingMin && parseFloat(filters.ratingMin) > numValue) {
+          errors.ratingMin = "Minimum cannot exceed maximum";
+        } else if (filters.ratingMin) {
+          errors.ratingMin = "";
+        }
+      }
+    }
+
+    setFilterErrors(errors);
+  };
+
+  const resetFilters = () => {
+    setSearchQuery("");
+    setFilters({
+      status: "",
+      yearMin: "",
+      yearMax: "",
+      ratingMin: "",
+      ratingMax: "",
+    });
+    setFilterErrors({
+      yearMin: "",
+      yearMax: "",
+      ratingMin: "",
+      ratingMax: "",
+    });
+    setCurrentPage(1);
+  };
+
+  const handleAddMovie = () => {
     setEditingMovie(null);
     setShowForm(true);
   };
@@ -161,11 +281,10 @@ const MovieList = () => {
   };
 
   const handleToggleStatus = async (movie) => {
-    const message = movie.isDisabled ? "enable" : "disable";
-    if (window.confirm(`Are you sure you want to ${message} this movie?`)) {
-      try {
-        setProcessingMovies((prev) => [...prev, movie.id]);
+    const action = movie.isDisabled ? "enable" : "disable";
 
+    if (window.confirm(`Are you sure you want to ${action} this movie?`)) {
+      try {
         const { error } = await supabase
           .from("Movies")
           .update({ isDisabled: !movie.isDisabled })
@@ -181,173 +300,189 @@ const MovieList = () => {
 
         setNotification({
           show: true,
-          message: `Movie ${message}d successfully!`,
+          message: `Movie ${action}d successfully`,
           type: "success",
         });
       } catch (err) {
-        console.error(`Failed to ${message} movie:`, err);
+        console.error(`Error ${action}ing movie:`, err);
         setNotification({
           show: true,
-          message: `Failed to ${message} movie: ${err.message}`,
+          message: `Failed to ${action} movie: ${err.message}`,
           type: "error",
         });
-      } finally {
-        setProcessingMovies((prev) => prev.filter((id) => id !== movie.id));
       }
     }
   };
 
-  const handleFilterChange = (e) => {
-    const { name, value } = e.target;
-    setFilters((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-    validateField(name, value);
-    setCurrentPage(1);
-  };
-
-  const validateField = (name, value) => {
-    const errors = { ...filterErrors };
-    if (!value) {
-      errors[name] = "";
-      setFilterErrors(errors);
-      return;
-    }
-
-    const currentYear = new Date().getFullYear();
-    const containsNonNumeric = /[^\d]/.test(value);
-
-    if ((name === "yearFrom" || name === "yearTo") && containsNonNumeric) {
-      errors[name] = "Please enter numbers only";
-      setFilterErrors(errors);
-      return;
-    }
-
-    if (name === "yearFrom") {
-      const yearNum = parseInt(value);
-
-      if (isNaN(yearNum)) {
-        errors.yearFrom = "Please enter a valid year";
-      } else if (yearNum < 1888) {
-        errors.yearFrom = "Year must be 1888 or later";
-      } else if (yearNum > currentYear + 10) {
-        errors.yearFrom = `Year cannot be more than ${currentYear + 10}`;
-      } else if (filters.yearTo && yearNum > parseInt(filters.yearTo)) {
-        errors.yearFrom = "From year cannot exceed To year";
-      } else {
-        errors.yearFrom = "";
-      }
-      if (filters.yearTo && parseInt(filters.yearTo) < yearNum) {
-        errors.yearTo = "To year must be after From year";
-      } else if (filters.yearTo) {
-        errors.yearTo = "";
-      }
-    }
-
-    if (name === "yearTo") {
-      const yearNum = parseInt(value);
-
-      if (isNaN(yearNum)) {
-        errors.yearTo = "Please enter a valid year";
-      } else if (yearNum < 1888) {
-        errors.yearTo = "Year must be 1888 or later";
-      } else if (yearNum > currentYear + 10) {
-        errors.yearTo = `Year cannot be more than ${currentYear + 10}`;
-      } else if (filters.yearFrom && yearNum < parseInt(filters.yearFrom)) {
-        errors.yearTo = "To year must be after From year";
-      } else {
-        errors.yearTo = "";
-      }
-      if (filters.yearFrom && parseInt(filters.yearFrom) > yearNum) {
-        errors.yearFrom = "From year cannot exceed To year";
-      } else if (filters.yearFrom) {
-        errors.yearFrom = "";
-      }
-    }
-
-    setFilterErrors(errors);
-  };
-
-  const resetFilters = () => {
-    setFilters({
-      type: "",
-      status: "",
-      yearFrom: "",
-      yearTo: "",
-    });
-    setFilterErrors({
-      yearFrom: "",
-      yearTo: "",
-    });
-    setCurrentPage(1);
-  };
-
-  const handleSubmit = async (values, { resetForm, setSubmitting }) => {
+  const handleSubmit = async (values, { setSubmitting, resetForm }) => {
     try {
-      setProcessingMovies((prev) => [...prev, values.id]);
-      const movieData = {
-        title: values.title,
-        year: values.year,
-        imdb_rating: values.imdb_rating,
-        description: values.description,
-        type: values.type,
-        runtime: values.runtime,
-        language: values.language,
-        country: values.country,
-        posterUrl: values.poster_url,
-        bannerUrl: values.banner_url,
-        trailerUrl: values.trailer_url,
-        isDisabled: values.isDisabled || false,
-        genreIds: values.genre?.map((g) => g.id || g) || [],
-        directorIds: values.director?.id ? [values.director.id] : [],
-      };
-
       if (editingMovie) {
-        await updateMovie(values.id, movieData);
+        const { error } = await supabase
+          .from("Movies")
+          .update({
+            title: values.title,
+            year: values.year,
+            type: values.type,
+            description: values.description || null,
+            isDisabled: values.isDisabled || false,
+            imdb_rating: values.imdb_rating,
+            poster_url: values.poster_url || null,
+            banner_url: values.banner_url || null,
+            trailer_url: values.trailer_url || null,
+            runtime: values.runtime || null,
+            country: values.country || null,
+            language: values.language || null,
+          })
+          .eq("id", editingMovie.id);
+
+        if (error) throw error;
+
+        const { error: deleteGenreError } = await supabase
+          .from("MovieGenres")
+          .delete()
+          .eq("movie_id", editingMovie.id);
+
+        if (deleteGenreError) throw deleteGenreError;
+
+        if (values.genreIds && values.genreIds.length > 0) {
+          const uniqueGenreIds = [...new Set(values.genreIds)];
+
+          const genreAssociations = uniqueGenreIds.map((genreId) => ({
+            movie_id: editingMovie.id,
+            genre_id: genreId,
+          }));
+
+          const { error: genreError } = await supabase
+            .from("MovieGenres")
+            .insert(genreAssociations);
+
+          if (genreError) throw genreError;
+        }
+
+        const { error: deleteDirectorError } = await supabase
+          .from("MovieDirectors")
+          .delete()
+          .eq("movie_id", editingMovie.id);
+
+        if (deleteDirectorError) throw deleteDirectorError;
+
+        if (values.directorIds && values.directorIds.length > 0) {
+          const uniqueDirectorIds = [...new Set(values.directorIds)];
+          const directorAssociations = uniqueDirectorIds.map((directorId) => ({
+            movie_id: editingMovie.id,
+            director_id: directorId,
+          }));
+
+          const { error: directorError } = await supabase
+            .from("MovieDirectors")
+            .insert(directorAssociations);
+
+          if (directorError) throw directorError;
+        }
+
+        const { error: deleteActorError } = await supabase
+          .from("MovieActors")
+          .delete()
+          .eq("movie_id", editingMovie.id);
+
+        if (deleteActorError) throw deleteActorError;
+
+        if (values.actorIds && values.actorIds.length > 0) {
+          const uniqueActorIds = [...new Set(values.actorIds)];
+
+          const actorAssociations = uniqueActorIds.map((actorId) => ({
+            movie_id: editingMovie.id,
+            actor_id: actorId,
+          }));
+
+          const { error: actorError } = await supabase
+            .from("MovieActors")
+            .insert(actorAssociations);
+
+          if (actorError) throw actorError;
+        }
+
+        await fetchMovies();
+
         setNotification({
           show: true,
-          message: "Movie updated successfully!",
+          message: "Movie updated successfully",
           type: "success",
         });
       } else {
-        await addMovie(movieData);
+        const { data, error } = await supabase
+          .from("Movies")
+          .insert({
+            title: values.title,
+            year: values.year,
+            type: values.type,
+            description: values.description || null,
+            isDisabled: false,
+            imdb_rating: values.imdb_rating,
+            poster_url: values.poster_url || null,
+            banner_url: values.banner_url || null,
+            trailer_url: values.trailer_url || null,
+            runtime: values.runtime || null,
+            country: values.country || null,
+            language: values.language || null,
+          })
+          .select();
+
+        if (error) throw error;
+
+        const newMovieId = data[0].id;
+        if (values.genreIds && values.genreIds.length > 0) {
+          const genreAssociations = values.genreIds.map((genreId) => ({
+            movie_id: newMovieId,
+            genre_id: genreId,
+          }));
+
+          await supabase.from("MovieGenres").insert(genreAssociations);
+        }
+        if (values.directorIds && values.directorIds.length > 0) {
+          const directorAssociations = values.directorIds.map((directorId) => ({
+            movie_id: newMovieId,
+            director_id: directorId,
+          }));
+
+          await supabase.from("MovieDirectors").insert(directorAssociations);
+        }
+        if (values.actorIds && values.actorIds.length > 0) {
+          const actorAssociations = values.actorIds.map((actorId) => ({
+            movie_id: newMovieId,
+            actor_id: actorId,
+          }));
+
+          await supabase.from("MovieActors").insert(actorAssociations);
+        }
+        fetchMovies();
+
         setNotification({
           show: true,
-          message: "Movie added successfully!",
+          message: "Movie created successfully",
           type: "success",
         });
       }
 
       resetForm();
       setShowForm(false);
-      fetchMovies();
-    } catch (error) {
+    } catch (err) {
+      console.error("Error saving movie:", err);
       setNotification({
         show: true,
-        message: `Failed to ${editingMovie ? "update" : "add"} movie: ${
-          error.message
-        }`,
+        message: `Failed to save movie: ${err.message}`,
         type: "error",
       });
     } finally {
       setSubmitting(false);
-      setProcessingMovies((prev) => prev.filter((id) => id !== values.id));
     }
   };
 
-  const getSortIndicator = (key) => {
-    if (sortConfig.key === key) {
-      return sortConfig.direction === "asc" ? " ▲" : " ▼";
-    }
-    return "";
-  };
-
-  if (loading) return <div className="loading">Loading...</div>;
+  if (loading) return <div className="loading">Loading movies...</div>;
   if (error) return <div className="error-message">{error}</div>;
 
   return (
-    <div className="movie-list-section">
+    <div className="list-section">
       {notification.show && (
         <div className={`notification ${notification.type}`}>
           {notification.message}
@@ -361,8 +496,8 @@ const MovieList = () => {
             <input
               type="text"
               placeholder="Search by Title..."
-              value={searchMovie}
-              onChange={(e) => setSearchMovie(e.target.value)}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
               className="search-input"
             />
           </div>
@@ -372,27 +507,14 @@ const MovieList = () => {
           >
             {showFilters ? "Hide Filters" : "Show Filters"}
           </button>
-          <button className="add-btn" onClick={handleAddMovie}>
-            Add Movie
+          <button onClick={handleAddMovie} className="add-btn">
+            Add New Movie
           </button>
         </div>
       </div>
 
       {showFilters && (
         <div className="filter-panel">
-          <div className="filter-group">
-            <label>Movie Type</label>
-            <select
-              name="type"
-              value={filters.type}
-              onChange={handleFilterChange}
-            >
-              <option value="">All Types</option>
-              <option value="Movie">Movie</option>
-              <option value="TV Series">TV Series</option>
-              <option value="Documentary">Documentary</option>
-            </select>
-          </div>
           <div className="filter-group">
             <label>Status</label>
             <select
@@ -406,31 +528,67 @@ const MovieList = () => {
             </select>
           </div>
           <div className="filter-group">
-            <label>Year From</label>
+            <label>Year Min</label>
             <input
               type="number"
-              name="yearFrom"
-              value={filters.yearFrom}
+              name="yearMin"
+              value={filters.yearMin}
               onChange={handleFilterChange}
-              placeholder="From"
-              className={filterErrors.yearFrom ? "input-error" : ""}
+              placeholder="Min Year"
+              min="1900"
+              className={filterErrors.yearMin ? "input-error" : ""}
             />
-            {filterErrors.yearFrom && (
-              <div className="error-text">{filterErrors.yearFrom}</div>
+            {filterErrors.yearMin && (
+              <div className="error-text">{filterErrors.yearMin}</div>
             )}
           </div>
           <div className="filter-group">
-            <label>Year To</label>
+            <label>Year Max</label>
             <input
               type="number"
-              name="yearTo"
-              value={filters.yearTo}
+              name="yearMax"
+              value={filters.yearMax}
               onChange={handleFilterChange}
-              placeholder="To"
-              className={filterErrors.yearTo ? "input-error" : ""}
+              placeholder="Max Year"
+              min="1900"
+              className={filterErrors.yearMax ? "input-error" : ""}
             />
-            {filterErrors.yearTo && (
-              <div className="error-text">{filterErrors.yearTo}</div>
+            {filterErrors.yearMax && (
+              <div className="error-text">{filterErrors.yearMax}</div>
+            )}
+          </div>
+          <div className="filter-group">
+            <label>Rating Min</label>
+            <input
+              type="number"
+              name="ratingMin"
+              value={filters.ratingMin}
+              onChange={handleFilterChange}
+              placeholder="Min Rating"
+              min="0"
+              max="10"
+              step="0.1"
+              className={filterErrors.ratingMin ? "input-error" : ""}
+            />
+            {filterErrors.ratingMin && (
+              <div className="error-text">{filterErrors.ratingMin}</div>
+            )}
+          </div>
+          <div className="filter-group">
+            <label>Rating Max</label>
+            <input
+              type="number"
+              name="ratingMax"
+              value={filters.ratingMax}
+              onChange={handleFilterChange}
+              placeholder="Max Rating"
+              min="0"
+              max="10"
+              step="0.1"
+              className={filterErrors.ratingMax ? "input-error" : ""}
+            />
+            {filterErrors.ratingMax && (
+              <div className="error-text">{filterErrors.ratingMax}</div>
             )}
           </div>
           <button className="reset-filter-btn" onClick={resetFilters}>
@@ -439,32 +597,26 @@ const MovieList = () => {
         </div>
       )}
 
+      {showForm && (
+        <MovieFormPopup
+          movie={editingMovie}
+          onSubmit={handleSubmit}
+          onClose={() => setShowForm(false)}
+          isSubmitting={false}
+        />
+      )}
+
       <div className="table-container">
-        <table className="data-table">
+        <table className="table-data">
           <thead>
             <tr>
               <th>Image</th>
-              <th onClick={() => requestSort("title")} className="sortable">
-                Title{getSortIndicator("title")}
-              </th>
-              <th onClick={() => requestSort("type")} className="sortable">
-                Type{getSortIndicator("type")}
-              </th>
-              <th onClick={() => requestSort("year")} className="sortable">
-                Year{getSortIndicator("year")}
-              </th>
-              <th
-                onClick={() => requestSort("imdb_rating")}
-                className="sortable"
-              >
-                Rating{getSortIndicator("imdb_rating")}
-              </th>
-              <th
-                onClick={() => requestSort("isDisabled")}
-                className="sortable"
-              >
-                Status{getSortIndicator("isDisabled")}
-              </th>
+              <th>Title</th>
+              <th>Year</th>
+              <th>Rating</th>
+              <th>Genres</th>
+              <th>Directors</th>
+              <th>Status</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -475,7 +627,7 @@ const MovieList = () => {
                   key={movie.id}
                   className={movie.isDisabled ? "disabled-row" : ""}
                 >
-                  <td className="poster-cell">
+                  <td>
                     {movie.poster_url ? (
                       <img
                         src={movie.poster_url}
@@ -487,9 +639,10 @@ const MovieList = () => {
                     )}
                   </td>
                   <td>{movie.title}</td>
-                  <td>{movie.type}</td>
                   <td>{movie.year}</td>
                   <td>⭐ {movie.imdb_rating}</td>
+                  <td>{movie.genres}</td>
+                  <td>{movie.directors}</td>
                   <td>
                     <span
                       className={`status-badge ${
@@ -499,36 +652,30 @@ const MovieList = () => {
                       {movie.isDisabled ? "Disabled" : "Active"}
                     </span>
                   </td>
-                  <td>
+                  <td className="actions-cell">
                     <button
-                      className="edit-btn"
                       onClick={() => handleEditMovie(movie)}
-                      disabled={processingMovies.includes(movie.id)}
+                      className="edit-btn"
                     >
                       Edit
                     </button>
                     <button
-                      className={`toggle-btn ${
-                        movie.isDisabled ? "enable" : "disable"
-                      }`}
                       onClick={() => handleToggleStatus(movie)}
-                      disabled={processingMovies.includes(movie.id)}
+                      className={
+                        movie.isDisabled ? "enable-btn" : "disable-btn"
+                      }
                     >
-                      {processingMovies.includes(movie.id) ? (
-                        <span className="loading-spinner"></span>
-                      ) : movie.isDisabled ? (
-                        "Enable"
-                      ) : (
-                        "Disable"
-                      )}
+                      {movie.isDisabled ? "Enable" : "Disable"}
                     </button>
                   </td>
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan="7" className="no-results">
-                  No movies found matching your criteria
+                <td colSpan="7" className="no-data-row">
+                  {movies.length > 0
+                    ? "No movies found matching your criteria"
+                    : "No movies found. Add your first movie!"}
                 </td>
               </tr>
             )}
@@ -536,12 +683,12 @@ const MovieList = () => {
         </table>
       </div>
 
-      <div className="table-footer">
-        <div className="results-count">
-          Showing {paginatedMovies.length} of {filteredMovies.length} movies
-        </div>
+      {filteredMovies.length > ITEMS_PER_PAGE && (
+        <div className="table-footer">
+          <div className="results-count">
+            Showing {paginatedMovies.length} of {filteredMovies.length} movies
+          </div>
 
-        {pageCount > 1 && (
           <div className="pagination">
             <button
               className="page-btn"
@@ -569,19 +716,7 @@ const MovieList = () => {
               Next
             </button>
           </div>
-        )}
-      </div>
-
-      {showForm && (
-        <MovieForm
-          movie={editingMovie}
-          onSubmit={handleSubmit}
-          onClose={() => {
-            setShowForm(false);
-            setEditingMovie(null);
-          }}
-          formData={formData}
-        />
+        </div>
       )}
     </div>
   );

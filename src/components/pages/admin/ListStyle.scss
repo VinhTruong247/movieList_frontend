@@ -192,12 +192,8 @@
         background: rgba($accent-color, 0.1);
         font-weight: 600;
         padding: 1rem;
-        text-align: left;
+        text-align: center;
         border-bottom: 1px solid rgba($primary-color, 0.1);
-
-        &:last-child {
-          text-align: center;
-        }
 
         &.sortable {
           cursor: pointer;
@@ -219,11 +215,15 @@
 
       td {
         padding: 1rem;
-        text-align: left;
+        text-align: center;
         border-bottom: 1px solid rgba($primary-color, 0.1);
 
-        &:last-child {
-          text-align: center;
+        .movie-thumbnail {
+          width: 100px;
+          height: 150px;
+          border-radius: 4px;
+          object-fit: cover;
+          margin-right: 0.5rem;
         }
       }
 
@@ -235,7 +235,6 @@
 
       .actions-cell {
         white-space: nowrap;
-        text-align: right;
 
         button {
           margin-right: 0.5rem;
