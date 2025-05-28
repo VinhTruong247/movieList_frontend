@@ -1,14 +1,11 @@
 import { useState, useEffect, useMemo } from "react";
 import supabase from "../../../../supabase-client";
-import MovieFormPopup from "./movieForm/MovieFormPopup";
 import "../ListStyle.scss";
 
 const MovieList = () => {
   const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [showForm, setShowForm] = useState(false);
-  const [editingMovie, setEditingMovie] = useState(null);
   const [notification, setNotification] = useState({
     show: false,
     message: "",
@@ -270,212 +267,14 @@ const MovieList = () => {
     setCurrentPage(1);
   };
 
-  const handleAddMovie = () => {
-    setEditingMovie(null);
-    setShowForm(true);
-  };
-
-  const handleEditMovie = (movie) => {
-    setEditingMovie(movie);
-    setShowForm(true);
-  };
-
-  const handleToggleStatus = async (movie) => {
-    const action = movie.isDisabled ? "enable" : "disable";
-
-    if (window.confirm(`Are you sure you want to ${action} this movie?`)) {
-      try {
-        const { error } = await supabase
-          .from("Movies")
-          .update({ isDisabled: !movie.isDisabled })
-          .eq("id", movie.id);
-
-        if (error) throw error;
-
-        setMovies(
-          movies.map((m) =>
-            m.id === movie.id ? { ...m, isDisabled: !movie.isDisabled } : m
-          )
-        );
-
-        setNotification({
-          show: true,
-          message: `Movie ${action}d successfully`,
-          type: "success",
-        });
-      } catch (err) {
-        console.error(`Error ${action}ing movie:`, err);
-        setNotification({
-          show: true,
-          message: `Failed to ${action} movie: ${err.message}`,
-          type: "error",
-        });
-      }
-    }
-  };
-
-  const handleSubmit = async (values, { setSubmitting, resetForm }) => {
-    try {
-      if (editingMovie) {
-        const { error } = await supabase
-          .from("Movies")
-          .update({
-            title: values.title,
-            year: values.year,
-            type: values.type,
-            description: values.description || null,
-            isDisabled: values.isDisabled || false,
-            imdb_rating: values.imdb_rating,
-            poster_url: values.poster_url || null,
-            banner_url: values.banner_url || null,
-            trailer_url: values.trailer_url || null,
-            runtime: values.runtime || null,
-            country: values.country || null,
-            language: values.language || null,
-          })
-          .eq("id", editingMovie.id);
-
-        if (error) throw error;
-
-        const { error: deleteGenreError } = await supabase
-          .from("MovieGenres")
-          .delete()
-          .eq("movie_id", editingMovie.id);
-
-        if (deleteGenreError) throw deleteGenreError;
-
-        if (values.genreIds && values.genreIds.length > 0) {
-          const uniqueGenreIds = [...new Set(values.genreIds)];
-
-          const genreAssociations = uniqueGenreIds.map((genreId) => ({
-            movie_id: editingMovie.id,
-            genre_id: genreId,
-          }));
-
-          const { error: genreError } = await supabase
-            .from("MovieGenres")
-            .insert(genreAssociations);
-
-          if (genreError) throw genreError;
-        }
-
-        const { error: deleteDirectorError } = await supabase
-          .from("MovieDirectors")
-          .delete()
-          .eq("movie_id", editingMovie.id);
-
-        if (deleteDirectorError) throw deleteDirectorError;
-
-        if (values.directorIds && values.directorIds.length > 0) {
-          const uniqueDirectorIds = [...new Set(values.directorIds)];
-          const directorAssociations = uniqueDirectorIds.map((directorId) => ({
-            movie_id: editingMovie.id,
-            director_id: directorId,
-          }));
-
-          const { error: directorError } = await supabase
-            .from("MovieDirectors")
-            .insert(directorAssociations);
-
-          if (directorError) throw directorError;
-        }
-
-        const { error: deleteActorError } = await supabase
-          .from("MovieActors")
-          .delete()
-          .eq("movie_id", editingMovie.id);
-
-        if (deleteActorError) throw deleteActorError;
-
-        if (values.actorIds && values.actorIds.length > 0) {
-          const uniqueActorIds = [...new Set(values.actorIds)];
-
-          const actorAssociations = uniqueActorIds.map((actorId) => ({
-            movie_id: editingMovie.id,
-            actor_id: actorId,
-          }));
-
-          const { error: actorError } = await supabase
-            .from("MovieActors")
-            .insert(actorAssociations);
-
-          if (actorError) throw actorError;
-        }
-
-        await fetchMovies();
-
-        setNotification({
-          show: true,
-          message: "Movie updated successfully",
-          type: "success",
-        });
-      } else {
-        const { data, error } = await supabase
-          .from("Movies")
-          .insert({
-            title: values.title,
-            year: values.year,
-            type: values.type,
-            description: values.description || null,
-            isDisabled: false,
-            imdb_rating: values.imdb_rating,
-            poster_url: values.poster_url || null,
-            banner_url: values.banner_url || null,
-            trailer_url: values.trailer_url || null,
-            runtime: values.runtime || null,
-            country: values.country || null,
-            language: values.language || null,
-          })
-          .select();
-
-        if (error) throw error;
-
-        const newMovieId = data[0].id;
-        if (values.genreIds && values.genreIds.length > 0) {
-          const genreAssociations = values.genreIds.map((genreId) => ({
-            movie_id: newMovieId,
-            genre_id: genreId,
-          }));
-
-          await supabase.from("MovieGenres").insert(genreAssociations);
-        }
-        if (values.directorIds && values.directorIds.length > 0) {
-          const directorAssociations = values.directorIds.map((directorId) => ({
-            movie_id: newMovieId,
-            director_id: directorId,
-          }));
-
-          await supabase.from("MovieDirectors").insert(directorAssociations);
-        }
-        if (values.actorIds && values.actorIds.length > 0) {
-          const actorAssociations = values.actorIds.map((actorId) => ({
-            movie_id: newMovieId,
-            actor_id: actorId,
-          }));
-
-          await supabase.from("MovieActors").insert(actorAssociations);
-        }
-        fetchMovies();
-
-        setNotification({
-          show: true,
-          message: "Movie created successfully",
-          type: "success",
-        });
-      }
-
-      resetForm();
-      setShowForm(false);
-    } catch (err) {
-      console.error("Error saving movie:", err);
-      setNotification({
-        show: true,
-        message: `Failed to save movie: ${err.message}`,
-        type: "error",
-      });
-    } finally {
-      setSubmitting(false);
-    }
+  const refreshMovies = async () => {
+    setLoading(true);
+    await fetchMovies();
+    setNotification({
+      show: true,
+      message: "Movie list refreshed",
+      type: "success",
+    });
   };
 
   if (loading) return <div className="loading">Loading movies...</div>;
@@ -490,7 +289,7 @@ const MovieList = () => {
       )}
 
       <div className="list-header">
-        <h2>Movie Management</h2>
+        <h2>Movie List</h2>
         <div className="header-actions">
           <div className="search-box">
             <input
@@ -507,8 +306,8 @@ const MovieList = () => {
           >
             {showFilters ? "Hide Filters" : "Show Filters"}
           </button>
-          <button onClick={handleAddMovie} className="add-btn">
-            Add New Movie
+          <button onClick={refreshMovies} className="refresh-btn">
+            Refresh Movies
           </button>
         </div>
       </div>
@@ -597,15 +396,6 @@ const MovieList = () => {
         </div>
       )}
 
-      {showForm && (
-        <MovieFormPopup
-          movie={editingMovie}
-          onSubmit={handleSubmit}
-          onClose={() => setShowForm(false)}
-          isSubmitting={false}
-        />
-      )}
-
       <div className="table-container">
         <table className="table-data">
           <thead>
@@ -617,7 +407,6 @@ const MovieList = () => {
               <th>Genres</th>
               <th>Directors</th>
               <th>Status</th>
-              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -652,22 +441,6 @@ const MovieList = () => {
                       {movie.isDisabled ? "Disabled" : "Active"}
                     </span>
                   </td>
-                  <td className="actions-cell">
-                    <button
-                      onClick={() => handleEditMovie(movie)}
-                      className="edit-btn"
-                    >
-                      Edit
-                    </button>
-                    <button
-                      onClick={() => handleToggleStatus(movie)}
-                      className={
-                        movie.isDisabled ? "enable-btn" : "disable-btn"
-                      }
-                    >
-                      {movie.isDisabled ? "Enable" : "Disable"}
-                    </button>
-                  </td>
                 </tr>
               ))
             ) : (
@@ -675,7 +448,7 @@ const MovieList = () => {
                 <td colSpan="7" className="no-data-row">
                   {movies.length > 0
                     ? "No movies found matching your criteria"
-                    : "No movies found. Add your first movie!"}
+                    : "No movies found in the database."}
                 </td>
               </tr>
             )}
