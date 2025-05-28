@@ -1,6 +1,8 @@
 import { useState, useEffect, useMemo } from "react";
 import supabase from "../../../../supabase-client";
 import "../ListStyle.scss";
+import MovieFormPopup from "./movieForm/MovieFormPopup";
+import { addMovie, updateMovie } from "../../../../services/MovieListAPI";
 
 const MovieList = () => {
   const [movies, setMovies] = useState([]);
@@ -27,6 +29,10 @@ const MovieList = () => {
     ratingMin: "",
     ratingMax: "",
   });
+
+  const [showMovieForm, setShowMovieForm] = useState(false);
+  const [editingMovie, setEditingMovie] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const ITEMS_PER_PAGE = 10;
   const [currentPage, setCurrentPage] = useState(1);
@@ -277,6 +283,53 @@ const MovieList = () => {
     });
   };
 
+  const handleAddMovie = () => {
+    setEditingMovie(null);
+    setShowMovieForm(true);
+  };
+
+  const handleEditMovie = (movie) => {
+    setEditingMovie(movie);
+    setShowMovieForm(true);
+  };
+
+  const handleCloseForm = () => {
+    setShowMovieForm(false);
+    setEditingMovie(null);
+  };
+
+  const handleSubmitMovie = async (values) => {
+    setIsSubmitting(true);
+    try {
+      if (editingMovie) {
+        await updateMovie(editingMovie.id, values);
+        setNotification({
+          show: true,
+          message: "Movie updated successfully",
+          type: "success",
+        });
+      } else {
+        await addMovie(values);
+        setNotification({
+          show: true,
+          message: "Movie added successfully",
+          type: "success",
+        });
+      }
+      setShowMovieForm(false);
+      refreshMovies();
+    } catch (error) {
+      console.error("Error saving movie:", error);
+      setNotification({
+        show: true,
+        message: `Failed to save movie: ${error.message}`,
+        type: "error",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   if (loading) return <div className="loading">Loading movies...</div>;
   if (error) return <div className="error-message">{error}</div>;
 
@@ -308,6 +361,9 @@ const MovieList = () => {
           </button>
           <button onClick={refreshMovies} className="refresh-btn">
             Refresh Movies
+          </button>
+          <button onClick={handleAddMovie} className="add-btn">
+            Add Movie
           </button>
         </div>
       </div>
@@ -415,6 +471,8 @@ const MovieList = () => {
                 <tr
                   key={movie.id}
                   className={movie.isDisabled ? "disabled-row" : ""}
+                  onClick={() => handleEditMovie(movie)}
+                  style={{ cursor: "pointer" }}
                 >
                   <td>
                     {movie.poster_url ? (
@@ -490,6 +548,15 @@ const MovieList = () => {
             </button>
           </div>
         </div>
+      )}
+
+      {showMovieForm && (
+        <MovieFormPopup
+          movie={editingMovie}
+          onSubmit={handleSubmitMovie}
+          onClose={handleCloseForm}
+          isSubmitting={isSubmitting}
+        />
       )}
     </div>
   );
