@@ -4,7 +4,6 @@ import "../ListStyle.scss";
 import MovieFormPopup from "./movieForm/MovieFormPopup";
 import MovieDetailPopup from "./movieDetail/MovieDetailPopup";
 import { addMovie, updateMovie } from "../../../../services/MovieListAPI";
-// import "./MovieList.scss";
 
 const MovieList = () => {
   const [movies, setMovies] = useState([]);
@@ -65,6 +64,10 @@ const MovieList = () => {
           MovieGenres(
             genre_id,
             Genres(id, name)
+          ),
+          MovieActors(
+            actor_id,
+            Actors(id, name)
           ),
           MovieDirectors(
             director_id,

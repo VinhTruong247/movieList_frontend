@@ -6,7 +6,6 @@ import "./MovieForm.scss";
 
 const MovieSchema = Yup.object().shape({
   title: Yup.string()
-    .min(2, "Title must be at least 2 characters")
     .max(100, "Title must be less than 100 characters")
     .required("Title is required"),
   description: Yup.string().max(
