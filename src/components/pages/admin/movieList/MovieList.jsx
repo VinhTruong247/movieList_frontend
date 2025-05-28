@@ -2,7 +2,9 @@ import { useState, useEffect, useMemo } from "react";
 import supabase from "../../../../supabase-client";
 import "../ListStyle.scss";
 import MovieFormPopup from "./movieForm/MovieFormPopup";
+import MovieDetailPopup from "./movieDetail/MovieDetailPopup";
 import { addMovie, updateMovie } from "../../../../services/MovieListAPI";
+// import "./MovieList.scss";
 
 const MovieList = () => {
   const [movies, setMovies] = useState([]);
@@ -33,7 +35,8 @@ const MovieList = () => {
   const [showMovieForm, setShowMovieForm] = useState(false);
   const [editingMovie, setEditingMovie] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-
+  const [viewingMovie, setViewingMovie] = useState(null);
+  const [showMovieDetail, setShowMovieDetail] = useState(false);
   const ITEMS_PER_PAGE = 10;
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -330,6 +333,57 @@ const MovieList = () => {
     }
   };
 
+  const handleViewMovie = (movie, e) => {
+    if (e.target.closest(".actions-cell") || e.target.closest(".action-btn")) {
+      return;
+    }
+    setViewingMovie(movie);
+    setShowMovieDetail(true);
+  };
+
+  const handleEditButtonClick = (movie, e) => {
+    e.stopPropagation();
+    handleEditMovie(movie);
+  };
+
+  const handleToggleStatus = async (movie, e) => {
+    e.stopPropagation();
+    setLoading(true);
+
+    try {
+      const updatedStatus = !movie.isDisabled;
+      await supabase
+        .from("Movies")
+        .update({ isDisabled: updatedStatus })
+        .eq("id", movie.id);
+      setMovies(
+        movies.map((m) =>
+          m.id === movie.id ? { ...m, isDisabled: updatedStatus } : m
+        )
+      );
+
+      setNotification({
+        show: true,
+        message: `Movie ${updatedStatus ? "disabled" : "enabled"} successfully`,
+        type: "success",
+      });
+    } catch (error) {
+      console.error("Error toggling movie status:", error);
+      setNotification({
+        show: true,
+        message: `Failed to update movie status: ${error.message}`,
+        type: "error",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCloseDetail = () => {
+    setShowMovieDetail(false);
+    setViewingMovie(null);
+  };
+
   if (loading) return <div className="loading">Loading movies...</div>;
   if (error) return <div className="error-message">{error}</div>;
 
@@ -463,6 +517,7 @@ const MovieList = () => {
               <th>Genres</th>
               <th>Directors</th>
               <th>Status</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -471,7 +526,7 @@ const MovieList = () => {
                 <tr
                   key={movie.id}
                   className={movie.isDisabled ? "disabled-row" : ""}
-                  onClick={() => handleEditMovie(movie)}
+                  onClick={(e) => handleViewMovie(movie, e)}
                   style={{ cursor: "pointer" }}
                 >
                   <td>
@@ -499,11 +554,29 @@ const MovieList = () => {
                       {movie.isDisabled ? "Disabled" : "Active"}
                     </span>
                   </td>
+                  <td className="actions-cell">
+                    <button
+                      className="action-btn edit-btn"
+                      onClick={(e) => handleEditButtonClick(movie, e)}
+                      title="Edit Movie"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      className={`action-btn ${movie.isDisabled ? "enable-btn" : "disable-btn"}`}
+                      onClick={(e) => handleToggleStatus(movie, e)}
+                      title={
+                        movie.isDisabled ? "Enable Movie" : "Disable Movie"
+                      }
+                    >
+                      {movie.isDisabled ? "Enable" : "Disable"}
+                    </button>
+                  </td>
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan="7" className="no-data-row">
+                <td colSpan="8" className="no-data-row">
                   {movies.length > 0
                     ? "No movies found matching your criteria"
                     : "No movies found in the database."}
@@ -556,6 +629,17 @@ const MovieList = () => {
           onSubmit={handleSubmitMovie}
           onClose={handleCloseForm}
           isSubmitting={isSubmitting}
+        />
+      )}
+
+      {showMovieDetail && viewingMovie && (
+        <MovieDetailPopup
+          movie={viewingMovie}
+          onClose={handleCloseDetail}
+          onEdit={() => {
+            handleCloseDetail();
+            handleEditMovie(viewingMovie);
+          }}
         />
       )}
     </div>
