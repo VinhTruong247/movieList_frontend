@@ -29,8 +29,9 @@ const GenreList = () => {
     key: "name",
     direction: "asc",
   });
-  const [currentPage, setCurrentPage] = useState(1);
+
   const ITEMS_PER_PAGE = 10;
+  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
     fetchGenres();
@@ -114,6 +115,7 @@ const GenreList = () => {
       const maxCount = parseInt(filters.moviesMax);
       result = result.filter((genre) => genre.movieCount <= maxCount);
     }
+
     if (sortConfig.key) {
       result.sort((a, b) => {
         if (sortConfig.key === "movieCount") {

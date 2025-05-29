@@ -38,6 +38,7 @@ const MovieList = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [viewingMovie, setViewingMovie] = useState(null);
   const [showMovieDetail, setShowMovieDetail] = useState(false);
+
   const ITEMS_PER_PAGE = 10;
   const [currentPage, setCurrentPage] = useState(1);
 
