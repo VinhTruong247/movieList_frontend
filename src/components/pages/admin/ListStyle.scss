@@ -50,10 +50,30 @@
     flex-wrap: wrap;
     gap: 1rem;
 
-    h2 {
-      color: $primary-color;
-      margin: 0;
-      flex-shrink: 0;
+    .header-title {
+      flex-flow: row;
+      display: flex;
+
+      h2 {
+        color: $primary-color;
+        margin: 0;
+        flex-shrink: 0;
+      }
+
+      .refresh-btn {
+        margin-left: 0.5rem;
+        padding: 0.5rem;
+        background: rgba($primary-color, 0.1);
+        border: none;
+        border-radius: $border-radius;
+        cursor: pointer;
+        transition: all $transition-speed;
+
+        &:hover {
+          background: $primary-color;
+          color: white;
+        }
+      }
     }
 
     .header-actions {

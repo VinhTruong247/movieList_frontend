@@ -11,15 +11,15 @@ const UserList = () => {
   const [searchUser, setSearchUser] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [processingUsers, setProcessingUsers] = useState([]);
-  const [sortConfig, setSortConfig] = useState({
-    key: "email",
-    direction: "asc",
-  });
+  const [showFilters, setShowFilters] = useState(false);
   const [filters, setFilters] = useState({
     role: "",
     status: "",
   });
-  const [showFilters, setShowFilters] = useState(false);
+  const [sortConfig, setSortConfig] = useState({
+    key: "email",
+    direction: "asc",
+  });
   const [notification, setNotification] = useState({
     show: false,
     message: "",
@@ -313,10 +313,10 @@ const UserList = () => {
                       {user.isDisabled ? "Disabled" : "Active"}
                     </span>
                   </td>
-                  <td>
+                  <td className="actions-cell">
                     <button
-                      className={`toggle-btn ${
-                        user.isDisabled ? "enable" : "disable"
+                      className={`action-btn ${
+                        user.isDisabled ? "enable-btn" : "disable-btn"
                       }`}
                       onClick={() => handleToggleDisable(user)}
                       disabled={processingUsers.includes(user.id)}

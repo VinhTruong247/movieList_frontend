@@ -14,7 +14,6 @@ const GenreList = () => {
     message: "",
     type: "",
   });
-
   const [searchQuery, setSearchQuery] = useState("");
   const [showFilters, setShowFilters] = useState(false);
   const [filters, setFilters] = useState({
@@ -26,9 +25,12 @@ const GenreList = () => {
     moviesMin: "",
     moviesMax: "",
   });
-
-  const ITEMS_PER_PAGE = 10;
+  const [sortConfig, setSortConfig] = useState({
+    key: "name",
+    direction: "asc",
+  });
   const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 10;
 
   useEffect(() => {
     fetchGenres();
@@ -43,6 +45,21 @@ const GenreList = () => {
       return () => clearTimeout(timer);
     }
   }, [notification.show]);
+
+  const requestSort = (key) => {
+    let direction = "asc";
+    if (sortConfig.key === key && sortConfig.direction === "asc") {
+      direction = "desc";
+    }
+    setSortConfig({ key, direction });
+  };
+
+  const getSortIndicator = (key) => {
+    if (sortConfig.key === key) {
+      return sortConfig.direction === "asc" ? " ▲" : " ▼";
+    }
+    return "";
+  };
 
   const fetchGenres = async () => {
     setLoading(true);
@@ -97,8 +114,36 @@ const GenreList = () => {
       const maxCount = parseInt(filters.moviesMax);
       result = result.filter((genre) => genre.movieCount <= maxCount);
     }
+    if (sortConfig.key) {
+      result.sort((a, b) => {
+        if (sortConfig.key === "movieCount") {
+          const aRating = parseFloat(a.movieCount) || 0;
+          const bRating = parseFloat(b.movieCount) || 0;
+          return sortConfig.direction === "asc"
+            ? aRating - bRating
+            : bRating - aRating;
+        }
+
+        const aValue = a[sortConfig.key] || "";
+        const bValue = b[sortConfig.key] || "";
+
+        if (typeof aValue === "string" && typeof bValue === "string") {
+          const comparison = aValue.localeCompare(bValue);
+          return sortConfig.direction === "asc" ? comparison : -comparison;
+        } else {
+          if (aValue < bValue) {
+            return sortConfig.direction === "asc" ? -1 : 1;
+          }
+          if (aValue > bValue) {
+            return sortConfig.direction === "asc" ? 1 : -1;
+          }
+          return 0;
+        }
+      });
+    }
+
     return result;
-  }, [genres, searchQuery, filters]);
+  }, [genres, searchQuery, sortConfig, filters]);
   const paginatedGenres = useMemo(() => {
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
     return filteredGenres.slice(startIndex, startIndex + ITEMS_PER_PAGE);
@@ -187,6 +232,16 @@ const GenreList = () => {
       moviesMax: "",
     });
     setCurrentPage(1);
+  };
+
+  const refreshGenres = async () => {
+    setLoading(true);
+    await fetchGenres();
+    setNotification({
+      show: true,
+      message: "Genre list refreshed",
+      type: "success",
+    });
   };
 
   const handleAddGenre = () => {
@@ -312,7 +367,12 @@ const GenreList = () => {
       )}
 
       <div className="list-header">
-        <h2>Genre Management</h2>
+        <div className="header-title">
+          <h2>Genre Management</h2>
+          <button onClick={refreshGenres} className="refresh-btn">
+            ↻
+          </button>
+        </div>
         <div className="header-actions">
           <div className="search-box">
             <input
@@ -398,9 +458,16 @@ const GenreList = () => {
         <table className="table-data">
           <thead>
             <tr>
-              <th>Name</th>
+              <th onClick={() => requestSort("name")} className="sortable">
+                Name{getSortIndicator("name")}
+              </th>
               <th>Status</th>
-              <th>Movies</th>
+              <th
+                onClick={() => requestSort("movieCount")}
+                className="sortable"
+              >
+                Movie(s){getSortIndicator("movieCount")}
+              </th>
               <th>Actions</th>
             </tr>
           </thead>

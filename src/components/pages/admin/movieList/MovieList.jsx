@@ -445,7 +445,12 @@ const MovieList = () => {
       )}
 
       <div className="list-header">
-        <h2>Movie List</h2>
+        <div className="header-title">
+          <h2>Movie List</h2>
+          <button onClick={refreshMovies} className="refresh-btn">
+            ↻
+          </button>
+        </div>
         <div className="header-actions">
           <div className="search-box">
             <input
@@ -461,9 +466,6 @@ const MovieList = () => {
             onClick={() => setShowFilters(!showFilters)}
           >
             {showFilters ? "Hide Filters" : "Show Filters"}
-          </button>
-          <button onClick={refreshMovies} className="refresh-btn">
-            Refresh Movies
           </button>
           <button onClick={handleAddMovie} className="add-btn">
             Add Movie
