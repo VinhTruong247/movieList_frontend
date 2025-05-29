@@ -26,6 +26,10 @@ const ActorList = () => {
     moviesMin: "",
     moviesMax: "",
   });
+  const [sortConfig, setSortConfig] = useState({
+    key: "name",
+    direction: "asc",
+  });
 
   const ITEMS_PER_PAGE = 10;
   const [currentPage, setCurrentPage] = useState(1);
@@ -43,6 +47,21 @@ const ActorList = () => {
       return () => clearTimeout(timer);
     }
   }, [notification.show]);
+
+  const requestSort = (key) => {
+    let direction = "asc";
+    if (sortConfig.key === key && sortConfig.direction === "asc") {
+      direction = "desc";
+    }
+    setSortConfig({ key, direction });
+  };
+
+  const getSortIndicator = (key) => {
+    if (sortConfig.key === key) {
+      return sortConfig.direction === "asc" ? " ▲" : " ▼";
+    }
+    return "";
+  };
 
   const fetchActors = async () => {
     setLoading(true);
@@ -100,8 +119,36 @@ const ActorList = () => {
       result = result.filter((actor) => actor.movieCount <= maxCount);
     }
 
+    if (sortConfig.key) {
+      result.sort((a, b) => {
+        if (sortConfig.key === "movieCount") {
+          const aRating = parseFloat(a.movieCount) || 0;
+          const bRating = parseFloat(b.movieCount) || 0;
+          return sortConfig.direction === "asc"
+            ? aRating - bRating
+            : bRating - aRating;
+        }
+
+        const aValue = a[sortConfig.key] || "";
+        const bValue = b[sortConfig.key] || "";
+
+        if (typeof aValue === "string" && typeof bValue === "string") {
+          const comparison = aValue.localeCompare(bValue);
+          return sortConfig.direction === "asc" ? comparison : -comparison;
+        } else {
+          if (aValue < bValue) {
+            return sortConfig.direction === "asc" ? -1 : 1;
+          }
+          if (aValue > bValue) {
+            return sortConfig.direction === "asc" ? 1 : -1;
+          }
+          return 0;
+        }
+      });
+    }
+
     return result;
-  }, [actors, searchQuery, filters]);
+  }, [actors, searchQuery, sortConfig, filters]);
 
   const paginatedActors = useMemo(() => {
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
@@ -191,6 +238,16 @@ const ActorList = () => {
       moviesMax: "",
     });
     setCurrentPage(1);
+  };
+
+  const refreshActors = async () => {
+    setLoading(true);
+    await fetchActors();
+    setNotification({
+      show: true,
+      message: "Actor list refreshed",
+      type: "success",
+    });
   };
 
   const handleAddActor = () => {
@@ -316,7 +373,12 @@ const ActorList = () => {
       )}
 
       <div className="list-header">
-        <h2>Actor Management</h2>
+        <div className="header-title">
+          <h2>Actor Management</h2>
+          <button onClick={refreshActors} className="refresh-btn">
+            ↻
+          </button>
+        </div>
         <div className="header-actions">
           <div className="search-box">
             <input
@@ -402,9 +464,16 @@ const ActorList = () => {
         <table className="table-data">
           <thead>
             <tr>
-              <th>Name</th>
+              <th onClick={() => requestSort("name")} className="sortable">
+                Name{getSortIndicator("name")}
+              </th>
               <th>Status</th>
-              <th>Movies</th>
+              <th
+                onClick={() => requestSort("movieCount")}
+                className="sortable"
+              >
+                Movie(s){getSortIndicator("movieCount")}
+              </th>
               <th>Actions</th>
             </tr>
           </thead>
