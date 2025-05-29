@@ -1,74 +1,114 @@
-import { useState, useEffect, useCallback } from "react";
-import { useParams, useNavigate, Link } from "react-router";
+import { useState, useEffect, useContext } from "react";
+import { useParams } from "react-router";
 import { getMovieById } from "../../../services/MovieListAPI";
-import Loader from "../../common/Loader";
+import { MovieContext } from "../../../context/MovieContext";
 import { useFavorites } from "../../../hooks/useFavorites";
-import TrailerPopup from "./Trailer/TrailerPopup";
 import SimilarMovie from "./SimilarMovie/SimilarMovie";
+import Loader from "../../common/Loader";
 import NoMovie from "./NoMovie/NoMovie";
+import TrailerPopup from "./Trailer/TrailerPopup";
 import "./MovieDetail.scss";
 
 const MovieDetail = () => {
   const { id } = useParams();
-  const navigate = useNavigate();
   const [movie, setMovie] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const [error, setError] = useState(null);
+  const { currentUser } = useContext(MovieContext);
+  const { toggleFavorite, isFavorite } = useFavorites();
+  const [activeTab, setActiveTab] = useState("overview");
   const [showTrailer, setShowTrailer] = useState(false);
-  const { isFavorite, toggleFavorite, isLoggedIn, isAdmin } = useFavorites();
 
-  const formattedRuntime = (movie) => {
-    if (!movie.runtime) return "";
+  useEffect(() => {
+    const fetchMovie = async () => {
+      try {
+        setLoading(true);
+        const movieData = await getMovieById(id);
+        setMovie(movieData);
+      } catch (err) {
+        console.error("Error fetching movie:", err);
+        setError("Failed to load movie details");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (id) {
+      fetchMovie();
+    }
+  }, [id]);
+
+  const formatRuntime = () => {
+    if (!movie.runtime) return "Not specified";
+
     if (
       typeof movie.runtime === "string" &&
       (movie.runtime.includes("min") || movie.runtime.includes("episodes"))
     ) {
       return movie.runtime;
     }
+
     return movie.type === "Movie"
       ? `${movie.runtime} mins`
       : `${movie.runtime} episodes`;
   };
 
-  useEffect(() => {
-    const fetchMovie = async () => {
-      try {
-        setLoading(true);
-        const data = await getMovieById(id);
-        if (!data || data.isDisabled) {
-          setMovie(null);
-          return;
-        }
-
-        const formattedMovie = {
-          ...data,
-          genre: data.MovieGenres?.map((g) => g.Genres.name) || [],
-          director:
-            data.MovieDirectors?.map((d) => d.Directors.name).join(", ") || "",
-        };
-
-        setMovie(formattedMovie);
-        setError("");
-      } catch (err) {
-        console.error(err);
-        setError("Error loading movie");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchMovie();
-  }, [id]);
-
-  const handleFavoriteToggle = useCallback(async () => {
-    if (!isLoggedIn) return;
-
+  const handleFavorite = async () => {
+    if (!currentUser) return;
     try {
       await toggleFavorite(movie.id);
     } catch (error) {
-      setError("Failed to update favorites");
+      console.error("Error updating favorites:", error);
     }
-  }, [isLoggedIn, movie, toggleFavorite]);
+  };
+
+  const renderCast = () => {
+    if (!movie.MovieActors || movie.MovieActors.length === 0) {
+      return <div className="no-data">No cast information available</div>;
+    }
+
+    return (
+      <div className="cast-grid">
+        {movie.MovieActors.map((actorRole, index) => (
+          <div key={index} className="cast-card">
+            <div className="actor-name">{actorRole.Actors?.name}</div>
+            {actorRole.character_name && (
+              <div className="character-name">
+                as {actorRole.character_name}
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+    );
+  };
+
+  const renderReviews = () => {
+    if (!movie.Reviews || movie.Reviews.length === 0) {
+      return <div className="no-data">No reviews yet</div>;
+    }
+
+    return (
+      <div className="reviews-list">
+        {movie.Reviews.map((review) => (
+          <div key={review.id} className="review-card">
+            <div className="review-header">
+              <div className="reviewer-info">
+                <div className="reviewer-name">{review.Users?.username}</div>
+                <div className="review-rating">⭐ {review.rating}/10</div>
+              </div>
+              <div className="review-date">
+                {new Date(review.created_at).toLocaleDateString()}
+              </div>
+            </div>
+            {review.comment && (
+              <div className="review-comment">{review.comment}</div>
+            )}
+          </div>
+        ))}
+      </div>
+    );
+  };
 
   if (loading) return <Loader />;
 
@@ -77,97 +117,203 @@ const MovieDetail = () => {
   if (error)
     return <div className="error-message">Error loading movie: {error}</div>;
 
-  const favorite = isFavorite(movie.id);
+  const favorite = currentUser ? isFavorite(movie.id) : false;
 
   return (
-    <div className="movie-detail">
-      <button className="back-button" onClick={() => navigate(-1)}>
-        ← Back
-      </button>
+    <div className="movie-detail-page">
+      <div className="movie-hero">
+        {movie.banner_url && (
+          <div className="hero-background">
+            <img src={movie.banner_url} alt={`${movie.title} banner`} />
+            <div className="hero-overlay"></div>
+          </div>
+        )}
 
-      <div className="detail-content">
-        <div className="poster-section">
+        <div className="hero-content">
           <div className="movie-poster">
-            <img src={movie.poster_url} alt={movie.title} />
-            <div className="movie-type">{movie.type}</div>
-          </div>
-          <button
-            className="trailer-button"
-            onClick={() => setShowTrailer(true)}
-          >
-            Watch Trailer
-          </button>
-        </div>
-
-        <div className="movie-info">
-          <h1 className="movie-title">{movie.title}</h1>
-
-          <div className="movie-meta">
-            <span className="year">📅 {movie.year}</span>
-            <span className="rating">⭐ {movie.imdb_rating}/10</span>
-            <span className="runtime">⏱️ {formattedRuntime(movie)}</span>
+            {movie.poster_url ? (
+              <img src={movie.poster_url} alt={`${movie.title} poster`} />
+            ) : (
+              <div className="no-poster">No Image Available</div>
+            )}
           </div>
 
-          <div className="genre-list">
-            {movie.MovieGenres?.filter(
-              (genre) => isAdmin || !genre.Genres?.isDisabled
-            ).map((genre, index) => (
-              <span
-                key={genre.genre_id || `genre-${index}`}
-                className={`genre-badge ${isAdmin && genre.Genres?.isDisabled ? "disabled-genre" : ""}`}
-              >
-                {genre.Genres?.name}
-                {isAdmin && genre.Genres?.isDisabled && (
-                  <span className="disabled-indicator">(disabled)</span>
-                )}
-              </span>
-            ))}
-          </div>
+          <div className="movie-main-info">
+            <h1 className="movie-title">
+              {movie.title} <span className="year">({movie.year})</span>
+            </h1>
 
-          <div className="movie-details">
-            <p className="description">{movie.description}</p>
-
-            <div className="additional-info">
-              <div className="info-item">
-                <span className="label">Director:</span>
-                <span className="value">{movie.director}</span>
+            <div className="movie-meta">
+              <div className="meta-item">
+                <span className="meta-label">Type:</span>
+                <span className="meta-value">{movie.type || "Movie"}</span>
               </div>
-              <div className="info-item">
-                <span className="label">Language:</span>
-                <span className="value">{movie.language}</span>
+              <div className="meta-item">
+                <span className="meta-label">Runtime:</span>
+                <span className="meta-value">{formatRuntime()}</span>
               </div>
-              <div className="info-item">
-                <span className="label">Country:</span>
-                <span className="value">{movie.country}</span>
+              <div className="meta-item">
+                <span className="meta-label">Rating:</span>
+                <span className="meta-value rating">
+                  ⭐{" "}
+                  {movie.imdb_rating ? `${movie.imdb_rating}/10` : "Not rated"}
+                </span>
               </div>
             </div>
-          </div>
 
-          {isLoggedIn ? (
-            <button
-              className={`favorite-button ${favorite ? "is-favorite" : ""}`}
-              onClick={handleFavoriteToggle}
-            >
-              {favorite ? "❤️ Remove from Favorites" : "🤍 Add to Favorites"}
-            </button>
-          ) : (
-            <div className="favorite-login-message">
-              <Link to="/login" className="login-link">
-                Login to add to your favorite list
-              </Link>
+            <div className="movie-genres">
+              {movie.MovieGenres && movie.MovieGenres.length > 0 ? (
+                movie.MovieGenres.map((genre, index) => (
+                  <span key={index} className="genre-tag">
+                    {genre.Genres?.name}
+                  </span>
+                ))
+              ) : (
+                <span className="no-genres">No genres specified</span>
+              )}
             </div>
-          )}
+
+            <div className="movie-actions">
+              {movie.trailer_url && (
+                <button
+                  className="trailer-btn"
+                  onClick={() => setShowTrailer(true)}
+                >
+                  Watch Trailer
+                </button>
+              )}
+
+              {currentUser && (
+                <button
+                  className={`favorite-btn ${favorite ? "is-favorite" : ""}`}
+                  onClick={handleFavorite}
+                >
+                  {favorite
+                    ? "❤️ Remove from Favorites"
+                    : "🤍 Add to Favorites"}
+                </button>
+              )}
+            </div>
+          </div>
         </div>
       </div>
 
-      <SimilarMovie currentMovie={movie} />
+      <div className="movie-tabs">
+        <button
+          className={`tab-button ${activeTab === "overview" ? "active" : ""}`}
+          onClick={() => setActiveTab("overview")}
+        >
+          Overview
+        </button>
+        <button
+          className={`tab-button ${activeTab === "cast" ? "active" : ""}`}
+          onClick={() => setActiveTab("cast")}
+        >
+          Cast & Crew
+        </button>
+        <button
+          className={`tab-button ${activeTab === "reviews" ? "active" : ""}`}
+          onClick={() => setActiveTab("reviews")}
+        >
+          Reviews ({movie.Reviews?.length || 0})
+        </button>
+      </div>
 
-      {showTrailer && (
-        <TrailerPopup
-          trailerUrl={movie.trailer_url}
-          onClose={() => setShowTrailer(false)}
-        />
-      )}
+      <div className="movie-detail-content">
+        {activeTab === "overview" && (
+          <div className="tab-content overview-tab">
+            <div className="content-layout">
+              <div className="main-content">
+                {movie.description && (
+                  <div className="info-section">
+                    <h3 className="section-title">Description</h3>
+                    <div className="movie-description">{movie.description}</div>
+                  </div>
+                )}
+
+                <div className="info-section">
+                  <h3 className="section-title">Movie Details</h3>
+                  <div className="details-grid">
+                    <div className="detail-item">
+                      <span className="detail-label">Release Year</span>
+                      <span className="detail-value">
+                        {movie.year || "Unknown"}
+                      </span>
+                    </div>
+                    <div className="detail-item">
+                      <span className="detail-label">Language</span>
+                      <span className="detail-value">
+                        {movie.language || "Not specified"}
+                      </span>
+                    </div>
+                    <div className="detail-item">
+                      <span className="detail-label">Country</span>
+                      <span className="detail-value">
+                        {movie.country || "Not specified"}
+                      </span>
+                    </div>
+                    <div className="detail-item">
+                      <span className="detail-label">Type</span>
+                      <span className="detail-value">
+                        {movie.type || "Movie"}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="sidebar-content">
+                <SimilarMovie currentMovie={movie} />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {activeTab === "cast" && (
+          <div className="tab-content cast-tab">
+            <div className="content-layout">
+              <div className="main-content">
+                {movie.MovieDirectors && movie.MovieDirectors.length > 0 && (
+                  <div className="info-section">
+                    <h3 className="section-title">Directors</h3>
+                    <div className="directors-list">
+                      {movie.MovieDirectors.map((director, index) => (
+                        <span key={index} className="director-tag">
+                          {director.Directors?.name}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                <div className="info-section">
+                  <h3 className="section-title">Cast</h3>
+                  {renderCast()}
+                </div>
+              </div>
+
+              <div className="sidebar-content">
+                <SimilarMovie currentMovie={movie} />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {activeTab === "reviews" && (
+          <div className="tab-content reviews-tab">
+            <div className="info-section">
+              <h3 className="section-title">User Reviews</h3>
+              {renderReviews()}
+            </div>
+          </div>
+        )}
+
+        {showTrailer && (
+          <TrailerPopup
+            trailerUrl={movie.trailer_url}
+            onClose={() => setShowTrailer(false)}
+          />
+        )}
+      </div>
     </div>
   );
 };

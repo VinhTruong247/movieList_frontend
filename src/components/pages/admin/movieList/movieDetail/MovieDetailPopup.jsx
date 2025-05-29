@@ -56,7 +56,7 @@ const MovieDetailPopup = ({ movie, onClose, onEdit }) => {
           </div>
         </div>
 
-        <div className="movie-tabs">
+        <div className="movie-admin-tabs">
           <button
             className={`tab-button ${activeTab === "info" ? "active" : ""}`}
             onClick={() => setActiveTab("info")}
@@ -173,13 +173,6 @@ const MovieDetailPopup = ({ movie, onClose, onEdit }) => {
                       <div className="movie-description">
                         {movie.description}
                       </div>
-                    </div>
-                  )}
-
-                  {movie.plot && (
-                    <div className="info-section">
-                      <h3 className="section-title">Plot</h3>
-                      <div className="movie-plot">{movie.plot}</div>
                     </div>
                   )}
                 </div>
