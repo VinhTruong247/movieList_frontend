@@ -23,6 +23,8 @@ const MovieDetailPopup = ({ movie, onClose, onEdit }) => {
       return <div className="no-data">No actors listed for this movie</div>;
     }
 
+    console.log("Movie Actors:", movie.MovieActors);
+
     return (
       <div className="actors-grid">
         {movie.MovieActors.map((actorRole, index) => (

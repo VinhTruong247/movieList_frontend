@@ -67,6 +67,7 @@ const MovieList = () => {
           ),
           MovieActors(
             actor_id,
+            character_name,
             Actors(id, name)
           ),
           MovieDirectors(
