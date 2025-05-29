@@ -251,12 +251,13 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   display: flex;
   margin: 0 auto;
-  padding: 0 20rem;
+  padding: 0 12rem;
 
   .tab-button {
     padding: 1rem 2rem;
     background: none;
     border: none;
+    font-size: 1rem;
     font-weight: 500;
     color: #6b7280;
     cursor: pointer;
