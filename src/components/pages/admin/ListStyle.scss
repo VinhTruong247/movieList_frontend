@@ -6,6 +6,7 @@
   padding: 2rem;
   border-radius: $border-radius;
   box-shadow: $card-shadow;
+  margin-bottom: 2rem;
 
   .notification {
     padding: 1rem;
@@ -62,12 +63,15 @@
       flex-wrap: wrap;
 
       .search-box {
+        width: 300px;
+
         .search-input {
+          width: 100%;
           padding: 0.65rem 1rem;
-          border: 1px solid #ddd;
+          border: 2px solid rgba($primary-color, 0.1);
           border-radius: $border-radius;
-          width: 250px;
           font-size: 0.9rem;
+          transition: all $transition-speed;
 
           &:focus {
             outline: none;
@@ -198,6 +202,7 @@
         &.sortable {
           cursor: pointer;
           user-select: none;
+          position: relative;
 
           &:hover {
             background: rgba($accent-color, 0.2);

@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import supabase from "../../../../supabase-client";
-import "./UserList.scss";
+import "../ListStyle.scss";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -206,7 +206,7 @@ const UserList = () => {
   if (error) return <div className="error-message">{error}</div>;
 
   return (
-    <div className="user-list-section">
+    <div className="list-section">
       {notification.show && (
         <div className={`notification ${notification.type}`}>
           {notification.message}
@@ -267,7 +267,7 @@ const UserList = () => {
       )}
 
       <div className="table-container">
-        <table className="data-table">
+        <table className="table-data">
           <thead>
             <tr>
               <th onClick={() => requestSort("username")} className="sortable">

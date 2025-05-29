@@ -14,7 +14,6 @@ const MovieList = () => {
     message: "",
     type: "",
   });
-
   const [searchQuery, setSearchQuery] = useState("");
   const [showFilters, setShowFilters] = useState(false);
   const [filters, setFilters] = useState({
@@ -30,7 +29,10 @@ const MovieList = () => {
     ratingMin: "",
     ratingMax: "",
   });
-
+  const [sortConfig, setSortConfig] = useState({
+    key: "title",
+    direction: "asc",
+  });
   const [showMovieForm, setShowMovieForm] = useState(false);
   const [editingMovie, setEditingMovie] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -138,8 +140,36 @@ const MovieList = () => {
         (movie) => parseFloat(movie.imdb_rating) <= maxRating
       );
     }
+
+    if (sortConfig.key) {
+      result.sort((a, b) => {
+        if (sortConfig.key === "rating" || sortConfig.key === "imdb_rating") {
+          const aRating = parseFloat(a.imdb_rating) || 0;
+          const bRating = parseFloat(b.imdb_rating) || 0;
+          return sortConfig.direction === "asc"
+            ? aRating - bRating
+            : bRating - aRating;
+        }
+
+        const aValue = a[sortConfig.key];
+        const bValue = b[sortConfig.key];
+
+        if (typeof aValue === "string" && typeof bValue === "string") {
+          const comparison = aValue.localeCompare(bValue);
+          return sortConfig.direction === "asc" ? comparison : -comparison;
+        } else {
+          if (aValue > bValue) {
+            return sortConfig.direction === "asc" ? -1 : 1;
+          }
+          if (aValue < bValue) {
+            return sortConfig.direction === "asc" ? 1 : -1;
+          }
+          return 0;
+        }
+      });
+    }
     return result;
-  }, [movies, searchQuery, filters]);
+  }, [movies, searchQuery, sortConfig, filters]);
 
   const paginatedMovies = useMemo(() => {
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
@@ -160,6 +190,21 @@ const MovieList = () => {
     }));
     validateField(name, value);
     setCurrentPage(1);
+  };
+
+  const requestSort = (key) => {
+    let direction = "asc";
+    if (sortConfig.key === key && sortConfig.direction === "asc") {
+      direction = "desc";
+    }
+    setSortConfig({ key, direction });
+  };
+
+  const getSortIndicator = (key) => {
+    if (sortConfig.key === key) {
+      return sortConfig.direction === "asc" ? " ▲" : " ▼";
+    }
+    return "";
   };
 
   const validateField = (name, value) => {
@@ -515,12 +560,23 @@ const MovieList = () => {
           <thead>
             <tr>
               <th>Image</th>
-              <th>Title</th>
-              <th>Year</th>
-              <th>Rating</th>
+              <th onClick={() => requestSort("title")} className="sortable">
+                Title{getSortIndicator("title")}
+              </th>
+              <th onClick={() => requestSort("year")} className="sortable">
+                Year{getSortIndicator("year")}
+              </th>
+              <th onClick={() => requestSort("rating")} className="sortable">
+                Rating{getSortIndicator("rating")}
+              </th>
               <th>Genres</th>
               <th>Directors</th>
-              <th>Status</th>
+              <th
+                onClick={() => requestSort("isDisabled")}
+                className="sortable"
+              >
+                Status{getSortIndicator("isDisabled")}
+              </th>
               <th>Actions</th>
             </tr>
           </thead>
