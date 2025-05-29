@@ -111,7 +111,10 @@ const SimilarMovie = ({ currentMovie }) => {
                 {getGenreNames(movie)
                   .slice(0, 2)
                   .map((genre, index) => (
-                    <span key={index} className="genre-tag">
+                    <span
+                      key={`${movie.id}-genre-${genre}-${index}`}
+                      className="genre-tag"
+                    >
                       {genre}
                     </span>
                   ))}

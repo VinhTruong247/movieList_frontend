@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { useParams, useNavigate } from "react-router";
-import { Link } from "react-router";
+import { useParams, useNavigate, Link } from "react-router";
 import { getMovieById } from "../../../services/MovieListAPI";
 import Loader from "../../common/Loader";
 import { useFavorites } from "../../../hooks/useFavorites";
@@ -112,19 +111,14 @@ const MovieDetail = () => {
           <div className="genre-list">
             {movie.MovieGenres?.filter(
               (genre) => isAdmin || !genre.Genres?.isDisabled
-            ).map((genre) => (
+            ).map((genre, index) => (
               <span
-                key={genre.genre_id}
+                key={genre.genre_id || `genre-${index}`}
                 className={`genre-badge ${isAdmin && genre.Genres?.isDisabled ? "disabled-genre" : ""}`}
               >
                 {genre.Genres?.name}
                 {isAdmin && genre.Genres?.isDisabled && (
-                  <span
-                    key={`disabled-${genre.genre_id}`}
-                    className="disabled-indicator"
-                  >
-                    (disabled)
-                  </span>
+                  <span className="disabled-indicator">(disabled)</span>
                 )}
               </span>
             ))}

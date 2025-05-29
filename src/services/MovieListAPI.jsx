@@ -55,6 +55,10 @@ export const getMovieById = async (movieId, isAdmin = false) => {
       MovieGenres (
         Genres (id, name, isDisabled)
       ),
+      MovieActors (
+      actor_id,
+      Actors (id, name)
+      ),
       MovieDirectors (
         Directors (id, name)
       ),
