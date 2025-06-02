@@ -1,5 +1,5 @@
 import { useState, useEffect, useContext } from "react";
-import { useParams } from "react-router";
+import { useParams, useNavigate } from "react-router";
 import { getMovieById } from "../../../services/MovieListAPI";
 import { MovieContext } from "../../../context/MovieContext";
 import { useFavorites } from "../../../hooks/useFavorites";
@@ -18,6 +18,7 @@ const MovieDetail = () => {
   const { toggleFavorite, isFavorite } = useFavorites();
   const [activeTab, setActiveTab] = useState("overview");
   const [showTrailer, setShowTrailer] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchMovie = async () => {
@@ -119,6 +120,10 @@ const MovieDetail = () => {
 
   const favorite = currentUser ? isFavorite(movie.id) : false;
 
+  const handleLoginClick = () => {
+    navigate("/login");
+  };
+
   return (
     <div className="movie-detail-page">
       <div className="movie-hero">
@@ -183,7 +188,16 @@ const MovieDetail = () => {
                 </button>
               )}
 
-              {currentUser && (
+              {!currentUser && (
+                <button
+                  className="favorite-login-message"
+                  onClick={handleLoginClick}
+                >
+                  🤍 Login to add to your favorite list
+                </button>
+              )}
+
+              {currentUser && currentUser.role !== "admin" && (
                 <button
                   className={`favorite-btn ${favorite ? "is-favorite" : ""}`}
                   onClick={handleFavorite}
@@ -302,6 +316,22 @@ const MovieDetail = () => {
           <div className="tab-content reviews-tab">
             <div className="info-section">
               <h3 className="section-title">User Reviews</h3>
+
+              {!currentUser && (
+                <div className="login-prompt">
+                  <p>Please log in to write a review for this movie</p>
+                  <button className="login-btn" onClick={handleLoginClick}>
+                    Login to Review
+                  </button>
+                </div>
+              )}
+
+              {currentUser && currentUser.role !== "admin" && (
+                <div className="review-form-section">
+                  <button className="write-review-btn">Write a Review</button>
+                </div>
+              )}
+
               {renderReviews()}
             </div>
           </div>
