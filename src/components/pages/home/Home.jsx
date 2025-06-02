@@ -13,6 +13,7 @@ const Home = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeMovieType, setActiveMovieType] = useState("all");
   const [activeSortType, setActiveSortType] = useState("all");
+  const [viewMode, setViewMode] = useState("grid");
 
   useEffect(() => {
     if (movies && movies.length > 0) {
@@ -130,44 +131,140 @@ const Home = () => {
     <div className="home-container">
       <MovieCarousel movies={movies} />
 
-      <div className="content-wrapper">
-        <aside className="sidebar">
-          <div className="search-container">
-            <input
-              type="text"
-              placeholder="Search movies..."
-              value={searchQuery}
-              onChange={handleSearch}
-              className="search-input"
-            />
+      {/* Modern Filter Section */}
+      <div className="filter-section">
+        <div className="filter-header">
+          <div className="filter-title">
+            <h2>Discover Movies & TV Shows</h2>
+            <p>Find your next favorite entertainment</p>
           </div>
-          <GenreList
-            selectedGenre={selectedGenre}
-            onGenreSelect={handleGenreSelect}
-            activeMovieType={activeMovieType}
-            activeSortType={activeSortType}
-            onMovieTypeChange={handleMovieTypeFilter}
-            onSortTypeChange={handleSortTypeFilter}
-          />
-        </aside>
+          <div className="view-controls">
+            <button
+              className={`view-btn ${viewMode === "grid" ? "active" : ""}`}
+              onClick={() => setViewMode("grid")}
+            >
+              <span className="icon">⊞</span>
+              Grid
+            </button>
+            <button
+              className={`view-btn ${viewMode === "list" ? "active" : ""}`}
+              onClick={() => setViewMode("list")}
+            >
+              <span className="icon">☰</span>
+              List
+            </button>
+          </div>
+        </div>
 
-        <div className="main-content">
-          {filteredMovies.length > 0 ? (
-            <div className="movies-grid">
-              {filteredMovies.map((movie) => (
-                <MovieCard key={movie.id} movie={movie} />
-              ))}
+        <div className="filter-controls">
+          <div className="search-wrapper">
+            <div className="search-container">
+              <input
+                type="text"
+                placeholder="Search for movies and TV shows..."
+                value={searchQuery}
+                onChange={handleSearch}
+                className="search-input"
+              />
+              <span className="search-icon">🔍</span>
             </div>
-          ) : (
-            <div className="no-movies-found">
-              <h3>No movies found</h3>
-              <p>Try adjusting your search criteria or filters</p>
-              <button className="reset-filters-btn" onClick={resetFilters}>
-                Reset Filters
+          </div>
+
+          <div className="filter-tabs">
+            <div className="tab-group">
+              <span className="tab-label">Type:</span>
+              <button
+                className={`tab-btn ${activeMovieType === "all" ? "active" : ""}`}
+                onClick={() => handleMovieTypeFilter("all")}
+              >
+                All
+              </button>
+              <button
+                className={`tab-btn ${activeMovieType === "Movie" ? "active" : ""}`}
+                onClick={() => handleMovieTypeFilter("Movie")}
+              >
+                Movies
+              </button>
+              <button
+                className={`tab-btn ${activeMovieType === "TV Series" ? "active" : ""}`}
+                onClick={() => handleMovieTypeFilter("TV Series")}
+              >
+                TV Shows
               </button>
             </div>
-          )}
+
+            <div className="tab-group">
+              <span className="tab-label">Sort:</span>
+              <button
+                className={`tab-btn ${activeSortType === "all" ? "active" : ""}`}
+                onClick={() => handleSortTypeFilter("all")}
+              >
+                Default
+              </button>
+              <button
+                className={`tab-btn ${activeSortType === "top-rated" ? "active" : ""}`}
+                onClick={() => handleSortTypeFilter("top-rated")}
+              >
+                Top Rated
+              </button>
+              <button
+                className={`tab-btn ${activeSortType === "latest" ? "active" : ""}`}
+                onClick={() => handleSortTypeFilter("latest")}
+              >
+                Latest
+              </button>
+            </div>
+          </div>
+
+          <div className="genre-filter">
+            <GenreList
+              selectedGenre={selectedGenre}
+              onGenreSelect={handleGenreSelect}
+              activeMovieType={activeMovieType}
+              activeSortType={activeSortType}
+              onMovieTypeChange={handleMovieTypeFilter}
+              onSortTypeChange={handleSortTypeFilter}
+            />
+          </div>
         </div>
+      </div>
+
+      {/* Content Section */}
+      <div className="content-section">
+        <div className="content-header">
+          <div className="results-info">
+            <h3>
+              {selectedGenre !== "all" || searchQuery || activeMovieType !== "all"
+                ? `Filtered Results (${filteredMovies.length})`
+                : `All Movies & TV Shows (${filteredMovies.length})`}
+            </h3>
+            {(selectedGenre !== "all" || searchQuery || activeMovieType !== "all") && (
+              <button className="clear-filters" onClick={resetFilters}>
+                Clear All Filters
+              </button>
+            )}
+          </div>
+        </div>
+
+        {filteredMovies.length > 0 ? (
+          <div className={`movies-container ${viewMode}`}>
+            {filteredMovies.map((movie) => (
+              <MovieCard key={movie.id} movie={movie} viewMode={viewMode} />
+            ))}
+          </div>
+        ) : (
+          <div className="no-movies-found">
+            <div className="no-movies-icon">🎭</div>
+            <h3>No movies found</h3>
+            <p>
+              We couldn't find any movies matching your criteria. Try adjusting
+              your filters or search terms.
+            </p>
+            <button className="reset-filters-btn" onClick={resetFilters}>
+              Reset All Filters
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
