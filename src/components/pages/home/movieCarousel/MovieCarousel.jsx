@@ -71,6 +71,12 @@ const MovieCarousel = ({ movies }) => {
       .join(", ");
   };
 
+  const shortenDescription = (text, maxLength = 100) => {
+    if (!text) return "No description available";
+    if (text.length <= maxLength) return text;
+    return text.substring(0, maxLength).trim() + "...";
+  };
+
   return (
     <div className="carousel-container">
       <div className="carousel">
@@ -89,7 +95,7 @@ const MovieCarousel = ({ movies }) => {
                 <span className="year">{movie.year}</span>
                 <span className="genre">{getGenreNames(movie)}</span>
               </div>
-              <p className="description">{movie.description}</p>
+              <p className="description">{shortenDescription(movie.description)}</p>
               <Link
                 to={`/movie/${movie.id}`}
                 className={`view-button ${index === currentSlide ? "active" : ""}`}
