@@ -130,8 +130,6 @@ const Home = () => {
   return (
     <div className="home-container">
       <MovieCarousel movies={movies} />
-
-      {/* Modern Filter Section */}
       <div className="filter-section">
         <div className="filter-header">
           <div className="filter-title">
@@ -229,7 +227,6 @@ const Home = () => {
         </div>
       </div>
 
-      {/* Content Section */}
       <div className="content-section">
         <div className="content-header">
           <div className="results-info">

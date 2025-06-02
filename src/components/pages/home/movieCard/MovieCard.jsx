@@ -24,6 +24,24 @@ const MovieCard = ({ movie, viewMode = "grid" }) => {
       : `${movie.runtime} episodes`;
   };
 
+  const getGenresWithStatus = () => {
+    if (!movie.MovieGenres || !Array.isArray(movie.MovieGenres)) {
+      return [];
+    }
+    return movie.MovieGenres.map((mg) => ({
+      id: mg.genre_id,
+      name: mg.Genres?.name,
+      isDisabled: mg.Genres?.isDisabled || false
+    })).filter(genre => genre.name);
+  };
+
+  const getVisibleGenres = () => {
+    const genresWithStatus = getGenresWithStatus();
+    return isAdmin 
+      ? genresWithStatus 
+      : genresWithStatus.filter(genre => !genre.isDisabled);
+  };
+
   const handleFavorite = async (e) => {
     e.preventDefault();
     if (!currentUser) {
@@ -38,6 +56,10 @@ const MovieCard = ({ movie, viewMode = "grid" }) => {
   };
 
   if (viewMode === "list") {
+    const visibleGenres = getVisibleGenres();
+    const displayedGenres = visibleGenres.slice(0, 3);
+    const remainingGenres = visibleGenres.slice(3);
+
     return (
       <div className="movie-card list-view">
         <Link to={`/movie/${movie.id}`} className="movie-link">
@@ -54,19 +76,42 @@ const MovieCard = ({ movie, viewMode = "grid" }) => {
                 <span className="movie-runtime">{formattedRuntime()}</span>
               </div>
               <div className="movie-genres">
-                {movie.MovieGenres?.filter(
-                  (genre) => isAdmin || !genre.Genres?.isDisabled
-                ).slice(0, 3).map((genre) => (
+                {displayedGenres.map((genre) => (
                   <span
-                    key={genre.genre_id}
-                    className={`genre-badge ${isAdmin && genre.Genres?.isDisabled ? "disabled-genre" : ""}`}
+                    key={genre.id}
+                    className={`genre-badge ${isAdmin && genre.isDisabled ? "disabled-genre" : ""}`}
                   >
-                    {genre.Genres?.name}
+                    {genre.name}
+                    {isAdmin && genre.isDisabled && (
+                      <span className="disabled-indicator"> (disabled)</span>
+                    )}
                   </span>
                 ))}
-                {movie.MovieGenres?.length > 3 && (
-                  <span className="genre-badge more">
-                    +{movie.MovieGenres.length - 3} more
+                {remainingGenres.length > 0 && (
+                  <span className="more-genres-wrapper">
+                    <span className="genre-badge more">
+                      +{remainingGenres.length} more
+                    </span>
+                    <div className="genre-tooltip">
+                      <div className="tooltip-content">
+                        <h4>Remaining Genres:</h4>
+                        <div className="tooltip-genres">
+                          {remainingGenres.map((genre) => (
+                            <span
+                              key={`tooltip-${genre.id}`}
+                              className={`tooltip-genre-tag ${
+                                isAdmin && genre.isDisabled ? "disabled-genre" : ""
+                              }`}
+                            >
+                              {genre.name}
+                              {isAdmin && genre.isDisabled && (
+                                <span className="disabled-indicator"> (disabled)</span>
+                              )}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
                   </span>
                 )}
               </div>
@@ -88,6 +133,10 @@ const MovieCard = ({ movie, viewMode = "grid" }) => {
     );
   }
 
+  const visibleGenres = getVisibleGenres();
+  const displayedGenres = visibleGenres.slice(0, 2);
+  const remainingGenres = visibleGenres.slice(2);
+
   return (
     <div className="movie-card grid-view">
       <Link to={`/movie/${movie.id}`} className="movie-link">
@@ -108,16 +157,44 @@ const MovieCard = ({ movie, viewMode = "grid" }) => {
             <span className="movie-year">{movie.year}</span>
           </div>
           <div className="movie-genres">
-            {movie.MovieGenres?.filter(
-              (genre) => isAdmin || !genre.Genres?.isDisabled
-            ).slice(0, 2).map((genre) => (
+            {displayedGenres.map((genre) => (
               <span
-                key={genre.genre_id}
-                className={`genre-badge ${isAdmin && genre.Genres?.isDisabled ? "disabled-genre" : ""}`}
+                key={genre.id}
+                className={`genre-badge ${isAdmin && genre.isDisabled ? "disabled-genre" : ""}`}
               >
-                {genre.Genres?.name}
+                {genre.name}
+                {isAdmin && genre.isDisabled && (
+                  <span className="disabled-indicator"> (disabled)</span>
+                )}
               </span>
             ))}
+            {remainingGenres.length > 0 && (
+              <span className="more-genres-wrapper">
+                <span className="genre-badge more">
+                  +{remainingGenres.length} more
+                </span>
+                <div className="genre-tooltip">
+                  <div className="tooltip-content">
+                    <h4>Remaining Genres:</h4>
+                    <div className="tooltip-genres">
+                      {remainingGenres.map((genre) => (
+                        <span
+                          key={`tooltip-${genre.id}`}
+                          className={`tooltip-genre-tag ${
+                            isAdmin && genre.isDisabled ? "disabled-genre" : ""
+                          }`}
+                        >
+                          {genre.name}
+                          {isAdmin && genre.isDisabled && (
+                            <span className="disabled-indicator"> (disabled)</span>
+                          )}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </span>
+            )}
           </div>
           <p className="movie-runtime">{formattedRuntime()}</p>
         </div>

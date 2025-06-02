@@ -2,13 +2,64 @@
 @use "sass:color";
 
 .movie-card {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+
+  .movie-type {
+    position: absolute;
+    background: rgba($primary-color, 0.9);
+    color: white;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    z-index: 2;
+  }
+
+  .movie-title {
+    font-weight: 700;
+    color: white;
+    line-height: 1.3;
+  }
+
+  .movie-rating {
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.3), rgba(255, 237, 74, 0.3));
+    color: white;
+    font-weight: 600;
+  }
+
+  .genre-badge {
+    background: rgba($accent-color, 0.2);
+    color: $accent-color;
+    font-weight: 500;
+  }
+
+  .favorite-button,
+  .favorite-button-list {
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    &.is-favorite {
+      background: rgba($secondary-color, 0.2);
+      border-color: $secondary-color;
+      color: $secondary-color;
+    }
+  }
+
   &.grid-view {
-    background: rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(10px);
     border-radius: 16px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    overflow: hidden;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     height: 100%;
     display: flex;
     flex-direction: column;
@@ -19,13 +70,8 @@
       border-color: rgba(255, 255, 255, 0.2);
 
       .movie-poster {
-        .movie-overlay {
-          opacity: 1;
-        }
-
-        img {
-          transform: scale(1.05);
-        }
+        .movie-overlay { opacity: 1; }
+        img { transform: scale(1.05); }
       }
     }
 
@@ -50,32 +96,18 @@
       }
 
       .movie-type {
-        position: absolute;
         top: 1rem;
         right: 1rem;
-        background: rgba($primary-color, 0.9);
-        backdrop-filter: blur(10px);
-        color: white;
         padding: 0.5rem 1rem;
         border-radius: 12px;
         font-size: 0.8rem;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        z-index: 2;
+        backdrop-filter: blur(10px);
       }
 
       .movie-overlay {
         position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: linear-gradient(
-          135deg,
-          rgba(0, 0, 0, 0.7) 0%,
-          rgba($primary-color, 0.5) 100%
-        );
+        inset: 0;
+        background: linear-gradient(135deg, rgba(0, 0, 0, 0.7) 0%, rgba($primary-color, 0.5) 100%);
         display: flex;
         align-items: center;
         justify-content: center;
@@ -107,10 +139,7 @@
 
       .movie-title {
         font-size: 1.2rem;
-        font-weight: 700;
         margin-bottom: 1rem;
-        color: white;
-        line-height: 1.3;
         display: -webkit-box;
         -webkit-line-clamp: 2;
         line-clamp: 2;
@@ -126,11 +155,8 @@
         font-size: 0.9rem;
 
         .movie-rating {
-          background: linear-gradient(135deg, #ffd700, #ffed4e);
-          color: #333;
           padding: 0.3rem 0.6rem;
           border-radius: 8px;
-          font-weight: 600;
           font-size: 0.8rem;
         }
 
@@ -147,11 +173,8 @@
         margin-bottom: 1rem;
 
         .genre-badge {
-          background: rgba($accent-color, 0.2);
-          color: $accent-color;
           padding: 0.3rem 0.6rem;
           border-radius: 6px;
-          font-weight: 600;
           font-size: 0.75rem;
           border: 1px solid rgba($accent-color, 0.3);
         }
@@ -190,34 +213,13 @@
 
       .favorite-button {
         width: 50px;
-        background: rgba(255, 255, 255, 0.1);
-        border: 2px solid rgba(255, 255, 255, 0.2);
-        color: white;
         border-radius: 8px;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        font-size: 1.2rem;
-
-        &:hover {
-          background: rgba(255, 255, 255, 0.2);
-        }
-
-        &.is-favorite {
-          background: rgba($secondary-color, 0.2);
-          border-color: $secondary-color;
-          color: $secondary-color;
-        }
       }
     }
   }
 
   &.list-view {
-    background: rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(10px);
     border-radius: 12px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    overflow: hidden;
-    transition: all 0.3s ease;
 
     &:hover {
       transform: translateX(8px);
@@ -248,15 +250,11 @@
       }
 
       .movie-type {
-        position: absolute;
         top: 0.5rem;
         right: 0.5rem;
-        background: rgba($primary-color, 0.9);
-        color: white;
         padding: 0.25rem 0.5rem;
         border-radius: 6px;
         font-size: 0.7rem;
-        font-weight: 600;
       }
     }
 
@@ -271,9 +269,7 @@
 
         .movie-title {
           font-size: 1.3rem;
-          font-weight: 700;
           margin-bottom: 0.5rem;
-          color: white;
         }
 
         .movie-meta {
@@ -283,11 +279,8 @@
           font-size: 0.9rem;
 
           .movie-rating {
-            background: linear-gradient(135deg, #ffd700, #ffed4e);
-            color: #333;
             padding: 0.25rem 0.5rem;
             border-radius: 6px;
-            font-weight: 600;
             font-size: 0.8rem;
           }
 
@@ -304,12 +297,9 @@
           flex-wrap: wrap;
 
           .genre-badge {
-            background: rgba($accent-color, 0.2);
-            color: $accent-color;
             padding: 0.25rem 0.5rem;
             border-radius: 6px;
             font-size: 0.75rem;
-            font-weight: 500;
 
             &.more {
               background: rgba(255, 255, 255, 0.1);
@@ -343,25 +333,135 @@
         .favorite-button-list {
           width: 40px;
           height: 40px;
-          background: rgba(255, 255, 255, 0.1);
-          border: 2px solid rgba(255, 255, 255, 0.2);
-          color: white;
           border-radius: 8px;
-          cursor: pointer;
-          transition: all 0.3s ease;
-          font-size: 1.2rem;
+        }
+      }
+    }
+  }
+}
+
+.movie-genres {
+  .more-genres-wrapper {
+    position: relative;
+    display: inline-block;
+
+    .genre-badge.more {
+      cursor: pointer;
+      transition: all 0.3s ease;
+
+      &:hover {
+        background: rgba($primary-color, 0.15);
+        border-color: rgba($primary-color, 0.3);
+      }
+    }
+
+    .genre-tooltip {
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      margin-bottom: 0.5rem;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+      z-index: 1000;
+      pointer-events: none;
+
+      .tooltip-content {
+        background: rgba(0, 0, 0, 0.9);
+        color: white;
+        padding: 1rem;
+        border-radius: 8px;
+        min-width: 200px;
+        max-width: 280px;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+
+        h4 {
+          font-size: 0.85rem;
+          margin: 0 0 0.75rem 0;
+          color: #fff;
+          font-weight: 600;
+          text-align: center;
+        }
+
+        .tooltip-genres {
           display: flex;
-          align-items: center;
-          justify-content: center;
+          flex-wrap: wrap;
+          gap: 0.4rem;
 
-          &:hover {
-            background: rgba(255, 255, 255, 0.2);
+          .tooltip-genre-tag {
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+
+            &.disabled-genre {
+              background: rgba(231, 76, 60, 0.3);
+              color: #ff9999;
+              border-color: rgba(231, 76, 60, 0.4);
+
+              .disabled-indicator {
+                font-size: 0.6rem;
+                font-style: italic;
+                opacity: 0.8;
+              }
+            }
           }
+        }
 
-          &.is-favorite {
-            background: rgba($secondary-color, 0.2);
-            border-color: $secondary-color;
-            color: $secondary-color;
+        &::after {
+          content: '';
+          position: absolute;
+          top: 100%;
+          left: 50%;
+          transform: translateX(-50%);
+          border: 5px solid transparent;
+          border-top-color: rgba(0, 0, 0, 0.9);
+        }
+      }
+    }
+
+    &:hover .genre-tooltip {
+      opacity: 1;
+      visibility: visible;
+      transform: translateX(-50%) translateY(-5px);
+    }
+  }
+
+  .genre-badge.disabled-genre {
+    background: rgba(231, 76, 60, 0.2);
+    color: #ff6b6b;
+    border-color: rgba(231, 76, 60, 0.3);
+
+    .disabled-indicator {
+      font-size: 0.65rem;
+      font-style: italic;
+      opacity: 0.8;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .movie-genres {
+    .more-genres-wrapper {
+      .genre-tooltip {
+        .tooltip-content {
+          min-width: 150px;
+          max-width: 200px;
+          padding: 0.75rem;
+
+          .tooltip-genres {
+            gap: 0.3rem;
+
+            .tooltip-genre-tag {
+              font-size: 0.65rem;
+              padding: 0.15rem 0.3rem;
+            }
           }
         }
       }
@@ -369,42 +469,23 @@
   }
 }
 
-@media (max-width: 768px) {
-  .movie-card {
-    &.list-view {
-      .movie-link {
-        flex-direction: column;
-        align-items: flex-start;
-        padding: 1rem;
+@media (max-width: 480px) {
+  .movie-genres {
+    .more-genres-wrapper {
+      .genre-tooltip {
+        bottom: auto;
+        top: 100%;
+        margin-bottom: 0;
+        margin-top: 0.5rem;
 
-        .movie-poster-list {
-          flex: none;
-          width: 100%;
-          height: 200px;
-        }
-
-        .movie-content-list {
-          width: 100%;
-          flex-direction: column;
-          align-items: flex-start;
-          gap: 1rem;
-
-          .movie-actions-list {
-            align-self: stretch;
-            justify-content: space-between;
+        .tooltip-content {
+          &::after {
+            top: auto;
+            bottom: 100%;
+            border-top-color: transparent;
+            border-bottom-color: rgba(0, 0, 0, 0.9);
           }
         }
-      }
-    }
-
-    &.grid-view {
-      .movie-poster {
-        height: 300px;
-      }
-
-      .movie-content,
-      .movie-actions {
-        padding: 1rem;
       }
     }
   }

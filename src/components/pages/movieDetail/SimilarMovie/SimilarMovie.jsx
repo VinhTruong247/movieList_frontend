@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import { Link } from "react-router";
 import { getMovies } from "../../../../services/MovieListAPI";
+import { MovieContext } from "../../../../context/MovieContext";
 import Loader from "../../../common/Loader";
 import "./SimilarMovie.scss";
 
@@ -8,14 +9,28 @@ const SimilarMovie = ({ currentMovie }) => {
   const [similarMovies, setSimilarMovies] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { currentUser } = useContext(MovieContext);
+  const isAdmin = currentUser?.role === "admin";
 
   const getGenreNames = (movie) => {
     if (!movie.MovieGenres || !Array.isArray(movie.MovieGenres)) {
       return [];
     }
-    return movie.MovieGenres.filter((mg) => mg.Genres).map(
-      (mg) => mg.Genres.name
-    );
+    return movie.MovieGenres
+      .filter((mg) => mg.Genres && (isAdmin || !mg.Genres.isDisabled))
+      .map((mg) => mg.Genres.name);
+  };
+
+  const getGenreNamesWithDisabled = (movie) => {
+    if (!movie.MovieGenres || !Array.isArray(movie.MovieGenres)) {
+      return [];
+    }
+    return movie.MovieGenres
+      .filter((mg) => mg.Genres)
+      .map((mg) => ({
+        name: mg.Genres.name,
+        isDisabled: mg.Genres.isDisabled || false
+      }));
   };
 
   useEffect(() => {
@@ -74,7 +89,7 @@ const SimilarMovie = ({ currentMovie }) => {
     };
 
     getSimilarMovies();
-  }, [currentMovie]);
+  }, [currentMovie, isAdmin]);
 
   if (loading) return <Loader />;
   if (error) return <div className="error-message">{error}</div>;
@@ -84,53 +99,88 @@ const SimilarMovie = ({ currentMovie }) => {
     <div className="similar-movies-section">
       <h2>Similar Movies</h2>
       <div className="similar-movies-grid">
-        {similarMovies.map((movie) => (
-          <Link
-            to={`/movie/${movie.id}`}
-            key={movie.id}
-            className="similar-movie-card"
-          >
-            <div className="similar-movie-poster">
-              <img
-                src={
-                  movie.poster_url ||
-                  "https://via.placeholder.com/150x225?text=No+Image"
-                }
-                alt={movie.title}
-                onError={(e) => {
-                  e.target.onerror = null;
-                  e.target.src =
-                    "https://via.placeholder.com/150x225?text=No+Image";
-                }}
-              />
-              <div className="movie-type">{movie.type}</div>
-            </div>
-            <div className="similar-movie-info">
-              <h3 className="similar-movie-title">{movie.title}</h3>
-              <div className="similar-movie-genre">
-                {getGenreNames(movie)
-                  .slice(0, 2)
-                  .map((genre, index) => (
-                    <span
-                      key={`${movie.id}-genre-${genre}-${index}`}
-                      className="genre-tag"
-                    >
-                      {genre}
+        {similarMovies.map((movie) => {
+          const genresWithStatus = getGenreNamesWithDisabled(movie);
+          const visibleGenres = isAdmin 
+            ? genresWithStatus 
+            : genresWithStatus.filter(genre => !genre.isDisabled);
+
+          const remainingGenres = visibleGenres.slice(2);
+
+          return (
+            <Link
+              to={`/movie/${movie.id}`}
+              key={movie.id}
+              className="similar-movie-card"
+            >
+              <div className="similar-movie-poster">
+                <img
+                  src={
+                    movie.poster_url ||
+                    "https://via.placeholder.com/150x225?text=No+Image"
+                  }
+                  alt={movie.title}
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src =
+                      "https://via.placeholder.com/150x225?text=No+Image";
+                  }}
+                />
+                <div className="movie-type">{movie.type}</div>
+              </div>
+              <div className="similar-movie-info">
+                <h3 className="similar-movie-title">{movie.title}</h3>
+                <div className="similar-movie-genre">
+                  {visibleGenres
+                    .slice(0, 2)
+                    .map((genre, index) => (
+                      <span
+                        key={`${movie.id}-genre-${genre.name}-${index}`}
+                        className={`genre-tag ${
+                          isAdmin && genre.isDisabled ? "disabled-genre" : ""
+                        }`}
+                      >
+                        {genre.name}
+                        {isAdmin && genre.isDisabled && (
+                          <span className="disabled-indicator"> (disabled)</span>
+                        )}
+                      </span>
+                    ))}
+                  {visibleGenres.length > 2 && (
+                    <span className="more-genres-wrapper">
+                      <span className="more-genres">
+                        +{visibleGenres.length - 2}
+                      </span>
+                      <div className="genre-tooltip">
+                        <div className="tooltip-content">
+                          <div className="tooltip-genres">
+                            {remainingGenres.map((genre, index) => (
+                              <span
+                                key={`tooltip-${movie.id}-${genre.name}-${index}`}
+                                className={`tooltip-genre-tag ${
+                                  isAdmin && genre.isDisabled ? "disabled-genre" : ""
+                                }`}
+                              >
+                                {genre.name}
+                                {isAdmin && genre.isDisabled && (
+                                  <span className="disabled-indicator"> (disabled)</span>
+                                )}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
                     </span>
-                  ))}
-                {getGenreNames(movie).length > 2 && (
-                  <span className="more-genres">
-                    +{getGenreNames(movie).length - 2}
-                  </span>
-                )}
+                  )}
+                </div>
+                <div className="similar-movie-meta">
+                  <span className="year">{movie.year}</span>
+                  <span className="rating">⭐ {movie.imdb_rating}</span>
+                </div>
               </div>
-              <div className="similar-movie-meta">
-                <span className="year">{movie.year}</span>
-                <span className="rating">⭐ {movie.imdb_rating}</span>
-              </div>
-            </div>
-          </Link>
-        ))}
+            </Link>
+          );
+        })}
       </div>
     </div>
   );
