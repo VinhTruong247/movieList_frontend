@@ -1,7 +1,7 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router";
 import { Formik, Form, Field } from "formik";
-import { signUp } from "../../services/UserListAPI";
+import { signUp, getCurrentUser } from "../../services/UserListAPI";
 import { RegisterSchema } from "./Validation";
 import "./RegisterPage.scss";
 
@@ -9,13 +9,34 @@ const RegisterPage = () => {
   const navigate = useNavigate();
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [checkingSession, setCheckingSession] = useState(true);
+
+  useEffect(() => {
+    const checkExistingSession = async () => {
+      try {
+        const userData = await getCurrentUser();
+        if (userData && userData.userData) {
+          if (userData.userData.role === "admin") {
+            navigate("/admin");
+          } else {
+            navigate("/");
+          }
+        }
+      } catch (err) {
+        console.error("Session check error:", err);
+      } finally {
+        setCheckingSession(false);
+      }
+    };
+
+    checkExistingSession();
+  }, [navigate]);
 
   useEffect(() => {
     if (error) {
       const timer = setTimeout(() => {
         setError("");
       }, 5000);
-
       return () => clearTimeout(timer);
     }
   }, [error]);
@@ -23,12 +44,11 @@ const RegisterPage = () => {
   useEffect(() => {
     if (success) {
       const timer = setTimeout(() => {
-        navigate("/login");
-      }, 2000);
-
+        setSuccess("");
+      }, 5000);
       return () => clearTimeout(timer);
     }
-  }, [success, navigate]);
+  }, [success]);
 
   const handleSubmit = async (values, { setSubmitting }) => {
     try {
@@ -36,35 +56,57 @@ const RegisterPage = () => {
         email: values.email,
         password: values.password,
         username: values.username,
-        name: values.username,
+        name: values.name || values.username,
       });
 
-      setSuccess("Registration successful! Redirecting to login...");
+      setSuccess(
+        "Registration successful! Please check your email to verify your account, then sign in."
+      );
+
+      setTimeout(() => {
+        navigate("/login");
+      }, 3000);
     } catch (err) {
-      if (err.message?.includes("email")) {
-        setError("This email is already registered. Please use another email.");
-      } else if (err.message?.includes("username")) {
-        setError("This username is already taken. Please choose another one.");
+      console.error("Registration error:", err);
+      if (err.message.includes("already registered")) {
+        setError(
+          "This email is already registered. Please try signing in instead."
+        );
+      } else if (err.message.includes("Password")) {
+        setError("Password must be at least 6 characters long.");
       } else {
-        setError("Registration failed. Please try again later.");
+        setError(err.message || "Registration failed. Please try again.");
       }
     } finally {
       setSubmitting(false);
     }
   };
 
+  if (checkingSession) {
+    return (
+      <div className="auth-container">
+        <div className="auth-box checking-session">
+          <p>Checking session...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="auth-container">
       <div className="auth-box">
         <h2 className="auth-title">Create Account</h2>
-        <p className="auth-subtitle">Join our movie community</p>
+        <p className="auth-subtitle">
+          Join us to start building your movie list
+        </p>
 
-        {error && <div className="auth-error">{error}</div>}
-        {success && <div className="auth-success">{success}</div>}
+        {error && <div className="error-message">{error}</div>}
+        {success && <div className="success-message">{success}</div>}
 
         <Formik
           initialValues={{
             username: "",
+            name: "",
             email: "",
             password: "",
             confirmPassword: "",
@@ -72,69 +114,95 @@ const RegisterPage = () => {
           validationSchema={RegisterSchema}
           onSubmit={handleSubmit}
         >
-          {({ errors, touched, isSubmitting, values }) => (
+          {({ errors, touched, values, isSubmitting }) => (
             <Form className="auth-form">
               <div className="form-group">
-                <label htmlFor="username">Username</label>
-                <Field
-                  type="text"
-                  name="username"
-                  id="username"
-                  className={`form-input ${
-                    errors.username && touched.username ? "error" : ""
-                  }`}
-                  placeholder="Choose a username"
-                />
+                <label htmlFor="username">Username *</label>
+                <div className="input-wrapper">
+                  <Field
+                    type="text"
+                    name="username"
+                    id="username"
+                    className={`form-input ${
+                      errors.username && touched.username ? "error" : ""
+                    }`}
+                    placeholder="Enter your username"
+                  />
+                </div>
                 {errors.username && touched.username && (
                   <div className="error-message">{errors.username}</div>
                 )}
               </div>
 
               <div className="form-group">
-                <label htmlFor="email">Email</label>
-                <Field
-                  type="email"
-                  name="email"
-                  id="email"
-                  className={`form-input ${
-                    errors.email && touched.email ? "error" : ""
-                  }`}
-                  placeholder="Enter your email"
-                />
+                <label htmlFor="name">Name</label>
+                <div className="input-wrapper">
+                  <Field
+                    type="text"
+                    name="name"
+                    id="name"
+                    className={`form-input ${
+                      errors.name && touched.name ? "error" : ""
+                    }`}
+                    placeholder="Enter your name (optional)"
+                  />
+                </div>
+                {errors.name && touched.name && (
+                  <div className="error-message">{errors.name}</div>
+                )}
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="email">Email *</label>
+                <div className="input-wrapper">
+                  <Field
+                    type="email"
+                    name="email"
+                    id="email"
+                    className={`form-input ${
+                      errors.email && touched.email ? "error" : ""
+                    }`}
+                    placeholder="Enter your email"
+                  />
+                </div>
                 {errors.email && touched.email && (
                   <div className="error-message">{errors.email}</div>
                 )}
               </div>
 
               <div className="form-group">
-                <label htmlFor="password">Password</label>
-                <Field
-                  type="password"
-                  name="password"
-                  id="password"
-                  className={`form-input ${
-                    errors.password && touched.password ? "error" : ""
-                  }`}
-                  placeholder="Create a password"
-                />
+                <label htmlFor="password">Password *</label>
+                <div className="input-wrapper">
+                  <Field
+                    type="password"
+                    name="password"
+                    id="password"
+                    className={`form-input ${
+                      errors.password && touched.password ? "error" : ""
+                    }`}
+                    placeholder="Enter your password"
+                  />
+                </div>
                 {errors.password && touched.password && (
                   <div className="error-message">{errors.password}</div>
                 )}
               </div>
 
               <div className="form-group">
-                <label htmlFor="confirmPassword">Confirm Password</label>
-                <Field
-                  type="password"
-                  name="confirmPassword"
-                  id="confirmPassword"
-                  className={`form-input ${
-                    errors.confirmPassword && touched.confirmPassword
-                      ? "error"
-                      : ""
-                  }`}
-                  placeholder="Confirm your password"
-                />
+                <label htmlFor="confirmPassword">Confirm Password *</label>
+                <div className="input-wrapper">
+                  <Field
+                    type="password"
+                    name="confirmPassword"
+                    id="confirmPassword"
+                    className={`form-input ${
+                      errors.confirmPassword && touched.confirmPassword
+                        ? "error"
+                        : ""
+                    }`}
+                    placeholder="Confirm your password"
+                  />
+                </div>
                 {errors.confirmPassword && touched.confirmPassword && (
                   <div className="error-message">{errors.confirmPassword}</div>
                 )}
@@ -143,23 +211,22 @@ const RegisterPage = () => {
               <button
                 type="submit"
                 className={`submit-btn ${
-                  !values.username ||
                   !values.email ||
                   !values.password ||
-                  !values.confirmPassword ||
-                  isSubmitting
+                  !values.username ||
+                  !values.confirmPassword
                     ? "disabled"
                     : ""
                 }`}
                 disabled={
                   isSubmitting ||
-                  !values.username ||
                   !values.email ||
                   !values.password ||
+                  !values.username ||
                   !values.confirmPassword
                 }
               >
-                {isSubmitting ? "Registering..." : "Sign Up"}
+                {isSubmitting ? "Creating Account..." : "Create Account"}
               </button>
             </Form>
           )}

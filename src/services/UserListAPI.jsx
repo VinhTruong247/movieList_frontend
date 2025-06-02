@@ -26,30 +26,19 @@ export const signUp = async ({ email, password, username, name }) => {
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
+    options: {
+      data: {
+        name: name || username,
+        username,
+        role: "user",
+        isDisabled: false,
+      },
+    },
   });
 
   if (error) throw error;
 
-  try {
-    const { error: insertError } = await supabase.from("Users").insert([
-      {
-        email,
-        username,
-        name: name || username,
-        role: "user",
-        isDisabled: false,
-      },
-    ]);
-
-    if (insertError) {
-      console.error("Failed to create user record, cleaning up auth user");
-      throw insertError;
-    }
-
-    return data;
-  } catch (insertError) {
-    throw insertError;
-  }
+  return data;
 };
 
 export const logoutUser = async (navigate) => {
@@ -77,7 +66,7 @@ export const getCurrentUser = async () => {
       .single();
 
     if (userError) {
-      console.warn("User found in auth but not in database:", userError);
+      console.warn(userError);
       return null;
     }
 
