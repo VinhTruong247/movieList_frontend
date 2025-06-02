@@ -302,7 +302,9 @@ const DirectorList = () => {
           .from("Directors")
           .update({
             name: values.name,
-            bio: values.bio || null,
+            biography: values.biography || null,
+            nationality: values.nationality || null,
+            image_url: values.imageUrl || null,
             isDisabled: values.isDisabled || false,
           })
           .eq("id", editingDirector.id);
@@ -315,7 +317,9 @@ const DirectorList = () => {
               ? {
                   ...d,
                   name: values.name,
-                  bio: values.bio || null,
+                  biography: values.biography || null,
+                  nationality: values.nationality || null,
+                  image_url: values.imageUrl || null,
                   isDisabled: values.isDisabled || false,
                 }
               : d
@@ -332,7 +336,9 @@ const DirectorList = () => {
           .from("Directors")
           .insert({
             name: values.name,
-            bio: values.bio || null,
+            biography: values.biography || null,
+            nationality: values.nationality || null,
+            image_url: values.imageUrl || null,
             isDisabled: false,
           })
           .select();
@@ -488,9 +494,8 @@ const DirectorList = () => {
                   <td>{director.name}</td>
                   <td>
                     <span
-                      className={`status-badge ${
-                        director.isDisabled ? "disabled" : "active"
-                      }`}
+                      className={`status-badge ${director.isDisabled ? "disabled" : "active"
+                        }`}
                     >
                       {director.isDisabled ? "Disabled" : "Active"}
                     </span>

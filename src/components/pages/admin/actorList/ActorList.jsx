@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import supabase from "../../../../supabase-client";
 import ActorForm from "./actorForm/ActorForm";
 import "../ListStyle.scss";
+import { defaultAllowedOrigins } from "vite";
 
 const ActorList = () => {
   const [actors, setActors] = useState([]);
@@ -301,7 +302,9 @@ const ActorList = () => {
           .from("Actors")
           .update({
             name: values.name,
-            bio: values.bio || null,
+            biography: values.biography || null,
+            nationality: values.nationality || null,
+            image_url: values.imageUrl || null,
             isDisabled: values.isDisabled || false,
           })
           .eq("id", editingActor.id);
@@ -314,7 +317,9 @@ const ActorList = () => {
               ? {
                   ...a,
                   name: values.name,
-                  bio: values.bio || null,
+                  biography: values.biography || null,
+                  nationality: values.nationality || null,
+                  image_url: values.imageUrl || null,
                   isDisabled: values.isDisabled || false,
                 }
               : a
@@ -331,7 +336,9 @@ const ActorList = () => {
           .from("Actors")
           .insert({
             name: values.name,
-            bio: values.bio || null,
+            biography: values.biography || null,
+            nationality: values.nationality || null,
+            image_url: values.imageUrl || null,
             isDisabled: false,
           })
           .select();

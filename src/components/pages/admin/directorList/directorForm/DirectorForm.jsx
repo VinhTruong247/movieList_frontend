@@ -6,7 +6,9 @@ const DirectorSchema = Yup.object().shape({
     .min(3, "Director name must be at least 3 characters")
     .max(50, "Director name must be less than 50 characters")
     .required("Director name is required"),
-  bio: Yup.string().max(500, "Bio must be less than 500 characters"),
+  biography: Yup.string().max(500, "Biography must be less than 500 characters"),
+  nationality: Yup.string().max(50, "Nationality must be less than 50 characters"),
+  imageUrl: Yup.string().url("Must be a valid URL"),
   isDisabled: Yup.boolean(),
 });
 
@@ -15,7 +17,9 @@ const DirectorForm = ({ director, onSubmit, onCancel, isSubmitting }) => {
 
   const initialValues = {
     name: director?.name || "",
-    bio: director?.bio || "",
+    biography: director?.biography || "",
+    nationality: director?.nationality || "",
+    imageUrl: director?.image_url || "",
     isDisabled: director?.isDisabled || false,
   };
 
@@ -30,12 +34,13 @@ const DirectorForm = ({ director, onSubmit, onCancel, isSubmitting }) => {
         {({ errors, touched, values }) => (
           <Form className="form-list">
             <div className="form-group">
-              <label htmlFor="name">Director Name</label>
+              <label htmlFor="name">Director Name *</label>
               <Field
                 id="name"
                 name="name"
                 type="text"
                 placeholder="Enter director name"
+                className={errors.name && touched.name ? "error" : ""}
                 autoFocus
               />
               <ErrorMessage
@@ -46,16 +51,49 @@ const DirectorForm = ({ director, onSubmit, onCancel, isSubmitting }) => {
             </div>
 
             <div className="form-group">
-              <label htmlFor="bio">Biography (Optional)</label>
+              <label htmlFor="biography">Biography (Optional)</label>
               <Field
-                id="bio"
-                name="bio"
+                id="biography"
+                name="biography"
                 as="textarea"
                 rows="4"
-                placeholder="Enter director bio"
+                placeholder="Enter director biography"
+                className={errors.biography && touched.biography ? "error" : ""}
               />
               <ErrorMessage
-                name="bio"
+                name="biography"
+                component="div"
+                className="error-message"
+              />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="nationality">Nationality (Optional)</label>
+              <Field
+                id="nationality"
+                name="nationality"
+                type="text"
+                placeholder="Enter director nationality"
+                className={errors.nationality && touched.nationality ? "error" : ""}
+              />
+              <ErrorMessage
+                name="nationality"
+                component="div"
+                className="error-message"
+              />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="imageUrl">Image URL (Optional)</label>
+              <Field
+                id="imageUrl"
+                name="imageUrl"
+                type="url"
+                placeholder="https://example.com/image.jpg"
+                className={errors.imageUrl && touched.imageUrl ? "error" : ""}
+              />
+              <ErrorMessage
+                name="imageUrl"
                 component="div"
                 className="error-message"
               />
