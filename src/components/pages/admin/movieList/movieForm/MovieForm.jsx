@@ -27,6 +27,7 @@ const MovieSchema = Yup.object().shape({
     .typeError("Rating must be a number"),
   runtime: Yup.number()
     .min(1, "Runtime must be positive")
+    .required("Runtime is required")
     .typeError("Runtime must be a number"),
   posterUrl: Yup.string().url("Must be a valid URL"),
   bannerUrl: Yup.string().url("Must be a valid URL"),
@@ -197,7 +198,17 @@ const MovieForm = ({ movie, onSubmit, onCancel, isSubmitting }) => {
 
   return (
     <div className="movie-form-container">
-      <h3>{isEditMode ? "Edit Movie" : "Add New Movie"}</h3>
+      <div className="form-header">
+        <div>
+          <h3>{isEditMode ? "Edit Movie" : "Add New Movie"}</h3>
+          <p className="form-subtitle">
+            {isEditMode
+              ? "Update the movie information below"
+              : "Fill in all the required fields to add a new movie"}
+          </p>
+        </div>
+      </div>
+
       <Formik
         initialValues={getInitialValues()}
         validationSchema={MovieSchema}
@@ -206,360 +217,444 @@ const MovieForm = ({ movie, onSubmit, onCancel, isSubmitting }) => {
       >
         {({ errors, touched, values, setFieldValue }) => (
           <Form className="movie-form">
-            <div className="form-columns">
-              <div className="form-group">
-                <label htmlFor="title">Title</label>
-                <Field
-                  id="title"
-                  name="title"
-                  type="text"
-                  placeholder="Enter movie title"
-                  className={errors.title && touched.title ? "error" : ""}
-                  autoFocus
-                />
-                <ErrorMessage
-                  name="title"
-                  component="div"
-                  className="error-message"
-                />
+            <div className="form-section">
+              <div className="section-header">
+                <h4 className="section-title">📝 Basic Information</h4>
+                <p className="section-description">Essential movie details</p>
               </div>
 
-              <div className="form-group">
-                <label htmlFor="year">Release Year</label>
-                <Field
-                  id="year"
-                  name="year"
-                  type="number"
-                  placeholder="Enter release year"
-                  className={errors.year && touched.year ? "error" : ""}
-                />
-                <ErrorMessage
-                  name="year"
-                  component="div"
-                  className="error-message"
-                />
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="type">Type</label>
-                <Field
-                  as="select"
-                  id="type"
-                  name="type"
-                  className={errors.type && touched.type ? "error" : ""}
-                >
-                  <option value="Movie">Movie</option>
-                  <option value="TV Series">TV Series</option>
-                  <option value="Documentary">Documentary</option>
-                  <option value="Animation">Animation</option>
-                </Field>
-                <ErrorMessage
-                  name="type"
-                  component="div"
-                  className="error-message"
-                />
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="imdb_rating">IMDb Rating</label>
-                <Field
-                  id="imdb_rating"
-                  name="imdb_rating"
-                  type="number"
-                  step="0.1"
-                  min="0"
-                  max="10"
-                  placeholder="Enter IMDb rating"
-                  className={
-                    errors.imdb_rating && touched.imdb_rating ? "error" : ""
-                  }
-                />
-                <ErrorMessage
-                  name="imdb_rating"
-                  component="div"
-                  className="error-message"
-                />
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="runtime">Runtime (minutes)</label>
-                <Field
-                  id="runtime"
-                  name="runtime"
-                  type="number"
-                  min="1"
-                  placeholder="Enter runtime in minutes"
-                  className={errors.runtime && touched.runtime ? "error" : ""}
-                />
-                <ErrorMessage
-                  name="runtime"
-                  component="div"
-                  className="error-message"
-                />
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="language">Language</label>
-                <Field
-                  id="language"
-                  name="language"
-                  type="text"
-                  placeholder="Enter language"
-                  className={errors.language && touched.language ? "error" : ""}
-                />
-                <ErrorMessage
-                  name="language"
-                  component="div"
-                  className="error-message"
-                />
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="country">Country</label>
-                <Field
-                  id="country"
-                  name="country"
-                  type="text"
-                  placeholder="Enter country"
-                  className={errors.country && touched.country ? "error" : ""}
-                />
-                <ErrorMessage
-                  name="country"
-                  component="div"
-                  className="error-message"
-                />
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="posterUrl">Poster URL</label>
-                <Field
-                  id="posterUrl"
-                  name="posterUrl"
-                  type="url"
-                  placeholder="Enter poster URL"
-                  className={
-                    errors.posterUrl && touched.posterUrl ? "error" : ""
-                  }
-                />
-                <ErrorMessage
-                  name="posterUrl"
-                  component="div"
-                  className="error-message"
-                />
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="bannerUrl">Banner URL</label>
-                <Field
-                  id="bannerUrl"
-                  name="bannerUrl"
-                  type="url"
-                  placeholder="Enter banner URL"
-                  className={
-                    errors.bannerUrl && touched.bannerUrl ? "error" : ""
-                  }
-                />
-                <ErrorMessage
-                  name="bannerUrl"
-                  component="div"
-                  className="error-message"
-                />
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="trailerUrl">Trailer URL</label>
-                <Field
-                  id="trailerUrl"
-                  name="trailerUrl"
-                  type="url"
-                  placeholder="Enter trailer URL"
-                  className={
-                    errors.trailerUrl && touched.trailerUrl ? "error" : ""
-                  }
-                />
-                <ErrorMessage
-                  name="trailerUrl"
-                  component="div"
-                  className="error-message"
-                />
-              </div>
-            </div>
-
-            <div className="form-group full-width">
-              <label htmlFor="description">Description</label>
-              <Field
-                as="textarea"
-                id="description"
-                name="description"
-                rows="4"
-                placeholder="Enter movie description"
-                className={
-                  errors.description && touched.description ? "error" : ""
-                }
-              />
-              <ErrorMessage
-                name="description"
-                component="div"
-                className="error-message"
-              />
-            </div>
-
-            <div className="form-columns relationship-columns">
-              <div className="form-group">
-                <label>Genres</label>
-                <input
-                  type="text"
-                  placeholder="Search genres..."
-                  className="search-input"
-                  value={genreSearch}
-                  onChange={(e) => setGenreSearch(e.target.value)}
-                />
-                <div
-                  className={`checkbox-group with-search ${errors.genreIds && touched.genreIds ? "error" : ""}`}
-                >
-                  {filteredGenres.length > 0 ? (
-                    filteredGenres.map((genre) => (
-                      <div key={genre.id} className="checkbox-item">
-                        <label className="checkbox-label">
-                          <input
-                            type="checkbox"
-                            checked={values.genreIds.includes(genre.id)}
-                            onChange={(e) => {
-                              const isChecked = e.target.checked;
-                              const newGenreIds = isChecked
-                                ? [...values.genreIds, genre.id]
-                                : values.genreIds.filter(
-                                    (id) => id !== genre.id
-                                  );
-                              setFieldValue("genreIds", newGenreIds);
-                            }}
-                          />
-                          {genre.name} {genre.isDisabled && "(disabled)"}
-                        </label>
-                      </div>
-                    ))
-                  ) : (
-                    <div className="no-results">No matching genres found</div>
-                  )}
+              <div className="form-grid">
+                <div className="form-group">
+                  <label htmlFor="title">Title *</label>
+                  <Field
+                    id="title"
+                    name="title"
+                    type="text"
+                    placeholder="Enter movie title"
+                    className={errors.title && touched.title ? "error" : ""}
+                    autoFocus
+                  />
+                  <ErrorMessage
+                    name="title"
+                    component="div"
+                    className="error-message"
+                  />
                 </div>
-                <ErrorMessage
-                  name="genreIds"
-                  component="div"
-                  className="error-message"
-                />
+
+                <div className="form-group">
+                  <label htmlFor="year">Release Year *</label>
+                  <Field
+                    id="year"
+                    name="year"
+                    type="number"
+                    placeholder="Enter release year"
+                    className={errors.year && touched.year ? "error" : ""}
+                  />
+                  <ErrorMessage
+                    name="year"
+                    component="div"
+                    className="error-message"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="type">Type *</label>
+                  <Field
+                    as="select"
+                    id="type"
+                    name="type"
+                    className={errors.type && touched.type ? "error" : ""}
+                  >
+                    <option value="Movie">Movie</option>
+                    <option value="TV Series">TV Series</option>
+                    <option value="Documentary">Documentary</option>
+                  </Field>
+                  <ErrorMessage
+                    name="type"
+                    component="div"
+                    className="error-message"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="runtime">
+                    Runtime (
+                    {values.type === "TV Series" ? "Episodes" : "Minutes"}) *
+                  </label>
+                  <Field
+                    id="runtime"
+                    name="runtime"
+                    type="number"
+                    min="1"
+                    placeholder={
+                      values.type === "TV Series"
+                        ? "e.g., 24 episodes"
+                        : "e.g., 120 minutes"
+                    }
+                    className={errors.runtime && touched.runtime ? "error" : ""}
+                  />
+                  <ErrorMessage
+                    name="runtime"
+                    component="div"
+                    className="error-message"
+                  />
+                  <small className="field-hint">
+                    {values.type === "TV Series"
+                      ? "Enter the total number of episodes"
+                      : "Enter the duration in minutes"}
+                  </small>
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="imdb_rating">IMDb Rating</label>
+                  <Field
+                    id="imdb_rating"
+                    name="imdb_rating"
+                    type="number"
+                    step="0.1"
+                    min="0"
+                    max="10"
+                    placeholder="0.0 - 10.0"
+                    className={
+                      errors.imdb_rating && touched.imdb_rating ? "error" : ""
+                    }
+                  />
+                  <ErrorMessage
+                    name="imdb_rating"
+                    component="div"
+                    className="error-message"
+                  />
+                </div>
               </div>
 
-              <div className="form-group">
-                <label>Directors</label>
-                <input
-                  type="text"
-                  placeholder="Search directors..."
-                  className="search-input"
-                  value={directorSearch}
-                  onChange={(e) => setDirectorSearch(e.target.value)}
+              <div className="form-group full-width">
+                <label htmlFor="description">Description</label>
+                <Field
+                  as="textarea"
+                  id="description"
+                  name="description"
+                  rows="4"
+                  placeholder="Enter movie description"
+                  className={
+                    errors.description && touched.description ? "error" : ""
+                  }
                 />
-                <div
-                  className={`checkbox-group with-search ${errors.directorIds && touched.directorIds ? "error" : ""}`}
-                >
-                  {filteredDirectors.length > 0 ? (
-                    filteredDirectors.map((director) => (
-                      <div key={director.id} className="checkbox-item">
-                        <label className="checkbox-label">
-                          <input
-                            type="checkbox"
-                            checked={values.directorIds.includes(director.id)}
-                            onChange={(e) => {
-                              const isChecked = e.target.checked;
-                              const newDirectorIds = isChecked
-                                ? [...values.directorIds, director.id]
-                                : values.directorIds.filter(
-                                    (id) => id !== director.id
-                                  );
-                              setFieldValue("directorIds", newDirectorIds);
-                            }}
-                          />
-                          {director.name} {director.isDisabled && "(disabled)"}
-                        </label>
-                      </div>
-                    ))
-                  ) : (
-                    <div className="no-results">
-                      No matching directors found
-                    </div>
-                  )}
-                </div>
                 <ErrorMessage
-                  name="directorIds"
+                  name="description"
                   component="div"
                   className="error-message"
                 />
               </div>
             </div>
 
-            <div className="form-group full-width">
-              <label>Actors</label>
-              <div className="actor-selection">
-                <input
-                  type="text"
-                  placeholder="Search actors..."
-                  className="search-input"
-                  value={actorSearch}
-                  onChange={(e) => setActorSearch(e.target.value)}
-                />
-                <div className="checkbox-group with-search">
-                  {filteredActors.length > 0 ? (
-                    filteredActors.map((actor) => (
-                      <div key={actor.id} className="checkbox-item">
-                        <button
-                          type="button"
-                          className="add-actor-btn"
-                          onClick={() => addActor(actor.id)}
+            <div className="form-section">
+              <div className="section-header">
+                <h4 className="section-title">⚙️ Technical Details</h4>
+                <p className="section-description">
+                  Language and location information
+                </p>
+              </div>
+
+              <div className="form-grid">
+                <div className="form-group">
+                  <label htmlFor="language">Language</label>
+                  <Field
+                    id="language"
+                    name="language"
+                    type="text"
+                    placeholder="e.g., English, Spanish"
+                    className={
+                      errors.language && touched.language ? "error" : ""
+                    }
+                  />
+                  <ErrorMessage
+                    name="language"
+                    component="div"
+                    className="error-message"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="country">Country</label>
+                  <Field
+                    id="country"
+                    name="country"
+                    type="text"
+                    placeholder="e.g., United States, France"
+                    className={errors.country && touched.country ? "error" : ""}
+                  />
+                  <ErrorMessage
+                    name="country"
+                    component="div"
+                    className="error-message"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="form-section">
+              <div className="section-header">
+                <h4 className="section-title">🎬 Media Assets</h4>
+                <p className="section-description">Images and trailer links</p>
+              </div>
+
+              <div className="form-grid">
+                <div className="form-group">
+                  <label htmlFor="posterUrl">Poster URL</label>
+                  <Field
+                    id="posterUrl"
+                    name="posterUrl"
+                    type="url"
+                    placeholder="https://example.com/poster.jpg"
+                    className={
+                      errors.posterUrl && touched.posterUrl ? "error" : ""
+                    }
+                  />
+                  <ErrorMessage
+                    name="posterUrl"
+                    component="div"
+                    className="error-message"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="bannerUrl">Banner URL</label>
+                  <Field
+                    id="bannerUrl"
+                    name="bannerUrl"
+                    type="url"
+                    placeholder="https://example.com/banner.jpg"
+                    className={
+                      errors.bannerUrl && touched.bannerUrl ? "error" : ""
+                    }
+                  />
+                  <ErrorMessage
+                    name="bannerUrl"
+                    component="div"
+                    className="error-message"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="trailerUrl">Trailer URL</label>
+                  <Field
+                    id="trailerUrl"
+                    name="trailerUrl"
+                    type="url"
+                    placeholder="https://youtube.com/watch?v=..."
+                    className={
+                      errors.trailerUrl && touched.trailerUrl ? "error" : ""
+                    }
+                  />
+                  <ErrorMessage
+                    name="trailerUrl"
+                    component="div"
+                    className="error-message"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="form-section">
+              <div className="section-header">
+                <h4 className="section-title">🏷️ Categories & Credits</h4>
+                <p className="section-description">
+                  Select genres and assign directors
+                </p>
+              </div>
+
+              <div className="form-grid relationship-grid">
+                <div className="form-group">
+                  <label>Genres *</label>
+                  <input
+                    type="text"
+                    placeholder="Search genres..."
+                    className="search-input"
+                    value={genreSearch}
+                    onChange={(e) => setGenreSearch(e.target.value)}
+                  />
+                  <div
+                    className={`checkbox-group with-search ${
+                      errors.genreIds && touched.genreIds ? "error" : ""
+                    }`}
+                  >
+                    {filteredGenres.length > 0 ? (
+                      filteredGenres.map((genre) => (
+                        <div key={genre.id} className="checkbox-item">
+                          <label className="checkbox-label">
+                            <input
+                              type="checkbox"
+                              checked={values.genreIds.includes(genre.id)}
+                              onChange={(e) => {
+                                const isChecked = e.target.checked;
+                                const newGenreIds = isChecked
+                                  ? [...values.genreIds, genre.id]
+                                  : values.genreIds.filter(
+                                      (id) => id !== genre.id
+                                    );
+                                setFieldValue("genreIds", newGenreIds);
+                              }}
+                            />
+                            {genre.name} {genre.isDisabled && "(disabled)"}
+                          </label>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="no-results">No matching genres found</div>
+                    )}
+                  </div>
+                  <ErrorMessage
+                    name="genreIds"
+                    component="div"
+                    className="error-message"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label>Directors *</label>
+                  <input
+                    type="text"
+                    placeholder="Search directors..."
+                    className="search-input"
+                    value={directorSearch}
+                    onChange={(e) => setDirectorSearch(e.target.value)}
+                  />
+                  <div
+                    className={`checkbox-group with-search ${
+                      errors.directorIds && touched.directorIds ? "error" : ""
+                    }`}
+                  >
+                    {filteredDirectors.length > 0 ? (
+                      filteredDirectors.map((director) => (
+                        <div key={director.id} className="checkbox-item">
+                          <label className="checkbox-label">
+                            <input
+                              type="checkbox"
+                              checked={values.directorIds.includes(director.id)}
+                              onChange={(e) => {
+                                const isChecked = e.target.checked;
+                                const newDirectorIds = isChecked
+                                  ? [...values.directorIds, director.id]
+                                  : values.directorIds.filter(
+                                      (id) => id !== director.id
+                                    );
+                                setFieldValue("directorIds", newDirectorIds);
+                              }}
+                            />
+                            {director.name}{" "}
+                            {director.isDisabled && "(disabled)"}
+                          </label>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="no-results">
+                        No matching directors found
+                      </div>
+                    )}
+                  </div>
+                  <ErrorMessage
+                    name="directorIds"
+                    component="div"
+                    className="error-message"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="form-section">
+              <div className="section-header">
+                <h4 className="section-title">🎭 Cast & Characters</h4>
+                <p className="section-description">
+                  Add actors and their character names
+                </p>
+              </div>
+
+              <div className="form-group full-width">
+                <label>Actors</label>
+                <div className="actor-selection">
+                  <input
+                    type="text"
+                    placeholder="Search actors to add..."
+                    className="search-input"
+                    value={actorSearch}
+                    onChange={(e) => setActorSearch(e.target.value)}
+                  />
+                  <div className="checkbox-group with-search">
+                    {filteredActors.length > 0 ? (
+                      filteredActors.map((actor) => (
+                        <div key={actor.id} className="checkbox-item">
+                          <button
+                            type="button"
+                            className="add-actor-btn"
+                            onClick={() => addActor(actor.id)}
+                          >
+                            + {actor.name} {actor.isDisabled && "(disabled)"}
+                          </button>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="no-results">No matching actors found</div>
+                    )}
+                  </div>
+                </div>
+
+                {selectedActors.length > 0 && (
+                  <div className="selected-actors">
+                    <h5>Selected Cast ({selectedActors.length})</h5>
+                    <div className="actors-list">
+                      {selectedActors.map((actor) => (
+                        <div
+                          key={actor.actorId}
+                          className="selected-actor-item"
                         >
-                          + {actor.name} {actor.isDisabled && "(disabled)"}
-                        </button>
-                      </div>
-                    ))
-                  ) : (
-                    <div className="no-results">No matching actors found</div>
-                  )}
-                </div>
-              </div>
-
-              {selectedActors.length > 0 && (
-                <div className="selected-actors">
-                  <h4>Selected Actors</h4>
-                  {selectedActors.map((actor) => (
-                    <div key={actor.actorId} className="selected-actor-item">
-                      <div className="actor-name">
-                        {getActorName(actor.actorId)}
-                      </div>
-                      <input
-                        type="text"
-                        placeholder="Character name"
-                        value={actor.characterName}
-                        onChange={(e) =>
-                          updateCharacterName(actor.actorId, e.target.value)
-                        }
-                      />
-                      <button
-                        type="button"
-                        className="remove-actor-btn"
-                        onClick={() => removeActor(actor.actorId)}
-                      >
-                        X
-                      </button>
+                          <div className="actor-info">
+                            <div className="actor-name">
+                              {getActorName(actor.actorId)}
+                            </div>
+                            <input
+                              type="text"
+                              placeholder="Character name (optional)"
+                              value={actor.characterName}
+                              onChange={(e) =>
+                                updateCharacterName(
+                                  actor.actorId,
+                                  e.target.value
+                                )
+                              }
+                              className="character-input"
+                            />
+                          </div>
+                          <button
+                            type="button"
+                            className="remove-actor-btn"
+                            onClick={() => removeActor(actor.actorId)}
+                            title="Remove actor"
+                          >
+                            Remove
+                          </button>
+                        </div>
+                      ))}
                     </div>
-                  ))}
-                </div>
-              )}
+                  </div>
+                )}
+              </div>
             </div>
 
-            <div className="form-group status-toggle">
-              <label className="checkbox-label">
-                <Field type="checkbox" name="isDisabled" />
-                <span className="label-text">Disable this movie</span>
-              </label>
-              <small>Disabled movies won't appear in user searches</small>
+            <div className="form-section">
+              <div className="section-header">
+                <h4 className="section-title">⚙️ Settings</h4>
+                <p className="section-description">
+                  Movie availability and status
+                </p>
+              </div>
+
+              <div className="form-group status-toggle">
+                <label className="checkbox-label">
+                  <Field type="checkbox" name="isDisabled" />
+                  <span className="label-text">Disable this movie</span>
+                </label>
+                <small>Disabled movies won't appear in user searches</small>
+              </div>
             </div>
 
             <div className="form-actions">
