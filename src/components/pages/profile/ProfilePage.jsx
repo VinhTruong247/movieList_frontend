@@ -73,31 +73,78 @@ const ProfilePage = () => {
     }
   };
 
-  if (loading) return <div className="loading">Loading...</div>;
-  if (!userData) return <div className="loading">No user data available</div>;
+  if (loading) {
+    return (
+      <div className="profile-container">
+        <div className="loading-state">
+          <div className="loading-spinner"></div>
+          <p>Loading profile...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!userData) {
+    return (
+      <div className="profile-container">
+        <div className="error-state">
+          <div className="error-icon">⚠️</div>
+          <p>No user data available</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="profile-container">
-      <div className="profile-content">
-        <h1 className="profile-title">My Profile</h1>
+      <div className="profile-header">
+        <button
+          className="back-button"
+          onClick={() => navigate("/")}
+          title="Back to Home"
+        >
+          <svg
+            viewBox="0 0 24 24"
+            className="home-icon"
+            fill="none"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
+            />
+          </svg>
+        </button>
+        <div className="page-title-section">
+          <h1 className="profile-title">My Profile</h1>
+          <p className="profile-subtitle">Manage your account settings</p>
+        </div>
+      </div>
 
-        <div className="profile-section">
+      <div className="profile-content">
+        {error && <div className="error-message">{error}</div>}
+        {successMessage && (
+          <div className="success-message">{successMessage}</div>
+        )}
+
+        <div className="profile-section account-section">
           <div className="section-header">
-            <h2>Account Information</h2>
+            <div className="section-title">
+              <div className="section-icon">👤</div>
+              <h2>Account Information</h2>
+            </div>
             {!isEditing && (
               <button
                 className="edit-button"
                 onClick={() => setIsEditing(true)}
               >
-                Edit Profile
+                <span className="button-icon">✏️</span>
+                <span className="button-text">Edit Profile</span>
               </button>
             )}
           </div>
-
-          {error && <div className="error-message">{error}</div>}
-          {successMessage && (
-            <div className="success-message">{successMessage}</div>
-          )}
 
           {isEditing ? (
             <Formik
@@ -136,14 +183,18 @@ const ProfilePage = () => {
                       className="cancel-button"
                       onClick={() => setIsEditing(false)}
                     >
-                      Cancel
+                      <span className="button-icon">✕</span>
+                      <span className="button-text">Cancel</span>
                     </button>
                     <button
                       type="submit"
-                      className="save-button"
+                      className={`save-button ${isSubmitting ? "loading" : ""}`}
                       disabled={isSubmitting}
                     >
-                      {isSubmitting ? "Saving..." : "Save Changes"}
+                      <span className="button-icon">💾</span>
+                      <span className="button-text">
+                        {isSubmitting ? "Saving..." : "Save Changes"}
+                      </span>
                     </button>
                   </div>
                 </Form>
@@ -152,39 +203,81 @@ const ProfilePage = () => {
           ) : (
             <div className="profile-info">
               <div className="info-item">
-                <span className="label">Username</span>
-                <span className="value">{userData.username}</span>
+                <div className="info-icon">📧</div>
+                <div className="info-content">
+                  <span className="label">Email</span>
+                  <span className="value">{userData.email}</span>
+                </div>
               </div>
+              
               <div className="info-item">
-                <span className="label">Email</span>
-                <span className="value">{userData.email}</span>
+                <div className="info-icon">👤</div>
+                <div className="info-content">
+                  <span className="label">Username</span>
+                  <span className="value">{userData.username}</span>
+                </div>
               </div>
+
               <div className="info-item">
-                <span className="label">Account Status</span>
-                <span
-                  className={`value status ${
-                    userData.isDisabled ? "disabled" : "active"
-                  }`}
-                >
-                  {userData.isDisabled ? "Disabled" : "Active"}
-                </span>
+                <div className="info-icon">🔒</div>
+                <div className="info-content">
+                  <span className="label">Account Status</span>
+                  <span
+                    className={`value status ${
+                      userData.isDisabled ? "disabled" : "active"
+                    }`}
+                  >
+                    {userData.isDisabled ? "Disabled" : "Active"}
+                  </span>
+                </div>
               </div>
             </div>
           )}
         </div>
 
-        <div className="profile-section">
-          <h2>My Favorites</h2>
+        <div className="profile-section favorites-section">
+          <div className="section-header">
+            <div className="section-title">
+              <div className="section-icon">❤️</div>
+              <h2>My Favorites</h2>
+            </div>
+            {syncedFavorites.length > 0 && (
+              <div className="favorites-count">
+                {syncedFavorites.length} {syncedFavorites.length === 1 ? 'movie' : 'movies'}
+              </div>
+            )}
+          </div>
+          
           {loadingFavorites ? (
-            <div className="loading">Loading favorites...</div>
+            <div className="loading-state">
+              <div className="loading-spinner"></div>
+              <p>Loading favorites...</p>
+            </div>
           ) : syncedFavorites.length > 0 ? (
             <div className="favorites-grid">
-              {syncedFavorites.map((movie) => (
-                <MovieCard key={movie.id} movie={movie} />
+              {syncedFavorites.map((movie, index) => (
+                <div 
+                  key={movie.id} 
+                  className="favorite-item"
+                  style={{ animationDelay: `${index * 0.1}s` }}
+                >
+                  <MovieCard movie={movie} viewMode="grid" />
+                </div>
               ))}
             </div>
           ) : (
-            <p className="no-favorites">You haven't added any favorites yet.</p>
+            <div className="no-favorites">
+              <div className="empty-icon">💔</div>
+              <h3>No favorites yet</h3>
+              <p>Start building your collection by adding movies to your favorites!</p>
+              <button
+                className="browse-button"
+                onClick={() => navigate("/")}
+              >
+                <span className="button-icon">🎬</span>
+                <span className="button-text">Browse Movies</span>
+              </button>
+            </div>
           )}
         </div>
       </div>
