@@ -1,9 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router";
 import "./MovieCarousel.scss";
 
 const MovieCarousel = ({ movies }) => {
   const [currentSlide, setCurrentSlide] = useState(0);
+  const timerRef = useRef(null);
 
   if (!movies || movies.length === 0) {
     return (
@@ -20,22 +21,45 @@ const MovieCarousel = ({ movies }) => {
     .sort((a, b) => b.imdb_rating - a.imdb_rating)
     .slice(0, 5);
 
+  const resetTimer = () => {
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+    }
+    timerRef.current = setInterval(() => {
+      setCurrentSlide((prev) =>
+        prev === featuredMovies.length - 1 ? 0 : prev + 1
+      );
+    }, 5000);
+  };
+
   const nextSlide = () => {
     setCurrentSlide((prev) =>
       prev === featuredMovies.length - 1 ? 0 : prev + 1
     );
+    resetTimer();
   };
 
   const prevSlide = () => {
     setCurrentSlide((prev) =>
       prev === 0 ? featuredMovies.length - 1 : prev - 1
     );
+    resetTimer();
+  };
+
+  const handleDotClick = (index) => {
+    setCurrentSlide(index);
+    resetTimer();
   };
 
   useEffect(() => {
-    const timer = setInterval(nextSlide, 5000);
-    return () => clearInterval(timer);
-  }, []);
+    resetTimer();
+
+    return () => {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+      }
+    };
+  }, [featuredMovies.length]);
 
   const getGenreNames = (movie) => {
     if (!movie.MovieGenres || !Array.isArray(movie.MovieGenres)) {
@@ -88,7 +112,7 @@ const MovieCarousel = ({ movies }) => {
             <button
               key={index}
               className={`dot ${index === currentSlide ? "active" : ""}`}
-              onClick={() => setCurrentSlide(index)}
+              onClick={() => handleDotClick(index)}
             />
           ))}
         </div>
