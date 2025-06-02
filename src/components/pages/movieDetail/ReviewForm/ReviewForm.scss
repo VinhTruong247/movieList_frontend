@@ -1,0 +1,214 @@
+@use "../../../../styles/root" as *;
+@use "sass:color";
+
+.review-form-container {
+  background: white;
+  border: 1px solid rgba($primary-color, 0.1);
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+
+  .review-form-header {
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #eee;
+
+    h4 {
+      margin: 0 0 0.5rem 0;
+      color: $primary-color;
+      font-size: 1.2rem;
+      font-weight: 600;
+      position: relative;
+
+      &::after {
+        content: "";
+        position: absolute;
+        bottom: -5px;
+        left: 0;
+        width: 40px;
+        height: 3px;
+        background-color: $accent-color;
+      }
+    }
+
+    p {
+      margin: 0;
+      color: #666;
+      font-size: 0.9rem;
+    }
+  }
+
+  .review-form {
+    .form-group {
+      margin-bottom: 1.5rem;
+
+      label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+        color: #374151;
+        font-size: 0.9rem;
+      }
+
+      .rating-container {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 0.5rem;
+
+        .star-rating {
+          display: flex;
+          gap: 0.25rem;
+
+          .star {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            opacity: 0.3;
+            transform: scale(1);
+
+            &:hover {
+              transform: scale(1.2);
+            }
+
+            &.active {
+              opacity: 1;
+              filter: drop-shadow(0 0 3px rgba(255, 193, 7, 0.6));
+            }
+          }
+        }
+
+        .rating-display {
+          .rating-text {
+            font-weight: 600;
+            color: $primary-color;
+            font-size: 1.1rem;
+            background: linear-gradient(
+              135deg,
+              rgba($primary-color, 0.1),
+              rgba($accent-color, 0.1)
+            );
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            border: 1px solid rgba($primary-color, 0.2);
+          }
+        }
+      }
+
+      textarea {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        font-size: 0.95rem;
+        font-family: inherit;
+        line-height: 1.5;
+        resize: vertical;
+        min-height: 120px;
+        transition: all 0.2s ease;
+
+        &:focus {
+          outline: none;
+          border-color: $primary-color;
+          box-shadow: 0 0 0 3px rgba($primary-color, 0.1);
+        }
+
+        &.error {
+          border-color: #dc2626;
+          box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+        }
+
+        &::placeholder {
+          color: #9ca3af;
+        }
+      }
+
+      .character-count {
+        text-align: right;
+        font-size: 0.8rem;
+        color: #6b7280;
+        margin-top: 0.25rem;
+      }
+
+      .error-message {
+        color: #dc2626;
+        font-size: 0.8rem;
+        margin-top: 0.25rem;
+      }
+    }
+
+    .form-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 1rem;
+      margin-top: 1.5rem;
+      padding-top: 1rem;
+      border-top: 1px solid #e5e7eb;
+
+      button {
+        padding: 0.75rem 1.5rem;
+        border-radius: 6px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        font-size: 0.9rem;
+
+        &:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+        }
+      }
+
+      .cancel-btn {
+        background: #f9fafb;
+        border: 1px solid #d1d5db;
+        color: #374151;
+
+        &:hover:not(:disabled) {
+          background: #f3f4f6;
+          border-color: #9ca3af;
+        }
+      }
+
+      .submit-btn {
+        background: linear-gradient(135deg, $primary-color, $accent-color);
+        border: none;
+        color: white;
+
+        &:hover:not(:disabled) {
+          transform: translateY(-1px);
+          box-shadow: 0 4px 12px rgba($primary-color, 0.3);
+        }
+      }
+
+      @media (max-width: 640px) {
+        flex-direction: column;
+
+        button {
+          width: 100%;
+        }
+      }
+    }
+  }
+
+  @media (max-width: 768px) {
+    padding: 1rem;
+
+    .review-form-header h4 {
+      font-size: 1.1rem;
+    }
+
+    .form-group .rating-container {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.5rem;
+
+      .star-rating .star {
+        font-size: 1.25rem;
+      }
+    }
+  }
+}

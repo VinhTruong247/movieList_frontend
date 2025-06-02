@@ -17,7 +17,12 @@ export const getMovies = async (filters = {}, isAdmin = false) => {
       director_id, 
       Directors (id, name)
     ),
-    Reviews (id, rating, comment, user_id)
+    Reviews (id, rating, comment, user_id, created_at,
+    user_public_profiles!Reviews_user_id_fkey (
+        name,
+        avatar_url
+      )
+    )
   `);
 
   if (filters.title) query = query.ilike("title", `%${filters.title}%`);
@@ -64,7 +69,10 @@ export const getMovieById = async (movieId, isAdmin = false) => {
         Directors (id, name)
       ),
       Reviews (id, rating, comment, user_id, created_at,
-        Users (username, avatar_url)
+      user_public_profiles!Reviews_user_id_fkey (
+        name,
+        avatar_url
+      )
       )
     `
     )

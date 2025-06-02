@@ -1,12 +1,18 @@
 import { useState, useEffect, useContext } from "react";
 import { useParams, useNavigate } from "react-router";
 import { getMovieById } from "../../../services/MovieListAPI";
+import {
+  addReview,
+  updateReview,
+  deleteReview,
+} from "../../../services/ReviewsAPI";
 import { MovieContext } from "../../../context/MovieContext";
 import { useFavorites } from "../../../hooks/useFavorites";
 import SimilarMovie from "./SimilarMovie/SimilarMovie";
 import Loader from "../../common/Loader";
 import NoMovie from "./NoMovie/NoMovie";
 import TrailerPopup from "./Trailer/TrailerPopup";
+import ReviewForm from "./ReviewForm/ReviewForm";
 import "./MovieDetail.scss";
 
 const MovieDetail = () => {
@@ -18,6 +24,10 @@ const MovieDetail = () => {
   const { toggleFavorite, isFavorite } = useFavorites();
   const [activeTab, setActiveTab] = useState("overview");
   const [showTrailer, setShowTrailer] = useState(false);
+  const [showReviewForm, setShowReviewForm] = useState(false);
+  const [editingReview, setEditingReview] = useState(null);
+  const [isSubmittingReview, setIsSubmittingReview] = useState(false);
+  const [deletingReviewId, setDeletingReviewId] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -63,6 +73,11 @@ const MovieDetail = () => {
     }
   };
 
+  const refreshMovieData = async () => {
+    const updatedMovieData = await getMovieById(id);
+    setMovie(updatedMovieData);
+  };
+
   const renderCast = () => {
     if (!movie.MovieActors || movie.MovieActors.length === 0) {
       return <div className="no-data">No cast information available</div>;
@@ -84,31 +99,182 @@ const MovieDetail = () => {
     );
   };
 
+  const formatReviewTime = (createdAt) => {
+    const reviewDate = new Date(createdAt);
+    const now = new Date();
+    const diffInMs = now - reviewDate;
+    const diffInMinutes = Math.floor(diffInMs / (1000 * 60));
+    const diffInHours = Math.floor(diffInMs / (1000 * 60 * 60));
+    const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
+
+    if (diffInMinutes < 1) {
+      return "Just now";
+    } else if (diffInMinutes < 60) {
+      return `${diffInMinutes} minute${diffInMinutes !== 1 ? "s" : ""} ago`;
+    } else if (diffInHours < 24) {
+      return `${diffInHours} hour${diffInHours !== 1 ? "s" : ""} ago`;
+    } else if (diffInDays < 7) {
+      return `${diffInDays} day${diffInDays !== 1 ? "s" : ""} ago`;
+    } else {
+      return reviewDate.toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+      });
+    }
+  };
+
   const renderReviews = () => {
     if (!movie.Reviews || movie.Reviews.length === 0) {
-      return <div className="no-data">No reviews yet</div>;
+      return (
+        <div className="no-reviews">
+          <p>No reviews yet. Be the first to review this movie!</p>
+        </div>
+      );
     }
 
     return (
       <div className="reviews-list">
         {movie.Reviews.map((review) => (
-          <div key={review.id} className="review-card">
+          <div key={review.id} className="review-item">
             <div className="review-header">
               <div className="reviewer-info">
-                <div className="reviewer-name">{review.Users?.username}</div>
-                <div className="review-rating">⭐ {review.rating}/10</div>
+                <span className="reviewer-name">
+                  {review.user_public_profiles?.name || "Anonymous User"}
+                </span>
+                <div className="review-rating">
+                  <span className="stars">
+                    {[...Array(10)].map((_, index) => (
+                      <span
+                        key={index}
+                        className={`star ${index < review.rating ? "filled" : ""}`}
+                      >
+                        ⭐
+                      </span>
+                    ))}
+                  </span>
+                  <span className="rating-value">{review.rating}/10</span>
+                </div>
               </div>
-              <div className="review-date">
-                {new Date(review.created_at).toLocaleDateString()}
+              <div className="review-actions">
+                <div className="review-time">
+                  <span className="time-ago">
+                    {formatReviewTime(review.created_at)}
+                    {review.updated_at &&
+                      review.updated_at !== review.created_at && (
+                        <span className="edited-indicator"> (edited)</span>
+                      )}
+                  </span>
+                </div>
+                <div className="action-buttons">
+                  {currentUser && currentUser.id === review.user_id && (
+                    <>
+                      <button
+                        className="edit-review-btn"
+                        onClick={() => handleEditReview(review)}
+                        title="Edit your review"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        className="delete-review-btn"
+                        onClick={() => handleDeleteReview(review.id)}
+                        disabled={deletingReviewId === review.id}
+                        title="Delete your review"
+                      >
+                        {deletingReviewId === review.id
+                          ? "Deleting..."
+                          : "Delete"}
+                      </button>
+                    </>
+                  )}
+                  {currentUser &&
+                    currentUser.role === "admin" &&
+                    currentUser.id !== review.user_id && (
+                      <button
+                        className="admin-delete-btn"
+                        onClick={() => handleDeleteReview(review.id)}
+                        disabled={deletingReviewId === review.id}
+                        title="Admin: Delete this review"
+                      >
+                        {deletingReviewId === review.id
+                          ? "Deleting..."
+                          : "Delete"}
+                      </button>
+                    )}
+                </div>
               </div>
             </div>
-            {review.comment && (
-              <div className="review-comment">{review.comment}</div>
-            )}
+            <div className="review-content">
+              <p>{review.comment}</p>
+            </div>
           </div>
         ))}
       </div>
     );
+  };
+
+  const handleReviewSubmit = async (values, { resetForm }) => {
+    if (!currentUser) return;
+
+    setIsSubmittingReview(true);
+    try {
+      if (editingReview) {
+        await updateReview(editingReview.id, values.rating, values.comment);
+      } else {
+        await addReview(
+          movie.id,
+          currentUser.id,
+          values.rating,
+          values.comment
+        );
+      }
+
+      await refreshMovieData();
+      resetForm();
+      setShowReviewForm(false);
+      setEditingReview(null);
+    } catch (error) {
+      console.error("Error saving review:", error);
+      setLoading(false);
+    } finally {
+      setIsSubmittingReview(false);
+    }
+  };
+
+  const handleEditReview = (review) => {
+    setEditingReview(review);
+    setShowReviewForm(true);
+  };
+
+  const handleDeleteReview = async (reviewId) => {
+    const confirmMessage =
+      currentUser.role === "admin"
+        ? "Are you sure you want to delete this review as an admin?"
+        : "Are you sure you want to delete your review?";
+
+    if (window.confirm(confirmMessage)) {
+      setDeletingReviewId(reviewId);
+      try {
+        await deleteReview(reviewId);
+        await refreshMovieData();
+      } catch (error) {
+        console.error("Error saving review:", error);
+        setLoading(false);
+      } finally {
+        setDeletingReviewId(null);
+      }
+    }
+  };
+
+  const handleCancelReview = () => {
+    setShowReviewForm(false);
+    setEditingReview(null);
+  };
+
+  const hasUserReviewed = () => {
+    if (!currentUser || !movie.Reviews) return false;
+    return movie.Reviews.some((review) => review.user_id === currentUser.id);
   };
 
   if (loading) return <Loader />;
@@ -326,9 +492,44 @@ const MovieDetail = () => {
                 </div>
               )}
 
-              {currentUser && currentUser.role !== "admin" && (
+              {currentUser &&
+                currentUser.role !== "admin" &&
+                !hasUserReviewed() && (
+                  <div className="review-form-section">
+                    {!showReviewForm ? (
+                      <button
+                        className="write-review-btn"
+                        onClick={() => setShowReviewForm(true)}
+                      >
+                        Write a Review
+                      </button>
+                    ) : (
+                      <ReviewForm
+                        onSubmit={handleReviewSubmit}
+                        onCancel={handleCancelReview}
+                        isSubmitting={isSubmittingReview}
+                        editingReview={editingReview}
+                      />
+                    )}
+                  </div>
+                )}
+
+              {currentUser &&
+                currentUser.role !== "admin" &&
+                hasUserReviewed() &&
+                !showReviewForm && (
+                  <div className="already-reviewed">
+                    <p>✅ You have already reviewed this movie</p>
+                  </div>
+                )}
+              {showReviewForm && editingReview && (
                 <div className="review-form-section">
-                  <button className="write-review-btn">Write a Review</button>
+                  <ReviewForm
+                    onSubmit={handleReviewSubmit}
+                    onCancel={handleCancelReview}
+                    isSubmitting={isSubmittingReview}
+                    editingReview={editingReview}
+                  />
                 </div>
               )}
 
