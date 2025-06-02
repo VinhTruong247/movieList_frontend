@@ -1,6 +1,6 @@
 import supabase from "../supabase-client";
 
-const movieCache = new Map();
+export const movieCache = new Map();
 
 export const getMovies = async (filters = {}, isAdmin = false) => {
   let query = supabase.from("Movies").select(`

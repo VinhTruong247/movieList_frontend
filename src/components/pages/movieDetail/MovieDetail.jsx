@@ -1,6 +1,6 @@
 import { useState, useEffect, useContext } from "react";
 import { useParams, useNavigate } from "react-router";
-import { getMovieById } from "../../../services/MovieListAPI";
+import { getMovieById, movieCache } from "../../../services/MovieListAPI";
 import {
   addReview,
   updateReview,
@@ -74,6 +74,7 @@ const MovieDetail = () => {
   };
 
   const refreshMovieData = async () => {
+    movieCache.delete(id);
     const updatedMovieData = await getMovieById(id);
     setMovie(updatedMovieData);
   };
@@ -140,7 +141,7 @@ const MovieDetail = () => {
             <div className="review-header">
               <div className="reviewer-info">
                 <span className="reviewer-name">
-                  {review.user_public_profiles?.name || "Anonymous User"}
+                  {review.user_public_profiles?.name || "User"}
                 </span>
                 <div className="review-rating">
                   <span className="stars">
