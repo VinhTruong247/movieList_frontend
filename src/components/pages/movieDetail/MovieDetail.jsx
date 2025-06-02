@@ -403,78 +403,74 @@ const MovieDetail = () => {
       <div className="movie-detail-content">
         {activeTab === "overview" && (
           <div className="tab-content overview-tab">
-            <div className="content-layout">
-              <div className="main-content">
-                {movie.description && (
-                  <div className="info-section">
-                    <h3 className="section-title">Description</h3>
-                    <div className="movie-description">{movie.description}</div>
-                  </div>
-                )}
-
+            <div className="main-content">
+              {movie.description && (
                 <div className="info-section">
-                  <h3 className="section-title">Movie Details</h3>
-                  <div className="details-grid">
-                    <div className="detail-item">
-                      <span className="detail-label">Release Year</span>
-                      <span className="detail-value">
-                        {movie.year || "Unknown"}
-                      </span>
-                    </div>
-                    <div className="detail-item">
-                      <span className="detail-label">Language</span>
-                      <span className="detail-value">
-                        {movie.language || "Not specified"}
-                      </span>
-                    </div>
-                    <div className="detail-item">
-                      <span className="detail-label">Country</span>
-                      <span className="detail-value">
-                        {movie.country || "Not specified"}
-                      </span>
-                    </div>
-                    <div className="detail-item">
-                      <span className="detail-label">Type</span>
-                      <span className="detail-value">
-                        {movie.type || "Movie"}
-                      </span>
-                    </div>
+                  <h3 className="section-title">Description</h3>
+                  <div className="movie-description">{movie.description}</div>
+                </div>
+              )}
+
+              <div className="info-section">
+                <h3 className="section-title">Movie Details</h3>
+                <div className="details-grid">
+                  <div className="detail-item">
+                    <span className="detail-label">Release Year</span>
+                    <span className="detail-value">
+                      {movie.year || "Unknown"}
+                    </span>
+                  </div>
+                  <div className="detail-item">
+                    <span className="detail-label">Language</span>
+                    <span className="detail-value">
+                      {movie.language || "Not specified"}
+                    </span>
+                  </div>
+                  <div className="detail-item">
+                    <span className="detail-label">Country</span>
+                    <span className="detail-value">
+                      {movie.country || "Not specified"}
+                    </span>
+                  </div>
+                  <div className="detail-item">
+                    <span className="detail-label">Type</span>
+                    <span className="detail-value">
+                      {movie.type || "Movie"}
+                    </span>
                   </div>
                 </div>
               </div>
+            </div>
 
-              <div className="sidebar-content">
-                <SimilarMovie currentMovie={movie} />
-              </div>
+            <div className="sidebar-content">
+              <SimilarMovie currentMovie={movie} />
             </div>
           </div>
         )}
 
         {activeTab === "cast" && (
           <div className="tab-content cast-tab">
-            <div className="content-layout">
-              <div className="main-content">
-                {movie.MovieDirectors && movie.MovieDirectors.length > 0 && (
-                  <div className="info-section">
-                    <h3 className="section-title">Directors</h3>
-                    <div className="directors-list">
-                      {movie.MovieDirectors.map((director, index) => (
-                        <span key={index} className="director-tag">
-                          {director.Directors?.name}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
+            <div className="main-content">
+              {movie.MovieDirectors && movie.MovieDirectors.length > 0 && (
                 <div className="info-section">
-                  <h3 className="section-title">Cast</h3>
-                  {renderCast()}
+                  <h3 className="section-title">Directors</h3>
+                  <div className="directors-list">
+                    {movie.MovieDirectors.map((director, index) => (
+                      <span key={index} className="director-tag">
+                        {director.Directors?.name}
+                      </span>
+                    ))}
+                  </div>
                 </div>
+              )}
+              <div className="info-section">
+                <h3 className="section-title">Cast</h3>
+                {renderCast()}
               </div>
+            </div>
 
-              <div className="sidebar-content">
-                <SimilarMovie currentMovie={movie} />
-              </div>
+            <div className="sidebar-content">
+              <SimilarMovie currentMovie={movie} />
             </div>
           </div>
         )}

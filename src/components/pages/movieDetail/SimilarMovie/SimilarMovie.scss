@@ -1,116 +1,394 @@
+@use "../../../../styles/root" as *;
+@use "sass:color";
+
 .similar-movies-section {
+  margin-top: 3rem;
+  padding: 2.5rem;
+  background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+  border-radius: 20px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba($primary-color, 0.08);
+
   h2 {
-    font-size: 1.5rem;
-    margin-bottom: 1.5rem;
-    color: #333;
+    font-size: 2.25rem;
+    font-weight: 800;
+    color: $primary-color;
+    margin-bottom: 2rem;
+    text-align: center;
     position: relative;
+    padding-bottom: 1rem;
 
     &::after {
       content: "";
       position: absolute;
-      bottom: -8px;
-      left: 0;
-      width: 60px;
-      height: 3px;
-      background-color: #3498db;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80px;
+      height: 4px;
+      background: linear-gradient(135deg, $primary-color, $accent-color);
+      border-radius: 2px;
+    }
+
+    @media (max-width: 768px) {
+      font-size: 2rem;
+    }
+
+    @media (max-width: 480px) {
+      font-size: 1.75rem;
     }
   }
 
   .similar-movies-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 1.5rem;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
 
-    @media (min-width: 768px) {
-      grid-template-columns: repeat(4, 1fr);
+    @media (max-width: 1200px) {
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+    }
+
+    @media (max-width: 768px) {
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.25rem;
+    }
+
+    @media (max-width: 480px) {
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
     }
   }
 
   .similar-movie-card {
-    display: flex;
-    flex-direction: column;
-    background: #fff;
-    border-radius: 8px;
+    background: white;
+    border-radius: 16px;
     overflow: hidden;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    transition:
-      transform 0.3s ease,
-      box-shadow 0.3s ease;
     text-decoration: none;
     color: inherit;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+    border: 1px solid rgba($primary-color, 0.05);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
 
     &:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
-    }
+      transform: translateY(-8px) scale(1.02);
+      box-shadow: 0 20px 40px rgba($primary-color, 0.15);
+      border-color: rgba($primary-color, 0.12);
 
-    .similar-movie-poster {
-      position: relative;
-      aspect-ratio: 2/3;
+      .similar-movie-poster {
+        &::before {
+          opacity: 1;
+        }
 
-      img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
+        img {
+          transform: scale(1.05);
+        }
+
+        .movie-type {
+          transform: translateY(-2px);
+          box-shadow: 0 6px 15px rgba($primary-color, 0.4);
+        }
       }
 
-      .movie-type {
-        position: absolute;
-        top: 10px;
-        left: 10px;
-        background: rgba(0, 0, 0, 0.7);
-        color: white;
-        padding: 3px 8px;
-        border-radius: 4px;
-        font-size: 0.7rem;
-        font-weight: 500;
-      }
-    }
+      .similar-movie-info {
+        background: linear-gradient(135deg, white 0%, #f8fafc 100%);
 
-    .similar-movie-genre {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      margin-bottom: 8px;
-
-      .genre-tag {
-        font-size: 0.7rem;
-        padding: 2px 6px;
-        background-color: rgba(52, 152, 219, 0.1);
-        color: #3498db;
-        border-radius: 4px;
-        white-space: nowrap;
-      }
-
-      .more-genres {
-        font-size: 0.7rem;
-        color: #888;
-        padding: 2px 6px;
-      }
-    }
-
-    .similar-movie-info {
-      padding: 0.75rem;
-
-      .similar-movie-title {
-        font-size: 1rem;
-        font-weight: 600;
-        margin-bottom: 0.5rem;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-      }
-
-      .similar-movie-meta {
-        display: flex;
-        justify-content: space-between;
-        font-size: 0.8rem;
-        color: #666;
-
-        .rating {
-          font-weight: 500;
+        .similar-movie-title {
+          color: $accent-color;
         }
       }
     }
+
+    &:active {
+      transform: translateY(-4px) scale(1.01);
+    }
+  }
+
+  .similar-movie-poster {
+    position: relative;
+    height: 520px;
+    overflow: hidden;
+    background: linear-gradient(45deg, #f1f5f9, #e2e8f0);
+
+    &::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(
+        135deg,
+        rgba($primary-color, 0.1) 0%,
+        rgba($accent-color, 0.1) 100%
+      );
+      opacity: 0;
+      transition: opacity 0.4s ease;
+      z-index: 1;
+    }
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .movie-type {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background: linear-gradient(135deg, $primary-color, $accent-color);
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 10px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 4px 12px rgba($primary-color, 0.3);
+      z-index: 2;
+      transition: all 0.3s ease;
+
+      @media (max-width: 480px) {
+        top: 0.75rem;
+        right: 0.75rem;
+        padding: 0.4rem 0.8rem;
+        font-size: 0.75rem;
+      }
+    }
+
+    @media (max-width: 768px) {
+      height: 280px;
+    }
+
+    @media (max-width: 480px) {
+      height: 240px;
+    }
+  }
+
+  .similar-movie-info {
+    padding: 1.5rem;
+    background: white;
+    transition: background 0.3s ease;
+
+    @media (max-width: 480px) {
+      padding: 1.25rem;
+    }
+  }
+
+  .similar-movie-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: $primary-color;
+    margin-bottom: 1rem;
+    line-height: 1.3;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    transition: color 0.3s ease;
+
+    @media (max-width: 480px) {
+      font-size: 1.1rem;
+      margin-bottom: 0.75rem;
+    }
+  }
+
+  .similar-movie-genre {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+
+    .genre-tag {
+      background: linear-gradient(
+        135deg,
+        rgba($accent-color, 0.1),
+        rgba($accent-color, 0.15)
+      );
+      color: $accent-color;
+      padding: 0.4rem 0.8rem;
+      border-radius: 12px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      border: 1px solid rgba($accent-color, 0.2);
+      transition: all 0.3s ease;
+
+      &:hover {
+        background: linear-gradient(
+          135deg,
+          rgba($accent-color, 0.2),
+          rgba($accent-color, 0.25)
+        );
+        transform: translateY(-1px);
+      }
+
+      @media (max-width: 480px) {
+        padding: 0.35rem 0.7rem;
+        font-size: 0.75rem;
+      }
+    }
+
+    .more-genres {
+      background: rgba($primary-color, 0.1);
+      color: $primary-color;
+      padding: 0.4rem 0.8rem;
+      border-radius: 12px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      border: 1px solid rgba($primary-color, 0.2);
+
+      @media (max-width: 480px) {
+        padding: 0.35rem 0.7rem;
+        font-size: 0.75rem;
+      }
+    }
+  }
+
+  .similar-movie-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    background: #f8fafc;
+    border-radius: 10px;
+    border: 1px solid rgba($primary-color, 0.08);
+
+    .year {
+      color: $primary-color;
+      font-weight: 600;
+      background: rgba($primary-color, 0.1);
+      padding: 0.25rem 0.75rem;
+      border-radius: 6px;
+      font-size: 0.9rem;
+
+      @media (max-width: 480px) {
+        font-size: 0.85rem;
+        padding: 0.2rem 0.6rem;
+      }
+    }
+
+    .rating {
+      color: #f59e0b;
+      font-weight: 600;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+
+      @media (max-width: 480px) {
+        font-size: 0.85rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      padding: 0.6rem 0.8rem;
+    }
+  }
+
+  .error-message {
+    text-align: center;
+    padding: 2rem;
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 12px;
+    color: #dc2626;
+    font-size: 1rem;
+    font-weight: 500;
+    margin: 1rem 0;
+  }
+
+  @media (max-width: 768px) {
+    margin-top: 2rem;
+    padding: 2rem;
+    border-radius: 16px;
+  }
+
+  @media (max-width: 480px) {
+    margin-top: 1.5rem;
+    padding: 1.5rem;
+    border-radius: 12px;
+
+    h2 {
+      margin-bottom: 1.5rem;
+      padding-bottom: 0.75rem;
+
+      &::after {
+        width: 60px;
+        height: 3px;
+      }
+    }
+  }
+}
+
+.similar-movies-section .loader-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
+  background: transparent;
+}
+
+.similar-movies-section:empty {
+  display: none;
+}
+
+.similar-movie-card {
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fadeInUp 0.6s ease forwards;
+}
+
+.similar-movie-card:nth-child(1) {
+  animation-delay: 0.1s;
+}
+.similar-movie-card:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.similar-movie-card:nth-child(3) {
+  animation-delay: 0.3s;
+}
+.similar-movie-card:nth-child(4) {
+  animation-delay: 0.4s;
+}
+
+@keyframes fadeInUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.similar-movie-skeleton {
+  .similar-movie-poster {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: shimmer 2s infinite;
+  }
+
+  .similar-movie-info {
+    .similar-movie-title,
+    .genre-tag,
+    .year,
+    .rating {
+      background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+      background-size: 200% 100%;
+      animation: shimmer 2s infinite;
+      color: transparent;
+    }
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
   }
 }
