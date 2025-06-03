@@ -10,7 +10,6 @@ import ProfilePage from "../components/pages/profile/ProfilePage";
 import NotAuthen from "../components/common/NotAuthen";
 import NotFound from "../components/common/NotFound";
 import NotLogin from "../components/common/NotLogin";
-import ProtectedRoute from "./ProtectedRoute";
 import { Navigate } from "react-router";
 
 const AppRoutes = [
@@ -21,11 +20,7 @@ const AppRoutes = [
     children: [
       {
         path: "",
-        element: (
-          <ProtectedRoute allowGuest={true}>
-            <Home />
-          </ProtectedRoute>
-        ),
+        element: <Home />,
       },
       {
         path: "profile",
@@ -33,19 +28,11 @@ const AppRoutes = [
       },
       {
         path: "movie/:id",
-        element: (
-          <ProtectedRoute allowGuest={true}>
-            <MovieDetail />
-          </ProtectedRoute>
-        ),
+        element: <MovieDetail />,
       },
       {
         path: "favorites",
-        element: (
-          <ProtectedRoute>
-            <Favorites />
-          </ProtectedRoute>
-        ),
+        element: <Favorites />,
       },
       {
         path: "login",
@@ -59,11 +46,7 @@ const AppRoutes = [
   },
   {
     path: "admin",
-    element: (
-      <ProtectedRoute requireAdmin={true}>
-        <AdminLayout />
-      </ProtectedRoute>
-    ),
+    element: <AdminLayout />,
     children: [
       {
         path: "",

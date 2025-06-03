@@ -56,18 +56,17 @@ const LoginPage = () => {
         password: values.password,
       });
 
-      if (response.userData.isDisabled) {
-        setError("Your account has been disabled. Please contact support.");
-        return;
-      }
-
       if (response.userData.role === "admin") {
         navigate("/admin");
       } else {
         navigate("/");
       }
     } catch (err) {
-      setError("Invalid email or password. Please try again.");
+      if (err.message.includes("disabled")) {
+        setError("Your account has been disabled. Please contact support.");
+      } else {
+        setError("Invalid email or password. Please try again.");
+      }
     } finally {
       setSubmitting(false);
     }

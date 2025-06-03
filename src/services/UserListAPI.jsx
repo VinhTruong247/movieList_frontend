@@ -16,6 +16,13 @@ export const loginUser = async ({ email, password }) => {
 
   if (userError) throw userError;
 
+  if (userData.isDisabled) {
+    localStorage.clear();
+    sessionStorage.clear();
+    await supabase.auth.signOut();
+    throw new Error("Account has been disabled. Please contact support.");
+  }
+
   return {
     session: data.session,
     userData,
@@ -28,8 +35,8 @@ export const signUp = async ({ email, password, username, name }) => {
     password,
     options: {
       data: {
-        name: name || username,
-        username,
+        name: name,
+        username: username,
         role: "user",
         isDisabled: false,
       },
@@ -38,12 +45,30 @@ export const signUp = async ({ email, password, username, name }) => {
 
   if (error) throw error;
 
+  if (data.user) {
+    const { error: insertError } = await supabase
+      .from("Users")
+      .insert({
+        id: data.user.id,
+        email: data.user.email,
+        name: name,
+        username: username,
+        role: "user",
+        isDisabled: false,
+      });
+
+    if (insertError) throw insertError;
+  }
+
   return data;
 };
 
 export const logoutUser = async (navigate) => {
   const { error } = await supabase.auth.signOut();
   if (error) throw error;
+  localStorage.clear();
+  sessionStorage.clear();
+
   if (navigate) {
     navigate("/login");
   }
@@ -67,6 +92,11 @@ export const getCurrentUser = async () => {
 
     if (userError) {
       console.warn(userError);
+      return null;
+    }
+
+    if (userData.isDisabled) {
+      await supabase.auth.signOut();
       return null;
     }
 
