@@ -11,11 +11,12 @@ export const getMovies = async (filters = {}, isAdmin = false) => {
     ),
     MovieActors (
       actor_id,
-      Actors (id, name)
+      character_name,
+      Actors (id, name, image_url, isDisabled)
     ),
     MovieDirectors (
       director_id, 
-      Directors (id, name)
+      Directors (id, name, image_url, isDisabled)
     ),
     Reviews (id, rating, comment, user_id, created_at,
     user_public_profiles!Reviews_user_id_fkey (
@@ -63,10 +64,10 @@ export const getMovieById = async (movieId, isAdmin = false) => {
       MovieActors (
       actor_id,
       character_name,
-      Actors (id, name)
+      Actors (id, name, image_url, isDisabled)
       ),
       MovieDirectors (
-        Directors (id, name)
+        Directors (id, name, image_url, isDisabled)
       ),
       Reviews (id, rating, comment, user_id, created_at,
       user_public_profiles!Reviews_user_id_fkey (

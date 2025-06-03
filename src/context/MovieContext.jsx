@@ -150,7 +150,7 @@ export const MovieProvider = ({ children }) => {
 
   useEffect(() => {
     const userRole = currentUser?.role;
-    loadMoviesBasedOnUserRole(currentUser);
+    loadMoviesBasedOnUserRole(userRole);
   }, [currentUser?.role, loadMoviesBasedOnUserRole]);
 
   useEffect(() => {
@@ -198,18 +198,20 @@ export const MovieProvider = ({ children }) => {
     [currentUser, movies, favorites, syncedFavorites]
   );
 
+  const value = {
+    movies,
+    loading,
+    error,
+    currentUser,
+    favorites,
+    syncedFavorites,
+    toggleFavorite,
+    setCurrentUser,
+    setMovies,
+  };
+
   return (
-    <MovieContext.Provider
-      value={{
-        movies,
-        loading,
-        error,
-        currentUser,
-        favorites,
-        syncedFavorites,
-        toggleFavorite,
-      }}
-    >
+    <MovieContext.Provider value={value}>
       {children}
     </MovieContext.Provider>
   );

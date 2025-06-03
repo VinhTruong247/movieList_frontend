@@ -30,6 +30,8 @@ const MovieDetail = () => {
   const [deletingReviewId, setDeletingReviewId] = useState(null);
   const navigate = useNavigate();
 
+  const isAdmin = currentUser?.role === "admin";
+
   useEffect(() => {
     const fetchMovie = async () => {
       try {
@@ -84,11 +86,24 @@ const MovieDetail = () => {
       return <div className="no-data">No cast information available</div>;
     }
 
+    const visibleActors = movie.MovieActors.filter(actorRole => 
+      isAdmin || !actorRole.Actors?.isDisabled
+    );
+
+    if (visibleActors.length === 0) {
+      return <div className="no-data">No cast information available</div>;
+    }
+
     return (
       <div className="cast-grid">
-        {movie.MovieActors.map((actorRole, index) => (
+        {visibleActors.map((actorRole, index) => (
           <div key={index} className="cast-card">
-            <div className="actor-name">{actorRole.Actors?.name}</div>
+            <div className={`actor-name ${isAdmin && actorRole.Actors?.isDisabled ? "disabled-actor" : ""}`}>
+              {actorRole.Actors?.name}
+              {isAdmin && actorRole.Actors?.isDisabled && (
+                <span className="disabled-indicator"> (disabled)</span>
+              )}
+            </div>
             {actorRole.character_name && (
               <div className="character-name">
                 as {actorRole.character_name}
@@ -98,6 +113,58 @@ const MovieDetail = () => {
         ))}
       </div>
     );
+  };
+
+  const renderDirectors = () => {
+    if (!movie.MovieDirectors || movie.MovieDirectors.length === 0) {
+      return <span className="no-directors">No directors specified</span>;
+    }
+
+    const visibleDirectors = movie.MovieDirectors.filter(director => 
+      isAdmin || !director.Directors?.isDisabled
+    );
+
+    if (visibleDirectors.length === 0) {
+      return <span className="no-directors">No directors specified</span>;
+    }
+
+    return visibleDirectors.map((director, index) => (
+      <span 
+        key={index} 
+        className={`director-tag ${isAdmin && director.Directors?.isDisabled ? "disabled-director" : ""}`}
+      >
+        {director.Directors?.name}
+        {isAdmin && director.Directors?.isDisabled && (
+          <span className="disabled-indicator"> (disabled)</span>
+        )}
+      </span>
+    ));
+  };
+
+  const renderGenres = () => {
+    if (!movie.MovieGenres || movie.MovieGenres.length === 0) {
+      return <span className="no-genres">No genres specified</span>;
+    }
+
+    const visibleGenres = movie.MovieGenres.filter(genre => 
+      isAdmin || !genre.Genres?.isDisabled
+    );
+
+    if (visibleGenres.length === 0) {
+      return <span className="no-genres">No genres specified</span>;
+    }
+
+    return visibleGenres.map((genre, index) => (
+      <span 
+        key={index} 
+        className={`genre-tag ${isAdmin && genre.Genres?.isDisabled ? "disabled-genre" : ""}`}
+      >
+        {genre.Genres?.name}
+        {isAdmin && genre.Genres?.isDisabled && (
+          <span className="disabled-indicator"> (disabled)</span>
+        )}
+      </span>
+    ));
   };
 
   const formatReviewTime = (createdAt) => {
@@ -334,15 +401,7 @@ const MovieDetail = () => {
             </div>
 
             <div className="movie-genres">
-              {movie.MovieGenres && movie.MovieGenres.length > 0 ? (
-                movie.MovieGenres.map((genre, index) => (
-                  <span key={index} className="genre-tag">
-                    {genre.Genres?.name}
-                  </span>
-                ))
-              ) : (
-                <span className="no-genres">No genres specified</span>
-              )}
+              {renderGenres()}
             </div>
 
             <div className="movie-actions">
@@ -451,18 +510,12 @@ const MovieDetail = () => {
         {activeTab === "cast" && (
           <div className="tab-content cast-tab">
             <div className="main-content">
-              {movie.MovieDirectors && movie.MovieDirectors.length > 0 && (
-                <div className="info-section">
-                  <h3 className="section-title">Directors</h3>
-                  <div className="directors-list">
-                    {movie.MovieDirectors.map((director, index) => (
-                      <span key={index} className="director-tag">
-                        {director.Directors?.name}
-                      </span>
-                    ))}
-                  </div>
+              <div className="info-section">
+                <h3 className="section-title">Directors</h3>
+                <div className="directors-list">
+                  {renderDirectors()}
                 </div>
-              )}
+              </div>
               <div className="info-section">
                 <h3 className="section-title">Cast</h3>
                 {renderCast()}

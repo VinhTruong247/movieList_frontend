@@ -16,9 +16,9 @@ const LoginPage = () => {
         const userData = await getCurrentUser();
         if (userData && userData.userData) {
           if (userData.userData.isDisabled) {
+            setError("Your account has been disabled. Please contact support.");
             localStorage.removeItem('token');
             sessionStorage.removeItem('token');
-            setError("Your account has been disabled. Please contact support.");
             setCheckingSession(false);
             return;
           }
