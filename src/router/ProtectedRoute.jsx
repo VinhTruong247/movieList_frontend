@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Navigate } from 'react-router';
-import { getCurrentUser } from '../../services/UserListAPI';
+import { getCurrentUser } from '../services/UserListAPI';
 
 const ProtectedRoute = ({ children, requireAdmin = false, allowGuest = false }) => {
   const [loading, setLoading] = useState(true);
