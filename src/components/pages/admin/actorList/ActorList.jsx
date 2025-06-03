@@ -2,7 +2,6 @@ import { useState, useEffect, useMemo } from "react";
 import supabase from "../../../../supabase-client";
 import ActorForm from "./actorForm/ActorForm";
 import "../ListStyle.scss";
-import { defaultAllowedOrigins } from "vite";
 
 const ActorList = () => {
   const [actors, setActors] = useState([]);
