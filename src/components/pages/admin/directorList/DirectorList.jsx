@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import supabase from "../../../../supabase-client";
-import DirectorForm from "./directorForm/DirectorForm";
+import DirectorFormPopup from "./directorForm/DirectorFormPopup";
 import "../ListStyle.scss";
 
 const DirectorList = () => {
@@ -459,10 +459,10 @@ const DirectorList = () => {
       )}
 
       {showForm && (
-        <DirectorForm
+        <DirectorFormPopup
           director={editingDirector}
           onSubmit={handleSubmit}
-          onCancel={() => setShowForm(false)}
+          onClose={() => setShowForm(false)}
           isSubmitting={false}
         />
       )}
@@ -494,8 +494,9 @@ const DirectorList = () => {
                   <td>{director.name}</td>
                   <td>
                     <span
-                      className={`status-badge ${director.isDisabled ? "disabled" : "active"
-                        }`}
+                      className={`status-badge ${
+                        director.isDisabled ? "disabled" : "active"
+                      }`}
                     >
                       {director.isDisabled ? "Disabled" : "Active"}
                     </span>

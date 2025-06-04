@@ -1,21 +1,12 @@
 import { useState, useEffect, useMemo } from "react";
 import supabase from "../../../../supabase-client";
-import ActorForm from "./actorForm/ActorForm";
+import ActorFormPopup from "./actorForm/ActorFormPopup";
 import "../ListStyle.scss";
 
 const ActorList = () => {
   const [actors, setActors] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [showForm, setShowForm] = useState(false);
-  const [editingActor, setEditingActor] = useState(null);
-  const [notification, setNotification] = useState({
-    show: false,
-    message: "",
-    type: "",
-  });
-
-  const [searchQuery, setSearchQuery] = useState("");
   const [showFilters, setShowFilters] = useState(false);
   const [filters, setFilters] = useState({
     status: "",
@@ -33,6 +24,16 @@ const ActorList = () => {
 
   const ITEMS_PER_PAGE = 10;
   const [currentPage, setCurrentPage] = useState(1);
+  const [showActorForm, setShowActorForm] = useState(false);
+  const [editingActor, setEditingActor] = useState(null);
+  const [notification, setNotification] = useState({
+    show: false,
+    message: "",
+    type: "",
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     fetchActors();
@@ -252,12 +253,17 @@ const ActorList = () => {
 
   const handleAddActor = () => {
     setEditingActor(null);
-    setShowForm(true);
+    setShowActorForm(true);
   };
 
   const handleEditActor = (actor) => {
     setEditingActor(actor);
-    setShowForm(true);
+    setShowActorForm(true);
+  };
+
+  const handleCloseForm = () => {
+    setShowActorForm(false);
+    setEditingActor(null);
   };
 
   const handleToggleStatus = async (actor) => {
@@ -294,7 +300,8 @@ const ActorList = () => {
     }
   };
 
-  const handleSubmit = async (values, { setSubmitting, resetForm }) => {
+  const handleSubmitActor = async (values, { setSubmitting, resetForm }) => {
+    setIsSubmitting(true);
     try {
       if (editingActor) {
         const { error } = await supabase
@@ -354,7 +361,7 @@ const ActorList = () => {
       }
 
       resetForm();
-      setShowForm(false);
+      setShowActorForm(false);
     } catch (err) {
       console.error("Error saving actor:", err);
       setNotification({
@@ -363,7 +370,7 @@ const ActorList = () => {
         type: "error",
       });
     } finally {
-      setSubmitting(false);
+      setIsSubmitting(false);
     }
   };
 
@@ -457,12 +464,12 @@ const ActorList = () => {
         </div>
       )}
 
-      {showForm && (
-        <ActorForm
+      {showActorForm && (
+        <ActorFormPopup
           actor={editingActor}
-          onSubmit={handleSubmit}
-          onCancel={() => setShowForm(false)}
-          isSubmitting={false}
+          onSubmit={handleSubmitActor}
+          onClose={handleCloseForm}
+          isSubmitting={isSubmitting}
         />
       )}
 
