@@ -44,7 +44,11 @@ const DirectorForm = ({ director, onSubmit, onCancel, isSubmitting }) => {
                   className={errors.name && touched.name ? "error" : ""}
                   autoFocus
                 />
-                <ErrorMessage name="name" component="div" className="error-message" />
+                <ErrorMessage
+                  name="name"
+                  component="div"
+                  className="error-message"
+                />
               </div>
               <div className="form-group">
                 <label htmlFor="biography">Biography</label>
@@ -54,9 +58,15 @@ const DirectorForm = ({ director, onSubmit, onCancel, isSubmitting }) => {
                   as="textarea"
                   rows="4"
                   placeholder="Enter biography"
-                  className={errors.biography && touched.biography ? "error" : ""}
+                  className={
+                    errors.biography && touched.biography ? "error" : ""
+                  }
                 />
-                <ErrorMessage name="biography" component="div" className="error-message" />
+                <ErrorMessage
+                  name="biography"
+                  component="div"
+                  className="error-message"
+                />
               </div>
               <div className="form-group">
                 <label htmlFor="nationality">Nationality</label>
@@ -65,9 +75,15 @@ const DirectorForm = ({ director, onSubmit, onCancel, isSubmitting }) => {
                   name="nationality"
                   type="text"
                   placeholder="Enter nationality"
-                  className={errors.nationality && touched.nationality ? "error" : ""}
+                  className={
+                    errors.nationality && touched.nationality ? "error" : ""
+                  }
                 />
-                <ErrorMessage name="nationality" component="div" className="error-message" />
+                <ErrorMessage
+                  name="nationality"
+                  component="div"
+                  className="error-message"
+                />
               </div>
               <div className="form-group">
                 <label htmlFor="imageUrl">Image URL</label>
@@ -78,7 +94,11 @@ const DirectorForm = ({ director, onSubmit, onCancel, isSubmitting }) => {
                   placeholder="https://example.com/image.jpg"
                   className={errors.imageUrl && touched.imageUrl ? "error" : ""}
                 />
-                <ErrorMessage name="imageUrl" component="div" className="error-message" />
+                <ErrorMessage
+                  name="imageUrl"
+                  component="div"
+                  className="error-message"
+                />
               </div>
               {isEditMode && (
                 <div className="form-group status-toggle">
@@ -86,16 +106,31 @@ const DirectorForm = ({ director, onSubmit, onCancel, isSubmitting }) => {
                     <Field type="checkbox" name="isDisabled" />
                     <span className="label-text">Disable this director</span>
                   </label>
-                  <small>Disabled directors won't appear in user searches</small>
+                  <small>
+                    Disabled directors won't appear in user searches
+                  </small>
                 </div>
               )}
             </div>
             <div className="form-actions">
-              <button type="button" onClick={onCancel} className="cancel-btn" disabled={isSubmitting}>
+              <button
+                type="button"
+                onClick={onCancel}
+                className="cancel-btn"
+                disabled={isSubmitting}
+              >
                 Cancel
               </button>
-              <button type="submit" className="submit-btn" disabled={isSubmitting}>
-                {isSubmitting ? "Saving..." : isEditMode ? "Update Director" : "Add Director"}
+              <button
+                type="submit"
+                className="submit-btn"
+                disabled={isSubmitting}
+              >
+                {isSubmitting
+                  ? "Saving..."
+                  : isEditMode
+                    ? "Update Director"
+                    : "Add Director"}
               </button>
             </div>
           </Form>
