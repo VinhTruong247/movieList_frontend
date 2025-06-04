@@ -1,10 +1,10 @@
 import { useState, useEffect, useContext } from "react";
 import { useParams, Link } from "react-router";
-import { getDirectorById } from "../../../services/DirectorAPI";
-import { getMovies } from "../../../services/MovieListAPI";
-import { MovieContext } from "../../../context/MovieContext";
-import MovieCard from "../home/movieCard/MovieCard";
-import Loader from "../../common/Loader";
+import { getDirectorById } from "../../../../services/DirectorsAPI";
+import { getMovies } from "../../../../services/MovieListAPI";
+import { MovieContext } from "../../../../context/MovieContext";
+import MovieCard from "../../home/movieCard/MovieCard";
+import Loader from "../../../common/Loader";
 import "./DirectorDetail.scss";
 
 const DirectorDetail = () => {

@@ -1,5 +1,5 @@
 import { useState, useEffect, useContext } from "react";
-import { useParams, useNavigate } from "react-router";
+import { useParams, useNavigate, Link } from "react-router";
 import { getMovieById, movieCache } from "../../../services/MovieListAPI";
 import {
   addReview,
@@ -86,8 +86,8 @@ const MovieDetail = () => {
       return <div className="no-data">No cast information available</div>;
     }
 
-    const visibleActors = movie.MovieActors.filter(actorRole => 
-      isAdmin || !actorRole.Actors?.isDisabled
+    const visibleActors = movie.MovieActors.filter(
+      (actorRole) => isAdmin || !actorRole.Actors?.isDisabled
     );
 
     if (visibleActors.length === 0) {
@@ -98,7 +98,9 @@ const MovieDetail = () => {
       <div className="cast-grid">
         {visibleActors.map((actorRole, index) => (
           <div key={index} className="cast-card">
-            <div className={`actor-name ${isAdmin && actorRole.Actors?.isDisabled ? "disabled-actor" : ""}`}>
+            <div
+              className={`actor-name ${isAdmin && actorRole.Actors?.isDisabled ? "disabled-actor" : ""}`}
+            >
               {actorRole.Actors?.name}
               {isAdmin && actorRole.Actors?.isDisabled && (
                 <span className="disabled-indicator"> (disabled)</span>
@@ -120,8 +122,8 @@ const MovieDetail = () => {
       return <span className="no-directors">No directors specified</span>;
     }
 
-    const visibleDirectors = movie.MovieDirectors.filter(director => 
-      isAdmin || !director.Directors?.isDisabled
+    const visibleDirectors = movie.MovieDirectors.filter(
+      (director) => isAdmin || !director.Directors?.isDisabled
     );
 
     if (visibleDirectors.length === 0) {
@@ -129,15 +131,17 @@ const MovieDetail = () => {
     }
 
     return visibleDirectors.map((director, index) => (
-      <span 
-        key={index} 
-        className={`director-tag ${isAdmin && director.Directors?.isDisabled ? "disabled-director" : ""}`}
-      >
-        {director.Directors?.name}
-        {isAdmin && director.Directors?.isDisabled && (
-          <span className="disabled-indicator"> (disabled)</span>
-        )}
-      </span>
+      <Link to={`/director/${director.Directors?.id}`}>
+        <span
+          key={index}
+          className={`director-tag ${isAdmin && director.Directors?.isDisabled ? "disabled-director" : ""}`}
+        >
+          {director.Directors?.name}
+          {isAdmin && director.Directors?.isDisabled && (
+            <span className="disabled-indicator"> (disabled)</span>
+          )}
+        </span>
+      </Link>
     ));
   };
 
@@ -146,8 +150,8 @@ const MovieDetail = () => {
       return <span className="no-genres">No genres specified</span>;
     }
 
-    const visibleGenres = movie.MovieGenres.filter(genre => 
-      isAdmin || !genre.Genres?.isDisabled
+    const visibleGenres = movie.MovieGenres.filter(
+      (genre) => isAdmin || !genre.Genres?.isDisabled
     );
 
     if (visibleGenres.length === 0) {
@@ -155,8 +159,8 @@ const MovieDetail = () => {
     }
 
     return visibleGenres.map((genre, index) => (
-      <span 
-        key={index} 
+      <span
+        key={index}
         className={`genre-tag ${isAdmin && genre.Genres?.isDisabled ? "disabled-genre" : ""}`}
       >
         {genre.Genres?.name}
@@ -400,9 +404,7 @@ const MovieDetail = () => {
               </div>
             </div>
 
-            <div className="movie-genres">
-              {renderGenres()}
-            </div>
+            <div className="movie-genres">{renderGenres()}</div>
 
             <div className="movie-actions">
               {movie.trailer_url && (
@@ -512,9 +514,7 @@ const MovieDetail = () => {
             <div className="main-content">
               <div className="info-section">
                 <h3 className="section-title">Directors</h3>
-                <div className="directors-list">
-                  {renderDirectors()}
-                </div>
+                <div className="directors-list">{renderDirectors()}</div>
               </div>
               <div className="info-section">
                 <h3 className="section-title">Cast</h3>

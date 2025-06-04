@@ -1,5 +1,6 @@
 import Home from "../components/pages/home/Home";
 import MovieDetail from "../components/pages/movieDetail/MovieDetail";
+import DirectorDetail from "../components/pages/director/DirectorDetail/DirectorDetail";
 import Favorites from "../components/pages/favorites/Favorites";
 import LoginPage from "../components/auth/LoginPage";
 import RegisterPage from "../components/auth/RegisterPage";
@@ -29,6 +30,10 @@ const AppRoutes = [
       {
         path: "movie/:id",
         element: <MovieDetail />,
+      },
+      {
+        path: "director/:id",
+        element: <DirectorDetail />,
       },
       {
         path: "favorites",

@@ -1,4 +1,4 @@
-@use "../../../styles/root" as *;
+@use "../../../../styles/root" as *;
 @use "sass:color";
 
 .director-detail-container {
@@ -72,6 +72,7 @@
   .director-image {
     position: relative;
     border-radius: 20px;
+    height: 415px;
     overflow: hidden;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
     border: 4px solid rgba(255, 255, 255, 0.2);
@@ -79,7 +80,7 @@
 
     img {
       width: 100%;
-      height: 400px;
+      height: 415px;
       object-fit: cover;
       transition: transform 0.5s ease;
 
@@ -274,7 +275,7 @@
 
 .director-filmography {
   padding: 4rem 0;
-  background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+  background: $background-color;
 
   .container {
     max-width: 1400px;
@@ -293,7 +294,7 @@
     h2 {
       font-size: 2.5rem;
       font-weight: 800;
-      color: $primary-color;
+      color: white;
       margin-bottom: 1rem;
       position: relative;
       padding-bottom: 1rem;
