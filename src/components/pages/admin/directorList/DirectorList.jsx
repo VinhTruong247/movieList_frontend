@@ -1,5 +1,10 @@
 import { useState, useEffect, useMemo } from "react";
-import supabase from "../../../../supabase-client";
+import {
+  getDirectorsWithMovieCount,
+  createDirector,
+  updateDirector,
+  toggleDirectorStatus,
+} from "../../../../services/DirectorsAPI";
 import DirectorFormPopup from "./directorForm/DirectorFormPopup";
 import "../ListStyle.scss";
 
@@ -9,6 +14,7 @@ const DirectorList = () => {
   const [error, setError] = useState(null);
   const [showForm, setShowForm] = useState(false);
   const [editingDirector, setEditingDirector] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [notification, setNotification] = useState({
     show: false,
     message: "",
@@ -48,6 +54,14 @@ const DirectorList = () => {
     }
   }, [notification.show]);
 
+  const showNotification = (message, type = "success") => {
+    setNotification({
+      show: true,
+      message,
+      type,
+    });
+  };
+
   const requestSort = (key) => {
     let direction = "asc";
     if (sortConfig.key === key && sortConfig.direction === "asc") {
@@ -66,30 +80,13 @@ const DirectorList = () => {
   const fetchDirectors = async () => {
     setLoading(true);
     try {
-      const { data: directorsData, error: directorsError } = await supabase
-        .from("Directors")
-        .select("*")
-        .order("name");
-
-      if (directorsError) throw directorsError;
-      const { data: movieCountsData, error: movieCountsError } =
-        await supabase.rpc("get_directors_with_movie_count");
-      if (movieCountsError) throw movieCountsError;
-      const movieCountMap = {};
-      if (movieCountsData) {
-        movieCountsData.forEach((item) => {
-          movieCountMap[item.director_id] = item.movie_count;
-        });
-      }
-      const directorsWithCounts = directorsData.map((director) => ({
-        ...director,
-        movieCount: movieCountMap[director.id] || 0,
-      }));
-
+      const directorsWithCounts = await getDirectorsWithMovieCount(true);
       setDirectors(directorsWithCounts);
+      setError(null);
     } catch (err) {
       console.error("Error fetching directors:", err);
       setError("Failed to load directors");
+      showNotification("Failed to load directors", "error");
     } finally {
       setLoading(false);
     }
@@ -99,8 +96,10 @@ const DirectorList = () => {
     let result = [...directors];
     if (searchQuery) {
       const searchedText = searchQuery.toLowerCase();
-      result = result.filter((director) =>
-        director.name?.toLowerCase().includes(searchedText)
+      result = result.filter(
+        (director) =>
+          director.name?.toLowerCase().includes(searchedText) ||
+          director.nationality?.toLowerCase().includes(searchedText)
       );
     }
     if (filters.status) {
@@ -118,15 +117,14 @@ const DirectorList = () => {
       const maxCount = parseInt(filters.moviesMax);
       result = result.filter((director) => director.movieCount <= maxCount);
     }
-
     if (sortConfig.key) {
       result.sort((a, b) => {
         if (sortConfig.key === "movieCount") {
-          const aRating = parseFloat(a.movieCount) || 0;
-          const bRating = parseFloat(b.movieCount) || 0;
+          const aCount = parseFloat(a.movieCount) || 0;
+          const bCount = parseFloat(b.movieCount) || 0;
           return sortConfig.direction === "asc"
-            ? aRating - bRating
-            : bRating - aRating;
+            ? aCount - bCount
+            : bCount - aCount;
         }
 
         const aValue = a[sortConfig.key] || "";
@@ -149,6 +147,7 @@ const DirectorList = () => {
 
     return result;
   }, [directors, searchQuery, sortConfig, filters]);
+
   const paginatedDirectors = useMemo(() => {
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
     return filteredDirectors.slice(startIndex, startIndex + ITEMS_PER_PAGE);
@@ -173,18 +172,22 @@ const DirectorList = () => {
 
   const validateField = (name, value) => {
     const errors = { ...filterErrors };
+
     if (!value) {
       errors[name] = "";
       setFilterErrors(errors);
       return;
     }
+
     if (name === "moviesMin" || name === "moviesMax") {
       if (!/^\d+$/.test(value)) {
         errors[name] = "Please enter numbers only";
         setFilterErrors(errors);
         return;
       }
+
       const numValue = parseInt(value);
+
       if (name === "moviesMin") {
         if (numValue < 0) {
           errors.moviesMin = "Minimum cannot be negative";
@@ -196,6 +199,7 @@ const DirectorList = () => {
         } else {
           errors.moviesMin = "";
         }
+
         if (filters.moviesMax && parseInt(filters.moviesMax) < numValue) {
           errors.moviesMax = "Maximum must be greater than minimum";
         } else if (filters.moviesMax) {
@@ -214,6 +218,7 @@ const DirectorList = () => {
         } else {
           errors.moviesMax = "";
         }
+
         if (filters.moviesMin && parseInt(filters.moviesMin) > numValue) {
           errors.moviesMin = "Minimum cannot exceed maximum";
         } else if (filters.moviesMin) {
@@ -242,11 +247,7 @@ const DirectorList = () => {
   const refreshDirectors = async () => {
     setLoading(true);
     await fetchDirectors();
-    setNotification({
-      show: true,
-      message: "Directors list refreshed",
-      type: "success",
-    });
+    showNotification("Directors list refreshed");
   };
 
   const handleAddDirector = () => {
@@ -259,18 +260,17 @@ const DirectorList = () => {
     setShowForm(true);
   };
 
+  const handleCloseForm = () => {
+    setShowForm(false);
+    setEditingDirector(null);
+  };
+
   const handleToggleStatus = async (director) => {
     const action = director.isDisabled ? "enable" : "disable";
 
     if (window.confirm(`Are you sure you want to ${action} this director?`)) {
       try {
-        const { error } = await supabase
-          .from("Directors")
-          .update({ isDisabled: !director.isDisabled })
-          .eq("id", director.id);
-
-        if (error) throw error;
-
+        await toggleDirectorStatus(director.id, !director.isDisabled);
         setDirectors(
           directors.map((d) =>
             d.id === director.id
@@ -279,91 +279,46 @@ const DirectorList = () => {
           )
         );
 
-        setNotification({
-          show: true,
-          message: `Director ${action}d successfully`,
-          type: "success",
-        });
+        showNotification(`Director ${action}d successfully`);
       } catch (err) {
         console.error(`Error ${action}ing director:`, err);
-        setNotification({
-          show: true,
-          message: `Failed to ${action} director: ${err.message}`,
-          type: "error",
-        });
+        showNotification(
+          `Failed to ${action} director: ${err.message}`,
+          "error"
+        );
       }
     }
   };
 
   const handleSubmit = async (values, { setSubmitting, resetForm }) => {
+    setIsSubmitting(true);
     try {
       if (editingDirector) {
-        const { error } = await supabase
-          .from("Directors")
-          .update({
-            name: values.name,
-            biography: values.biography || null,
-            nationality: values.nationality || null,
-            image_url: values.imageUrl || null,
-            isDisabled: values.isDisabled || false,
-          })
-          .eq("id", editingDirector.id);
-
-        if (error) throw error;
-
+        const updatedDirector = await updateDirector(
+          editingDirector.id,
+          values
+        );
         setDirectors(
           directors.map((d) =>
             d.id === editingDirector.id
-              ? {
-                  ...d,
-                  name: values.name,
-                  biography: values.biography || null,
-                  nationality: values.nationality || null,
-                  image_url: values.imageUrl || null,
-                  isDisabled: values.isDisabled || false,
-                }
+              ? { ...updatedDirector, movieCount: d.movieCount }
               : d
           )
         );
 
-        setNotification({
-          show: true,
-          message: "Director updated successfully",
-          type: "success",
-        });
+        showNotification("Director updated successfully");
       } else {
-        const { data, error } = await supabase
-          .from("Directors")
-          .insert({
-            name: values.name,
-            biography: values.biography || null,
-            nationality: values.nationality || null,
-            image_url: values.imageUrl || null,
-            isDisabled: false,
-          })
-          .select();
-
-        if (error) throw error;
-
-        setDirectors([...directors, { ...data[0], movieCount: 0 }]);
-
-        setNotification({
-          show: true,
-          message: "Director created successfully",
-          type: "success",
-        });
+        const newDirector = await createDirector(values);
+        setDirectors([...directors, { ...newDirector, movieCount: 0 }]);
+        showNotification("Director created successfully");
       }
-
       resetForm();
       setShowForm(false);
     } catch (err) {
       console.error("Error saving director:", err);
-      setNotification({
-        show: true,
-        message: `Failed to save director: ${err.message}`,
-        type: "error",
-      });
+      showNotification(`Failed to save director: ${err.message}`, "error");
     } finally {
+      setIsSubmitting(false);
       setSubmitting(false);
     }
   };
@@ -390,7 +345,7 @@ const DirectorList = () => {
           <div className="search-box">
             <input
               type="text"
-              placeholder="Search by Name..."
+              placeholder="Search by Name or Nationality..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="search-input"
@@ -462,8 +417,8 @@ const DirectorList = () => {
         <DirectorFormPopup
           director={editingDirector}
           onSubmit={handleSubmit}
-          onClose={() => setShowForm(false)}
-          isSubmitting={false}
+          onClose={handleCloseForm}
+          isSubmitting={isSubmitting}
         />
       )}
 
@@ -474,6 +429,7 @@ const DirectorList = () => {
               <th onClick={() => requestSort("name")} className="sortable">
                 Name{getSortIndicator("name")}
               </th>
+              <th>Nationality</th>
               <th>Status</th>
               <th
                 onClick={() => requestSort("movieCount")}
@@ -491,7 +447,15 @@ const DirectorList = () => {
                   key={director.id}
                   className={director.isDisabled ? "disabled-row" : ""}
                 >
-                  <td>{director.name}</td>
+                  <td>
+                    <div className="name-cell">
+                      <span className="director-name">{director.name}</span>
+                      {director.isDisabled && (
+                        <span className="disabled-indicator">(Disabled)</span>
+                      )}
+                    </div>
+                  </td>
+                  <td>{director.nationality || "Not specified"}</td>
                   <td>
                     <span
                       className={`status-badge ${
@@ -506,6 +470,7 @@ const DirectorList = () => {
                     <button
                       onClick={() => handleEditDirector(director)}
                       className="edit-btn"
+                      title="Edit director"
                     >
                       Edit
                     </button>
@@ -514,6 +479,7 @@ const DirectorList = () => {
                       className={
                         director.isDisabled ? "enable-btn" : "disable-btn"
                       }
+                      title={`${director.isDisabled ? "Enable" : "Disable"} director`}
                     >
                       {director.isDisabled ? "Enable" : "Disable"}
                     </button>
@@ -522,7 +488,7 @@ const DirectorList = () => {
               ))
             ) : (
               <tr>
-                <td colSpan="4" className="no-data-row">
+                <td colSpan="5" className="no-data-row">
                   {directors.length > 0
                     ? "No directors found matching your criteria"
                     : "No directors found. Add your first director!"}
