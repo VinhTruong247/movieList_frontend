@@ -1,5 +1,10 @@
 import { useState, useEffect, useMemo } from "react";
-import supabase from "../../../../supabase-client";
+import {
+  getActorsWithMovieCount,
+  createActor,
+  updateActor,
+  toggleActorStatus,
+} from "../../../../services/ActorsAPI";
 import ActorFormPopup from "./actorForm/ActorFormPopup";
 import "../ListStyle.scss";
 
@@ -49,6 +54,14 @@ const ActorList = () => {
     }
   }, [notification.show]);
 
+  const showNotification = (message, type = "success") => {
+    setNotification({
+      show: true,
+      message,
+      type,
+    });
+  };
+
   const requestSort = (key) => {
     let direction = "asc";
     if (sortConfig.key === key && sortConfig.direction === "asc") {
@@ -67,30 +80,13 @@ const ActorList = () => {
   const fetchActors = async () => {
     setLoading(true);
     try {
-      const { data: actorsData, error: actorsError } = await supabase
-        .from("Actors")
-        .select("*")
-        .order("name");
-
-      if (actorsError) throw actorsError;
-      const { data: movieCountsData, error: movieCountsError } =
-        await supabase.rpc("get_actors_with_movie_count");
-      if (movieCountsError) throw movieCountsError;
-      const movieCountMap = {};
-      if (movieCountsData) {
-        movieCountsData.forEach((item) => {
-          movieCountMap[item.actor_id] = item.movie_count;
-        });
-      }
-      const actorsWithCounts = actorsData.map((actor) => ({
-        ...actor,
-        movieCount: movieCountMap[actor.id] || 0,
-      }));
-
+      const actorsWithCounts = await getActorsWithMovieCount(true);
       setActors(actorsWithCounts);
+      setError(null);
     } catch (err) {
       console.error("Error fetching actors:", err);
       setError("Failed to load actors");
+      showNotification("Failed to load actors", "error");
     } finally {
       setLoading(false);
     }
@@ -98,12 +94,16 @@ const ActorList = () => {
 
   const filteredActors = useMemo(() => {
     let result = [...actors];
+
     if (searchQuery) {
       const searchedText = searchQuery.toLowerCase();
-      result = result.filter((actor) =>
-        actor.name?.toLowerCase().includes(searchedText)
+      result = result.filter(
+        (actor) =>
+          actor.name?.toLowerCase().includes(searchedText) ||
+          actor.nationality?.toLowerCase().includes(searchedText)
       );
     }
+
     if (filters.status) {
       if (filters.status === "active") {
         result = result.filter((actor) => !actor.isDisabled);
@@ -119,15 +119,14 @@ const ActorList = () => {
       const maxCount = parseInt(filters.moviesMax);
       result = result.filter((actor) => actor.movieCount <= maxCount);
     }
-
     if (sortConfig.key) {
       result.sort((a, b) => {
         if (sortConfig.key === "movieCount") {
-          const aRating = parseFloat(a.movieCount) || 0;
-          const bRating = parseFloat(b.movieCount) || 0;
+          const aCount = parseFloat(a.movieCount) || 0;
+          const bCount = parseFloat(b.movieCount) || 0;
           return sortConfig.direction === "asc"
-            ? aRating - bRating
-            : bRating - aRating;
+            ? aCount - bCount
+            : bCount - aCount;
         }
 
         const aValue = a[sortConfig.key] || "";
@@ -186,7 +185,6 @@ const ActorList = () => {
         setFilterErrors(errors);
         return;
       }
-
       const numValue = parseInt(value);
       if (name === "moviesMin") {
         if (numValue < 0) {
@@ -244,11 +242,7 @@ const ActorList = () => {
   const refreshActors = async () => {
     setLoading(true);
     await fetchActors();
-    setNotification({
-      show: true,
-      message: "Actor list refreshed",
-      type: "success",
-    });
+    showNotification("Actors list refreshed");
   };
 
   const handleAddActor = () => {
@@ -271,31 +265,16 @@ const ActorList = () => {
 
     if (window.confirm(`Are you sure you want to ${action} this actor?`)) {
       try {
-        const { error } = await supabase
-          .from("Actors")
-          .update({ isDisabled: !actor.isDisabled })
-          .eq("id", actor.id);
-
-        if (error) throw error;
-
+        await toggleActorStatus(actor.id, !actor.isDisabled);
         setActors(
           actors.map((a) =>
             a.id === actor.id ? { ...a, isDisabled: !actor.isDisabled } : a
           )
         );
-
-        setNotification({
-          show: true,
-          message: `Actor ${action}d successfully`,
-          type: "success",
-        });
+        showNotification(`Actor ${action}d successfully`);
       } catch (err) {
         console.error(`Error ${action}ing actor:`, err);
-        setNotification({
-          show: true,
-          message: `Failed to ${action} actor: ${err.message}`,
-          type: "error",
-        });
+        showNotification(`Failed to ${action} actor: ${err.message}`, "error");
       }
     }
   };
@@ -304,73 +283,28 @@ const ActorList = () => {
     setIsSubmitting(true);
     try {
       if (editingActor) {
-        const { error } = await supabase
-          .from("Actors")
-          .update({
-            name: values.name,
-            biography: values.biography || null,
-            nationality: values.nationality || null,
-            image_url: values.imageUrl || null,
-            isDisabled: values.isDisabled || false,
-          })
-          .eq("id", editingActor.id);
-
-        if (error) throw error;
-
+        const updatedActor = await updateActor(editingActor.id, values);
         setActors(
           actors.map((a) =>
             a.id === editingActor.id
-              ? {
-                  ...a,
-                  name: values.name,
-                  biography: values.biography || null,
-                  nationality: values.nationality || null,
-                  image_url: values.imageUrl || null,
-                  isDisabled: values.isDisabled || false,
-                }
+              ? { ...updatedActor, movieCount: a.movieCount }
               : a
           )
         );
-
-        setNotification({
-          show: true,
-          message: "Actor updated successfully",
-          type: "success",
-        });
+        showNotification("Actor updated successfully");
       } else {
-        const { data, error } = await supabase
-          .from("Actors")
-          .insert({
-            name: values.name,
-            biography: values.biography || null,
-            nationality: values.nationality || null,
-            image_url: values.imageUrl || null,
-            isDisabled: false,
-          })
-          .select();
-
-        if (error) throw error;
-
-        setActors([...actors, { ...data[0], movieCount: 0 }]);
-
-        setNotification({
-          show: true,
-          message: "Actor created successfully",
-          type: "success",
-        });
+        const newActor = await createActor(values);
+        setActors([...actors, { ...newActor, movieCount: 0 }]);
+        showNotification("Actor created successfully");
       }
-
       resetForm();
       setShowActorForm(false);
     } catch (err) {
       console.error("Error saving actor:", err);
-      setNotification({
-        show: true,
-        message: `Failed to save actor: ${err.message}`,
-        type: "error",
-      });
+      showNotification(`Failed to save actor: ${err.message}`, "error");
     } finally {
       setIsSubmitting(false);
+      setSubmitting(false);
     }
   };
 
@@ -396,7 +330,7 @@ const ActorList = () => {
           <div className="search-box">
             <input
               type="text"
-              placeholder="Search by Name..."
+              placeholder="Search by Name or Nationality..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="search-input"
@@ -480,6 +414,7 @@ const ActorList = () => {
               <th onClick={() => requestSort("name")} className="sortable">
                 Name{getSortIndicator("name")}
               </th>
+              <th>Nationality</th>
               <th>Status</th>
               <th
                 onClick={() => requestSort("movieCount")}
@@ -497,7 +432,15 @@ const ActorList = () => {
                   key={actor.id}
                   className={actor.isDisabled ? "disabled-row" : ""}
                 >
-                  <td>{actor.name}</td>
+                  <td>
+                    <div className="name-cell">
+                      <span className="actor-name">{actor.name}</span>
+                      {actor.isDisabled && (
+                        <span className="disabled-indicator">(Disabled)</span>
+                      )}
+                    </div>
+                  </td>
+                  <td>{actor.nationality || "Not specified"}</td>
                   <td>
                     <span
                       className={`status-badge ${
@@ -512,6 +455,7 @@ const ActorList = () => {
                     <button
                       onClick={() => handleEditActor(actor)}
                       className="edit-btn"
+                      title="Edit actor"
                     >
                       Edit
                     </button>
@@ -520,6 +464,7 @@ const ActorList = () => {
                       className={
                         actor.isDisabled ? "enable-btn" : "disable-btn"
                       }
+                      title={`${actor.isDisabled ? "Enable" : "Disable"} actor`}
                     >
                       {actor.isDisabled ? "Enable" : "Disable"}
                     </button>
@@ -528,7 +473,7 @@ const ActorList = () => {
               ))
             ) : (
               <tr>
-                <td colSpan="4" className="no-data-row">
+                <td colSpan="5" className="no-data-row">
                   {actors.length > 0
                     ? "No actors found matching your criteria"
                     : "No actors found. Add your first actor!"}
