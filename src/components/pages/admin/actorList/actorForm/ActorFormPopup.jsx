@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import ActorForm from "./ActorForm";
-import "./ActorFormPopup.scss";
+import "./ActorForm.scss";
 
 const ActorFormPopup = ({ actor, onSubmit, onClose, isSubmitting }) => {
   useEffect(() => {
@@ -9,10 +9,8 @@ const ActorFormPopup = ({ actor, onSubmit, onClose, isSubmitting }) => {
         onClose();
       }
     };
-
     document.addEventListener("keydown", handleEscKey);
     document.body.style.overflow = "hidden";
-
     return () => {
       document.removeEventListener("keydown", handleEscKey);
       document.body.style.overflow = "auto";
@@ -22,11 +20,7 @@ const ActorFormPopup = ({ actor, onSubmit, onClose, isSubmitting }) => {
   return (
     <div className="actor-form-overlay" onClick={onClose}>
       <div className="actor-form-popup" onClick={(e) => e.stopPropagation()}>
-        <button
-          className="close-button"
-          onClick={onClose}
-          disabled={isSubmitting}
-        >
+        <button className="close-button" onClick={onClose} disabled={isSubmitting}>
           &times;
         </button>
         <ActorForm

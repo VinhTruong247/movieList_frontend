@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import DirectorForm from "./DirectorForm";
-import "./DirectorFormPopup.scss";
+import "./DirectorForm.scss";
 
 const DirectorFormPopup = ({ director, onSubmit, onClose, isSubmitting }) => {
   useEffect(() => {
@@ -9,10 +9,8 @@ const DirectorFormPopup = ({ director, onSubmit, onClose, isSubmitting }) => {
         onClose();
       }
     };
-
     document.addEventListener("keydown", handleEscKey);
     document.body.style.overflow = "hidden";
-
     return () => {
       document.removeEventListener("keydown", handleEscKey);
       document.body.style.overflow = "auto";
@@ -22,11 +20,7 @@ const DirectorFormPopup = ({ director, onSubmit, onClose, isSubmitting }) => {
   return (
     <div className="director-form-overlay" onClick={onClose}>
       <div className="director-form-popup" onClick={(e) => e.stopPropagation()}>
-        <button
-          className="close-button"
-          onClick={onClose}
-          disabled={isSubmitting}
-        >
+        <button className="close-button" onClick={onClose} disabled={isSubmitting}>
           &times;
         </button>
         <DirectorForm
