@@ -62,7 +62,6 @@ export const updateDirector = async (id, directorData) => {
       nationality: directorData.nationality || null,
       image_url: directorData.imageUrl || null,
       isDisabled: directorData.isDisabled || false,
-      updated_at: new Date().toISOString(),
     })
     .eq("id", id)
     .select()
@@ -98,7 +97,6 @@ export const toggleDirectorStatus = async (id, isDisabled) => {
     .from("Directors")
     .update({
       isDisabled: isDisabled,
-      updated_at: new Date().toISOString(),
     })
     .eq("id", id)
     .select()
@@ -243,20 +241,6 @@ export const getDirectorsStats = async () => {
     active: activeDirectors?.length || 0,
     disabled: disabledDirectors?.length || 0,
   };
-};
-
-export const batchUpdateDirectors = async (directorIds, updateData) => {
-  const { data, error } = await supabase
-    .from("Directors")
-    .update({
-      ...updateData,
-      updated_at: new Date().toISOString(),
-    })
-    .in("id", directorIds)
-    .select();
-
-  if (error) throw error;
-  return data;
 };
 
 export const getMostProlificDirectors = async (
