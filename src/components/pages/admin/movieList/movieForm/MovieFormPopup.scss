@@ -14,74 +14,64 @@
   z-index: 1000;
   padding: 20px;
   overflow-y: auto;
-}
 
-.movie-form-popup {
-  position: relative;
-  width: 100%;
-  max-width: 900px;
-  max-height: 90vh;
-  background: #ffffff;
-  border-radius: 8px;
-  overflow-y: auto;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+  .movie-form-popup {
+    position: relative;
+    width: 100%;
+    max-width: 900px;
+    max-height: 90vh;
+    background: #ffffff;
+    border-radius: 8px;
+    overflow-y: auto;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
 
-  &::-webkit-scrollbar {
-    width: 8px;
-  }
-
-  &::-webkit-scrollbar-track {
-    background: #f1f1f1;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background: #888;
-    border-radius: 4px;
-  }
-
-  &::-webkit-scrollbar-thumb:hover {
-    background: #555;
-  }
-
-  .movie-form-container {
-    padding-top: 0;
-    border: none;
-    margin-bottom: 0;
-    box-shadow: none;
-
-    h3 {
-      margin-top: 0.5rem;
+    &::-webkit-scrollbar {
+      width: 8px;
     }
-  }
-}
 
-.close-button {
-  position: absolute;
-  top: 15px;
-  right: 15px;
-  background: none;
-  border: none;
-  font-size: 24px;
-  line-height: 1;
-  color: $accent-color;
-  cursor: pointer;
-  z-index: 10;
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
+    &::-webkit-scrollbar-track {
+      background: #f1f1f1;
+    }
 
-  &:hover {
-    background: rgba(0, 0, 0, 0.05);
-    color: color.adjust($accent-color, $lightness: -10%);
-  }
+    &::-webkit-scrollbar-thumb {
+      background: #888;
+      border-radius: 4px;
+    }
 
-  &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
+    &::-webkit-scrollbar-thumb:hover {
+      background: #555;
+    }
+
+    .close-button {
+      position: absolute;
+      padding-bottom: 6px;
+      top: 15px;
+      right: 15px;
+      background: none;
+      border: none;
+      font-size: 24px;
+      line-height: 1;
+      color: $accent-color;
+      cursor: pointer;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+      z-index: 999;
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.15);
+        color: color.adjust(white, $lightness: -10%);
+      }
+
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+    }
   }
 }
 
