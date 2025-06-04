@@ -453,6 +453,8 @@
         background-color: $primary-color;
         border: none;
         color: white;
+        margin-bottom: 0px !important;
+        width: 15% !important;
 
         &:hover:not(:disabled) {
           background-color: color.adjust($accent-color, $lightness: -10%);
