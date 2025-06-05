@@ -107,13 +107,13 @@ const DirectorDetail = () => {
               <img
                 src={
                   director.image_url ||
-                  "https://via.placeholder.com/300x400?text=No+Image"
+                  "https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/330px-No-Image-Placeholder.svg.png?20200912122019"
                 }
                 alt={director.name}
                 onError={(e) => {
                   e.target.onerror = null;
                   e.target.src =
-                    "https://via.placeholder.com/300x400?text=No+Image";
+                    "https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/330px-No-Image-Placeholder.svg.png?20200912122019";
                 }}
               />
               {isAdmin && director.isDisabled && (

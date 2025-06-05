@@ -16,21 +16,19 @@ const SimilarMovie = ({ currentMovie }) => {
     if (!movie.MovieGenres || !Array.isArray(movie.MovieGenres)) {
       return [];
     }
-    return movie.MovieGenres
-      .filter((mg) => mg.Genres && (isAdmin || !mg.Genres.isDisabled))
-      .map((mg) => mg.Genres.name);
+    return movie.MovieGenres.filter(
+      (mg) => mg.Genres && (isAdmin || !mg.Genres.isDisabled)
+    ).map((mg) => mg.Genres.name);
   };
 
   const getGenreNamesWithDisabled = (movie) => {
     if (!movie.MovieGenres || !Array.isArray(movie.MovieGenres)) {
       return [];
     }
-    return movie.MovieGenres
-      .filter((mg) => mg.Genres)
-      .map((mg) => ({
-        name: mg.Genres.name,
-        isDisabled: mg.Genres.isDisabled || false
-      }));
+    return movie.MovieGenres.filter((mg) => mg.Genres).map((mg) => ({
+      name: mg.Genres.name,
+      isDisabled: mg.Genres.isDisabled || false,
+    }));
   };
 
   useEffect(() => {
@@ -101,9 +99,9 @@ const SimilarMovie = ({ currentMovie }) => {
       <div className="similar-movies-grid">
         {similarMovies.map((movie) => {
           const genresWithStatus = getGenreNamesWithDisabled(movie);
-          const visibleGenres = isAdmin 
-            ? genresWithStatus 
-            : genresWithStatus.filter(genre => !genre.isDisabled);
+          const visibleGenres = isAdmin
+            ? genresWithStatus
+            : genresWithStatus.filter((genre) => !genre.isDisabled);
 
           const remainingGenres = visibleGenres.slice(2);
 
@@ -117,13 +115,13 @@ const SimilarMovie = ({ currentMovie }) => {
                 <img
                   src={
                     movie.poster_url ||
-                    "https://via.placeholder.com/150x225?text=No+Image"
+                    "https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/330px-No-Image-Placeholder.svg.png?20200912122019"
                   }
                   alt={movie.title}
                   onError={(e) => {
                     e.target.onerror = null;
                     e.target.src =
-                      "https://via.placeholder.com/150x225?text=No+Image";
+                      "https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/330px-No-Image-Placeholder.svg.png?20200912122019";
                   }}
                 />
                 <div className="movie-type">{movie.type}</div>
@@ -131,21 +129,19 @@ const SimilarMovie = ({ currentMovie }) => {
               <div className="similar-movie-info">
                 <h3 className="similar-movie-title">{movie.title}</h3>
                 <div className="similar-movie-genre">
-                  {visibleGenres
-                    .slice(0, 2)
-                    .map((genre, index) => (
-                      <span
-                        key={`${movie.id}-genre-${genre.name}-${index}`}
-                        className={`genre-tag ${
-                          isAdmin && genre.isDisabled ? "disabled-genre" : ""
-                        }`}
-                      >
-                        {genre.name}
-                        {isAdmin && genre.isDisabled && (
-                          <span className="disabled-indicator"> (disabled)</span>
-                        )}
-                      </span>
-                    ))}
+                  {visibleGenres.slice(0, 2).map((genre, index) => (
+                    <span
+                      key={`${movie.id}-genre-${genre.name}-${index}`}
+                      className={`genre-tag ${
+                        isAdmin && genre.isDisabled ? "disabled-genre" : ""
+                      }`}
+                    >
+                      {genre.name}
+                      {isAdmin && genre.isDisabled && (
+                        <span className="disabled-indicator"> (disabled)</span>
+                      )}
+                    </span>
+                  ))}
                   {visibleGenres.length > 2 && (
                     <span className="more-genres-wrapper">
                       <span className="more-genres">
@@ -158,12 +154,17 @@ const SimilarMovie = ({ currentMovie }) => {
                               <span
                                 key={`tooltip-${movie.id}-${genre.name}-${index}`}
                                 className={`tooltip-genre-tag ${
-                                  isAdmin && genre.isDisabled ? "disabled-genre" : ""
+                                  isAdmin && genre.isDisabled
+                                    ? "disabled-genre"
+                                    : ""
                                 }`}
                               >
                                 {genre.name}
                                 {isAdmin && genre.isDisabled && (
-                                  <span className="disabled-indicator"> (disabled)</span>
+                                  <span className="disabled-indicator">
+                                    {" "}
+                                    (disabled)
+                                  </span>
                                 )}
                               </span>
                             ))}

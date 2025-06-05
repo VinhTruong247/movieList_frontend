@@ -12,6 +12,7 @@ import NotAuthen from "../components/common/NotAuthen";
 import NotFound from "../components/common/NotFound";
 import NotLogin from "../components/common/NotLogin";
 import { Navigate } from "react-router";
+import DirectorList from "../components/pages/director/DirectorList";
 
 const AppRoutes = [
   {
@@ -23,6 +24,7 @@ const AppRoutes = [
         path: "",
         element: <Home />,
       },
+
       {
         path: "profile",
         element: <ProfilePage />,
@@ -30,6 +32,10 @@ const AppRoutes = [
       {
         path: "movie/:id",
         element: <MovieDetail />,
+      },
+      {
+        path: "director",
+        element: <DirectorList />,
       },
       {
         path: "director/:id",
