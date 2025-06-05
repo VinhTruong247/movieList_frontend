@@ -429,7 +429,12 @@ const DirectorList = () => {
               <th onClick={() => requestSort("name")} className="sortable">
                 Name{getSortIndicator("name")}
               </th>
-              <th>Nationality</th>
+              <th
+                onClick={() => requestSort("nationality")}
+                className="sortable"
+              >
+                Nationality{getSortIndicator("nationality")}
+              </th>
               <th>Status</th>
               <th
                 onClick={() => requestSort("movieCount")}

@@ -62,7 +62,6 @@ export const updateActor = async (id, actorData) => {
       nationality: actorData.nationality || null,
       image_url: actorData.imageUrl || null,
       isDisabled: actorData.isDisabled || false,
-      updated_at: new Date().toISOString(),
     })
     .eq("id", id)
     .select()
@@ -98,7 +97,6 @@ export const toggleActorStatus = async (id, isDisabled) => {
     .from("Actors")
     .update({
       isDisabled: isDisabled,
-      updated_at: new Date().toISOString(),
     })
     .eq("id", id)
     .select()
