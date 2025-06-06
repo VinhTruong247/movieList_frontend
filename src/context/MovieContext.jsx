@@ -108,54 +108,92 @@ export const MovieProvider = ({ children }) => {
   );
 
   useEffect(() => {
-    const fetchUser = async () => {
-      await fetchData("current_user", async () => {
+    let isMounted = true;
+
+    const fetchCurrentUser = async () => {
+      try {
         const {
           data: { session },
         } = await supabase.auth.getSession();
-        if (session) {
-          const { data: userData, error } = await supabase
-            .from("Users")
-            .select("*")
-            .eq("id", session.user.id)
-            .single();
 
-          if (!error && userData) {
+        if (!session) {
+          if (isMounted) {
+            setCurrentUser(null);
+            setLoading(false);
+          }
+          return;
+        }
+
+        const { data: userData, error } = await supabase
+          .from("Users")
+          .select("*")
+          .eq("id", session.user.id)
+          .single();
+
+        if (!error && userData && !userData.isDisabled) {
+          if (isMounted) {
             setCurrentUser(userData);
           }
+        } else {
+          if (isMounted) {
+            setCurrentUser(null);
+          }
         }
-      });
+      } catch (error) {
+        console.error("Error fetching current user:", error);
+        if (isMounted) {
+          setCurrentUser(null);
+        }
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
+      }
     };
 
-    fetchUser();
+    fetchCurrentUser();
 
     const { data: authListener } = supabase.auth.onAuthStateChange(
       async (event, session) => {
+        console.log("Auth state changed:", event, session?.user?.email);
+
         if (event === "SIGNED_IN" && session) {
-          fetchUser();
+          setTimeout(() => {
+            if (isMounted) {
+              fetchCurrentUser();
+            }
+          }, 300);
         } else if (event === "SIGNED_OUT") {
-          setCurrentUser(null);
-          setFavorites([]);
-          setSyncedFavorites([]);
+          if (isMounted) {
+            setCurrentUser(null);
+            setFavorites([]);
+            setSyncedFavorites([]);
+            setLoading(false);
+          }
         }
       }
     );
 
     return () => {
+      isMounted = false;
       if (authListener?.subscription?.unsubscribe) {
         authListener.subscription.unsubscribe();
       }
     };
-  }, [fetchData]);
+  }, []);
 
   useEffect(() => {
-    const userRole = currentUser?.role;
-    loadMoviesBasedOnUserRole(userRole);
+    if (currentUser) {
+      loadMoviesBasedOnUserRole(currentUser);
+    }
   }, [currentUser?.role, loadMoviesBasedOnUserRole]);
 
   useEffect(() => {
     if (currentUser?.id) {
       loadUserFavorites(currentUser.id);
+    } else {
+      setFavorites([]);
+      setSyncedFavorites([]);
     }
   }, [currentUser?.id, loadUserFavorites]);
 
@@ -198,6 +236,12 @@ export const MovieProvider = ({ children }) => {
     [currentUser, movies, favorites, syncedFavorites]
   );
 
+  const refreshMovies = useCallback(async () => {
+    if (currentUser) {
+      await loadMoviesBasedOnUserRole(currentUser);
+    }
+  }, [currentUser, loadMoviesBasedOnUserRole]);
+
   const value = {
     movies,
     loading,
@@ -208,12 +252,11 @@ export const MovieProvider = ({ children }) => {
     toggleFavorite,
     setCurrentUser,
     setMovies,
+    refreshMovies,
   };
 
   return (
-    <MovieContext.Provider value={value}>
-      {children}
-    </MovieContext.Provider>
+    <MovieContext.Provider value={value}>{children}</MovieContext.Provider>
   );
 };
 

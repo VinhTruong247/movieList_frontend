@@ -1,50 +1,31 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { useNavigate, Link } from "react-router";
 import { Formik, Form, Field } from "formik";
-import { loginUser, getCurrentUser } from "../../services/UserListAPI";
+import { loginUser } from "../../services/UserListAPI";
+import { MovieContext } from "../../context/MovieContext";
 import { LoginSchema } from "./Validation";
 import "./LoginPage.scss";
 
 const LoginPage = () => {
   const navigate = useNavigate();
   const [error, setError] = useState("");
-  const [checkingSession, setCheckingSession] = useState(true);
+  const { currentUser, loading } = useContext(MovieContext);
 
   useEffect(() => {
-    const checkExistingSession = async () => {
-      try {
-        const userData = await getCurrentUser();
-        if (userData && userData.userData) {
-          if (userData.userData.isDisabled) {
-            setError("Your account has been disabled. Please contact support.");
-            localStorage.removeItem('token');
-            sessionStorage.removeItem('token');
-            setCheckingSession(false);
-            return;
-          }
-          
-          if (userData.userData.role === "admin") {
-            navigate("/admin");
-          } else {
-            navigate("/");
-          }
-        }
-      } catch (err) {
-        console.error("Session check error:", err);
-      } finally {
-        setCheckingSession(false);
+    if (!loading && currentUser) {
+      if (currentUser.role === "admin") {
+        navigate("/admin");
+      } else {
+        navigate("/");
       }
-    };
-
-    checkExistingSession();
-  }, [navigate]);
+    }
+  }, [currentUser, loading, navigate]);
 
   useEffect(() => {
     if (error) {
       const timer = setTimeout(() => {
         setError("");
       }, 3000);
-
       return () => clearTimeout(timer);
     }
   }, [error]);
@@ -72,7 +53,7 @@ const LoginPage = () => {
     }
   };
 
-  if (checkingSession) {
+  if (loading) {
     return (
       <div className="auth-container">
         <div className="auth-box checking-session">

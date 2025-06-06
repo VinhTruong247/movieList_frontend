@@ -1,68 +1,17 @@
-import { useContext, useState, useEffect } from "react";
+import { useContext } from "react";
 import { Link, useNavigate } from "react-router";
 import { MovieContext } from "../../../context/MovieContext";
 import { useFavorites } from "../../../hooks/useFavorites";
-import { logoutUser, getCurrentUser } from "../../../services/UserListAPI";
-import supabase from "../../../supabase-client";
+import { logoutUser } from "../../../services/UserListAPI";
 import "./styles/Header.scss";
 
 const Header = () => {
   const navigate = useNavigate();
   const context = useContext(MovieContext);
-  const { currentUser, setCurrentUser } = context;
+  const { currentUser, loading } = context;
   const { syncedFavorites } = useFavorites();
-  const [isAuthChecking, setIsAuthChecking] = useState(true);
-  const [isUserVerified, setIsUserVerified] = useState(false);
 
   const favoritesCount = syncedFavorites?.length || 0;
-
-  const verifyUserSession = async () => {
-    try {
-      setIsAuthChecking(true);
-      const userSession = await getCurrentUser();
-      if (userSession && userSession.userData && !userSession.userData.isDisabled) {
-        if (setCurrentUser) {
-          setCurrentUser(userSession.userData);
-        }
-        setIsUserVerified(true);
-      } else {
-        if (setCurrentUser) {
-          setCurrentUser(null);
-        }
-        setIsUserVerified(false);
-      }
-    } catch (error) {
-      console.error("Session verification failed:", error);
-      if (setCurrentUser) {
-        setCurrentUser(null);
-      }
-      setIsUserVerified(false);
-    } finally {
-      setIsAuthChecking(false);
-    }
-  };
-
-  useEffect(() => {
-    verifyUserSession();
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        console.log('Auth state changed:', event, session?.user?.email);
-        
-        if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
-          await verifyUserSession();
-        } else if (event === 'SIGNED_OUT') {
-          if (setCurrentUser) {
-            setCurrentUser(null);
-          }
-          setIsUserVerified(false);
-          setIsAuthChecking(false);
-        }
-      }
-    );
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, [setCurrentUser]);
 
   const handleLogout = async () => {
     try {
@@ -72,7 +21,7 @@ const Header = () => {
     }
   };
 
-  if (isAuthChecking) {
+  if (loading) {
     return (
       <header className="main-header">
         <div className="container">
@@ -82,7 +31,7 @@ const Header = () => {
               <span className="logo-text">Movie Collection</span>
             </Link>
             <div className="nav-links">
-              <span className="loading-text">Verifying session...</span>
+              <span className="loading-text">Loading...</span>
             </div>
           </nav>
         </div>
@@ -100,7 +49,7 @@ const Header = () => {
           </Link>
 
           <div className="nav-links">
-            {currentUser && isUserVerified && currentUser.role !== "admin" && (
+            {currentUser && currentUser.role !== "admin" && (
               <Link to="/favorites" className="nav-link favorites-link">
                 <span className="icon">❤️</span>
                 <span className="text">Favorites</span>
@@ -110,7 +59,7 @@ const Header = () => {
               </Link>
             )}
 
-            {currentUser && isUserVerified ? (
+            {currentUser ? (
               <div className="user-menu">
                 <span className="username">
                   Welcome,{" "}
