@@ -155,8 +155,6 @@ export const MovieProvider = ({ children }) => {
 
     const { data: authListener } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        console.log("Auth state changed:", event, session?.user?.email);
-
         if (event === "SIGNED_IN" && session) {
           setTimeout(() => {
             if (isMounted) {
