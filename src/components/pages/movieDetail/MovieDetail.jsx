@@ -97,21 +97,23 @@ const MovieDetail = () => {
     return (
       <div className="cast-grid">
         {visibleActors.map((actorRole, index) => (
-          <div key={index} className="cast-card">
-            <div
-              className={`actor-name ${isAdmin && actorRole.Actors?.isDisabled ? "disabled-actor" : ""}`}
-            >
-              {actorRole.Actors?.name}
-              {isAdmin && actorRole.Actors?.isDisabled && (
-                <span className="disabled-indicator"> (disabled)</span>
+          <Link to={`/actor/${actorRole.Actors?.id}`}>
+            <div key={index} className="cast-card">
+              <div
+                className={`actor-name ${isAdmin && actorRole.Actors?.isDisabled ? "disabled-actor" : ""}`}
+              >
+                {actorRole.Actors?.name}
+                {isAdmin && actorRole.Actors?.isDisabled && (
+                  <span className="disabled-indicator"> (disabled)</span>
+                )}
+              </div>
+              {actorRole.character_name && (
+                <div className="character-name">
+                  as {actorRole.character_name}
+                </div>
               )}
             </div>
-            {actorRole.character_name && (
-              <div className="character-name">
-                as {actorRole.character_name}
-              </div>
-            )}
-          </div>
+          </Link>
         ))}
       </div>
     );
