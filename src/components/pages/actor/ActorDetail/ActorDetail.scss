@@ -95,7 +95,7 @@
     background: rgba(255, 255, 255, 0.05);
     backdrop-filter: blur(20px);
     border: 2px solid rgba(255, 255, 255, 0.15);
-    box-shadow: 
+    box-shadow:
       0 25px 80px rgba(0, 0, 0, 0.4),
       0 0 0 1px rgba(52, 152, 219, 0.2),
       inset 0 1px 0 rgba(255, 255, 255, 0.1);
@@ -103,7 +103,7 @@
 
     &:hover {
       transform: translateY(-8px) scale(1.02);
-      box-shadow: 
+      box-shadow:
         0 35px 100px rgba(0, 0, 0, 0.5),
         0 0 0 1px rgba(52, 152, 219, 0.4),
         inset 0 1px 0 rgba(255, 255, 255, 0.2);
@@ -260,7 +260,7 @@
         border: 1px solid rgba(255, 255, 255, 0.15);
         min-width: 140px;
         transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        box-shadow: 
+        box-shadow:
           0 8px 32px rgba(0, 0, 0, 0.2),
           inset 0 1px 0 rgba(255, 255, 255, 0.1);
 
@@ -268,7 +268,7 @@
           transform: translateY(-8px) scale(1.05);
           background: rgba(52, 152, 219, 0.15);
           border-color: rgba(52, 152, 219, 0.3);
-          box-shadow: 
+          box-shadow:
             0 20px 60px rgba(52, 152, 219, 0.3),
             inset 0 1px 0 rgba(255, 255, 255, 0.2);
         }
@@ -357,7 +357,7 @@
 
     p {
       margin-bottom: 1.5rem;
-      
+
       &:last-child {
         margin-bottom: 0;
       }
@@ -576,20 +576,29 @@
 }
 
 @keyframes movePattern {
-  0% { transform: translateX(0) translateY(0); }
-  100% { transform: translateX(50px) translateY(50px); }
+  0% {
+    transform: translateX(0) translateY(0);
+  }
+  100% {
+    transform: translateX(50px) translateY(50px);
+  }
 }
 
 @keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.7; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
 }
 
 @media (max-width: 480px) {
   .actor-detail-container {
     .actor-hero {
       min-height: 70vh;
-      
+
       .hero-content {
         padding: 2rem 1rem;
       }
@@ -598,7 +607,7 @@
     .actor-biography,
     .actor-filmography {
       padding: 3rem 0;
-      
+
       .container {
         padding: 0 1rem;
       }
@@ -617,9 +626,9 @@
   justify-content: center;
   align-items: center;
   font-size: 1.4rem;
-  min-height: 50vh;
+  min-height: 50px;
   color: white;
-  
+
   &.error-message {
     color: $secondary-color;
     background: rgba(231, 76, 60, 0.1);
