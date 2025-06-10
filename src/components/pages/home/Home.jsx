@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Link } from "react-router";
 import MovieCarousel from "./movieCarousel/MovieCarousel";
 import MovieCard from "./movieCard/MovieCard";
 import GenreList from "./movieGenreList/GenreList";
@@ -155,7 +156,7 @@ const Home = () => {
         </div>
 
         <div className="filter-controls">
-          <div className="search-wrapper">
+          <div className="section-wrapper">
             <div className="search-container">
               <input
                 type="text"
@@ -165,6 +166,22 @@ const Home = () => {
                 className="search-input"
               />
               <span className="search-icon">🔍</span>
+            </div>
+
+            <div className="browse-section">
+              <div className="browse-header">
+                <h4>Find your Crew - Cast</h4>
+              </div>
+              <div className="browse-buttons">
+                <Link to="/actors" className="browse-btn actors-btn">
+                  <span className="icon">🎭</span>
+                  <span className="text">Browse Actors</span>
+                </Link>
+                <Link to="/directors" className="browse-btn directors-btn">
+                  <span className="icon">🎬</span>
+                  <span className="text">Browse Directors</span>
+                </Link>
+              </div>
             </div>
           </div>
 
@@ -231,11 +248,15 @@ const Home = () => {
         <div className="content-header">
           <div className="results-info">
             <h3>
-              {selectedGenre !== "all" || searchQuery || activeMovieType !== "all"
+              {selectedGenre !== "all" ||
+              searchQuery ||
+              activeMovieType !== "all"
                 ? `Filtered Results (${filteredMovies.length})`
                 : `All Movies & TV Shows (${filteredMovies.length})`}
             </h3>
-            {(selectedGenre !== "all" || searchQuery || activeMovieType !== "all") && (
+            {(selectedGenre !== "all" ||
+              searchQuery ||
+              activeMovieType !== "all") && (
               <button className="clear-filters" onClick={resetFilters}>
                 Clear All Filters
               </button>

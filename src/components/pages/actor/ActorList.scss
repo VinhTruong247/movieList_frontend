@@ -1,0 +1,129 @@
+@use "../../../styles/root" as *;
+@use "sass:color";
+
+.actor-list-page {
+  min-height: 100vh;
+  padding: 0;
+  background: $background-color;
+  color: white;
+
+  .page-title {
+    font-size: 2.5rem;
+    font-weight: 800;
+    margin: 0 0 0.5rem 0;
+    background: linear-gradient(135deg, #fff, #a8b2d1);
+    background-clip: text;
+    text-align: center;
+    letter-spacing: 1px;
+    padding-top: 3rem;
+  }
+
+  .actors-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 2rem;
+    margin: 2.5rem auto 0 auto;
+    max-width: 1400px;
+    padding: 0 2rem 4rem;
+  }
+
+  .actor-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+    text-decoration: none;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    padding: 2rem 1.5rem 1.5rem 1.5rem;
+    min-height: 340px;
+
+    &:hover {
+      transform: translateY(-8px) scale(1.04);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.18);
+      border-color: rgba($accent-color, 0.3);
+
+      .actor-image img {
+        transform: scale(1.05);
+        box-shadow: 0 8px 32px rgba($accent-color, 0.15);
+      }
+    }
+
+    .actor-image img {
+      width: 160px;
+      height: 210px;
+      object-fit: cover;
+      border-radius: 12px;
+      margin-bottom: 1.2rem;
+      background: #f3f4f6;
+      transition:
+        transform 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+        box-shadow 0.3s;
+      border: 2px solid rgba($accent-color, 0.15);
+    }
+
+    .actor-info {
+      text-align: center;
+
+      .actor-name {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: white;
+        margin-bottom: 0.5rem;
+        letter-spacing: 0.5px;
+        text-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+      }
+
+      .actor-nationality {
+        font-size: 1rem;
+        color: rgba(255, 255, 255, 0.7);
+        opacity: 0.9;
+        margin-bottom: 0.25rem;
+      }
+    }
+  }
+
+  .no-actors {
+    text-align: center;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 1.2rem;
+    margin-top: 3rem;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 2rem 1rem;
+    border-radius: 15px;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  }
+}
+
+@media (max-width: 1280px) {
+  .actor-list-page .actors-grid {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .actor-list-page .page-title {
+    font-size: 2rem;
+    padding-top: 2rem;
+  }
+  .actor-list-page .actors-grid {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 1rem;
+    padding: 0 1rem 2rem;
+  }
+  .actor-list-page .actor-card {
+    padding: 1.2rem 0.5rem 1rem 0.5rem;
+    min-height: 260px;
+  }
+  .actor-list-page .actor-card .actor-image img {
+    width: 110px;
+    height: 140px;
+  }
+}

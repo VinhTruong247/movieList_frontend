@@ -3,6 +3,7 @@ import MovieDetail from "../components/pages/movieDetail/MovieDetail";
 import DirectorDetail from "../components/pages/director/DirectorDetail/DirectorDetail";
 import ActorDetail from "../components/pages/actor/ActorDetail/ActorDetail";
 import DirectorList from "../components/pages/director/DirectorList";
+import ActorList from "../components/pages/actor/ActorList";
 import Favorites from "../components/pages/favorites/Favorites";
 import LoginPage from "../components/auth/LoginPage";
 import RegisterPage from "../components/auth/RegisterPage";
@@ -14,7 +15,6 @@ import NotAuthen from "../components/common/NotAuthen";
 import NotFound from "../components/common/NotFound";
 import NotLogin from "../components/common/NotLogin";
 import { Navigate } from "react-router";
-
 
 const AppRoutes = [
   {
@@ -36,12 +36,16 @@ const AppRoutes = [
         element: <MovieDetail />,
       },
       {
-        path: "director",
+        path: "directors",
         element: <DirectorList />,
       },
       {
         path: "director/:id",
         element: <DirectorDetail />,
+      },
+      {
+        path: "actors",
+        element: <ActorList />,
       },
       {
         path: "actor/:id",
