@@ -9,8 +9,8 @@ const MovieSchema = Yup.object().shape({
     .max(100, "Title must be less than 100 characters")
     .required("Title is required"),
   description: Yup.string().max(
-    2000,
-    "Description must be less than 2000 characters"
+    5000,
+    "Description must be less than 5000 characters"
   ),
   year: Yup.number()
     .min(1900, "Year must be 1900 or later")
@@ -92,6 +92,8 @@ const MovieForm = ({ movie, onSubmit, onCancel, isSubmitting }) => {
               }))
             );
           }
+        } else {
+          setSelectedActors([]);
         }
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -148,11 +150,17 @@ const MovieForm = ({ movie, onSubmit, onCancel, isSubmitting }) => {
   };
 
   const handleSubmit = async (values) => {
-    const actorData = selectedActors.map((actor) => ({
-      actorId: actor.actorId,
-      characterName: actor.characterName,
-    }));
-    await onSubmit({ ...values, actors: actorData });
+    const submissionData = {
+      ...values,
+      actors: selectedActors.map((actor) => ({
+        actorId: actor.actorId,
+        characterName: actor.characterName,
+      })),
+      genreIds: values.genreIds,
+      directorIds: values.directorIds,
+    };
+    console.log("Submitting data:", submissionData);
+    await onSubmit(submissionData);
   };
 
   const addActor = (actorId) => {

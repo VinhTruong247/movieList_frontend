@@ -123,6 +123,34 @@ export const addMovie = async (movieData) => {
     if (genreError) throw genreError;
   }
 
+  if (movieData.directorIds && movieData.directorIds.length > 0) {
+    const uniqueDirectorIds = [...new Set(movieData.directorIds)];
+    const directorAssociations = uniqueDirectorIds.map((directorId) => ({
+      movie_id: movie.id,
+      director_id: directorId,
+    }));
+
+    const { error: directorError } = await supabase
+      .from("MovieDirectors")
+      .insert(directorAssociations);
+
+    if (directorError) throw directorError;
+  }
+
+  if (movieData.actors && movieData.actors.length > 0) {
+    const actorAssociations = movieData.actors.map((actor) => ({
+      movie_id: movie.id,
+      actor_id: actor.actorId,
+      character_name: actor.characterName || null,
+    }));
+
+    const { error: actorError } = await supabase
+      .from("MovieActors")
+      .insert(actorAssociations);
+
+    if (actorError) throw actorError;
+  }
+
   return movie;
 };
 

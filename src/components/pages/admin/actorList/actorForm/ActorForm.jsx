@@ -4,7 +4,10 @@ import "./ActorForm.scss";
 
 const ActorSchema = Yup.object().shape({
   name: Yup.string().min(3).max(50).required("Name is required"),
-  biography: Yup.string().max(500),
+  biography: Yup.string().max(
+    5000,
+    "Biography must be less than 5000 characters"
+  ),
   nationality: Yup.string().max(50),
   imageUrl: Yup.string().url("Must be a valid URL"),
   isDisabled: Yup.boolean(),
@@ -44,7 +47,11 @@ const ActorForm = ({ actor, onSubmit, onCancel, isSubmitting }) => {
                   className={errors.name && touched.name ? "error" : ""}
                   autoFocus
                 />
-                <ErrorMessage name="name" component="div" className="error-message" />
+                <ErrorMessage
+                  name="name"
+                  component="div"
+                  className="error-message"
+                />
               </div>
               <div className="form-group">
                 <label htmlFor="biography">Biography</label>
@@ -54,9 +61,15 @@ const ActorForm = ({ actor, onSubmit, onCancel, isSubmitting }) => {
                   as="textarea"
                   rows="4"
                   placeholder="Enter biography"
-                  className={errors.biography && touched.biography ? "error" : ""}
+                  className={
+                    errors.biography && touched.biography ? "error" : ""
+                  }
                 />
-                <ErrorMessage name="biography" component="div" className="error-message" />
+                <ErrorMessage
+                  name="biography"
+                  component="div"
+                  className="error-message"
+                />
               </div>
               <div className="form-group">
                 <label htmlFor="nationality">Nationality</label>
@@ -65,9 +78,15 @@ const ActorForm = ({ actor, onSubmit, onCancel, isSubmitting }) => {
                   name="nationality"
                   type="text"
                   placeholder="Enter nationality"
-                  className={errors.nationality && touched.nationality ? "error" : ""}
+                  className={
+                    errors.nationality && touched.nationality ? "error" : ""
+                  }
                 />
-                <ErrorMessage name="nationality" component="div" className="error-message" />
+                <ErrorMessage
+                  name="nationality"
+                  component="div"
+                  className="error-message"
+                />
               </div>
               <div className="form-group">
                 <label htmlFor="imageUrl">Image URL</label>
@@ -78,7 +97,11 @@ const ActorForm = ({ actor, onSubmit, onCancel, isSubmitting }) => {
                   placeholder="https://example.com/image.jpg"
                   className={errors.imageUrl && touched.imageUrl ? "error" : ""}
                 />
-                <ErrorMessage name="imageUrl" component="div" className="error-message" />
+                <ErrorMessage
+                  name="imageUrl"
+                  component="div"
+                  className="error-message"
+                />
               </div>
               {isEditMode && (
                 <div className="form-group status-toggle">
@@ -91,11 +114,24 @@ const ActorForm = ({ actor, onSubmit, onCancel, isSubmitting }) => {
               )}
             </div>
             <div className="form-actions">
-              <button type="button" onClick={onCancel} className="cancel-btn" disabled={isSubmitting}>
+              <button
+                type="button"
+                onClick={onCancel}
+                className="cancel-btn"
+                disabled={isSubmitting}
+              >
                 Cancel
               </button>
-              <button type="submit" className="submit-btn" disabled={isSubmitting}>
-                {isSubmitting ? "Saving..." : isEditMode ? "Update Actor" : "Add Actor"}
+              <button
+                type="submit"
+                className="submit-btn"
+                disabled={isSubmitting}
+              >
+                {isSubmitting
+                  ? "Saving..."
+                  : isEditMode
+                    ? "Update Actor"
+                    : "Add Actor"}
               </button>
             </div>
           </Form>

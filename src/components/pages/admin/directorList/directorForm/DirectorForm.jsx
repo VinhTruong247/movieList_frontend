@@ -4,7 +4,10 @@ import "./DirectorForm.scss";
 
 const DirectorSchema = Yup.object().shape({
   name: Yup.string().min(3).max(50).required("Name is required"),
-  biography: Yup.string().max(500),
+  biography: Yup.string().max(
+    5000,
+    "Biography must be less than 5000 characters"
+  ),
   nationality: Yup.string().max(50),
   imageUrl: Yup.string().url("Must be a valid URL"),
   isDisabled: Yup.boolean(),
