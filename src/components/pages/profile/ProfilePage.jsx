@@ -32,54 +32,21 @@ const ProfilePage = () => {
     const loadUserData = async () => {
       try {
         setLoading(true);
-        
-        // Only redirect to login when accessing "own profile" without a userId
-        if (!userId) {
-          // If no userId in URL, this might be an attempt to view "my profile"
-          if (!currentUser) {
-            // Guest trying to view "my profile" - redirect to login
-            navigate("/not-login");
-            return;
-          } else {
-            // Current user viewing their own profile - continue
-          }
-        }
-        
-        let profileData;
-        if (isOwnProfile) {
-          // Viewing own profile (already logged in)
-          const user = await getCurrentUser();
-          if (!user || !user.session) {
-            navigate("/not-login");
-            return;
-          }
+        if (userId) {
+          const profileData = await getUserById(userId);
 
-          if (user.userData?.role === "admin") {
-            navigate("/admin");
-            return;
-          }
-          profileData = user.userData;
-        } else {
-          // Viewing someone else's profile - anyone can do this (including guests)
-          const userData = await getUserById(userId);
-          if (!userData) {
+          if (!profileData) {
             navigate("/not-found");
             return;
           }
-          profileData = userData;
-        }
 
-        setUserData(profileData);
-        setAvatarUrl(profileData.avatar_url || "");
-        
-        // Load favorites for the profile being viewed
-        if (!isOwnProfile) {
-          const profileUserId = profileData.id;
-          const favData = await getUserFavorites(profileUserId);
+          setUserData(profileData);
+          setAvatarUrl(profileData.avatar_url || "");
+
+          const favData = await getUserFavorites(userId);
 
           if (favData) {
             const favMovieIds = favData.map((item) => item.movie_id);
-            // Only filter disabled movies if not admin
             const favMovies = movies.filter(
               (movie) =>
                 favMovieIds.includes(movie.id) &&
@@ -87,17 +54,28 @@ const ProfilePage = () => {
             );
             setProfileFavorites(favMovies);
           }
+        } else if (currentUser) {
+          const user = await getCurrentUser();
+          if (user?.userData?.role === "admin") {
+            navigate("/admin");
+            return;
+          }
+          setUserData(user.userData);
+          setAvatarUrl(user.userData.avatar_url || "");
+        } else {
+          navigate("/");
+          return;
         }
       } catch (err) {
         console.error("Error loading profile data:", err);
-        navigate("/not-found");
+        setError("Failed to load profile data");
       } finally {
         setLoading(false);
       }
     };
 
     loadUserData();
-  }, [userId, currentUser, navigate, isOwnProfile, movies]);
+  }, [userId, currentUser, navigate, movies]);
 
   const handleSubmit = async (values) => {
     try {

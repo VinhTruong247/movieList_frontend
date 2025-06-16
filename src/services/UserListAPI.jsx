@@ -120,7 +120,7 @@ export const getUserById = async (userId) => {
     if (!userId) return null;
 
     const { data, error } = await supabase
-      .from("Users")
+      .from("user_public_profiles")
       .select("*")
       .eq("id", userId)
       .single();
