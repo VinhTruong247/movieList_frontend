@@ -167,22 +167,6 @@ const Home = () => {
               />
               <span className="search-icon">🔍</span>
             </div>
-
-            <div className="browse-section">
-              <div className="browse-header">
-                <h4>Find your Crew - Cast</h4>
-              </div>
-              <div className="browse-buttons">
-                <Link to="/actors" className="browse-btn actors-btn">
-                  <span className="icon">🎭</span>
-                  <span className="text">Browse Actors</span>
-                </Link>
-                <Link to="/directors" className="browse-btn directors-btn">
-                  <span className="icon">🎬</span>
-                  <span className="text">Browse Directors</span>
-                </Link>
-              </div>
-            </div>
           </div>
 
           <div className="filter-tabs">
@@ -261,6 +245,17 @@ const Home = () => {
                 Clear All Filters
               </button>
             )}
+
+            <div className="browse-section">
+              <Link to="/actors" className="browse-btn actors-btn">
+                <span className="icon">🎭</span>
+                <span className="text">Browse Actors</span>
+              </Link>
+              <Link to="/directors" className="browse-btn directors-btn">
+                <span className="icon">🎬</span>
+                <span className="text">Browse Directors</span>
+              </Link>
+            </div>
           </div>
         </div>
 
