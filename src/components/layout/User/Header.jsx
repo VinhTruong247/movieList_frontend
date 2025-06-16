@@ -72,8 +72,21 @@ const Header = () => {
                     Admin Dashboard
                   </Link>
                 ) : (
-                  <Link to="/profile" className="nav-link profile-link">
-                    My Profile
+                  <Link to={`/profile/${currentUser.id}`} className="nav-link profile-link">
+                    <div className="header-avatar">
+                      {currentUser.avatar_url ? (
+                        <img 
+                          src={currentUser.avatar_url} 
+                          alt="Profile" 
+                          className="avatar-image" 
+                        />
+                      ) : (
+                        <div className="avatar-initial">
+                          {(currentUser.name || currentUser.username || "?")[0].toUpperCase()}
+                        </div>
+                      )}
+                    </div>
+                    <span>My Profile</span>
                   </Link>
                 )}
                 <button onClick={handleLogout} className="logout-btn">

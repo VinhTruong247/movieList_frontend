@@ -28,7 +28,7 @@ const AppRoutes = [
       },
 
       {
-        path: "profile",
+        path: "profile/:id",
         element: <ProfilePage />,
       },
       {

@@ -1,11 +1,13 @@
 import { useState, useEffect, useContext } from "react";
 import { Formik, Form, Field } from "formik";
-import { useNavigate } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import {
   getCurrentUser,
   updateUserProfile,
+  getUserById,
 } from "../../../services/UserListAPI";
 import { useFavorites } from "../../../hooks/useFavorites";
+import { getUserFavorites } from "../../../services/FarvoritesAPI";
 import MovieCard from "../home/movieCard/MovieCard";
 import { ProfileSchema } from "../../auth/Validation";
 import { MovieContext } from "../../../context/MovieContext";
@@ -13,52 +15,89 @@ import "./ProfilePage.scss";
 
 const ProfilePage = () => {
   const navigate = useNavigate();
+  const { userId } = useParams();
   const [userData, setUserData] = useState(null);
+  const [profileFavorites, setProfileFavorites] = useState([]);
   const { syncedFavorites, loadingFavorites } = useFavorites();
   const [isEditing, setIsEditing] = useState(false);
+  const [avatarUrl, setAvatarUrl] = useState("");
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
-  const { refreshMovies } = useContext(MovieContext);
+  const { currentUser, refreshMovies, movies } = useContext(MovieContext);
   const [loading, setLoading] = useState(true);
 
+  const isOwnProfile = currentUser && (!userId || userId === currentUser.id);
+
   useEffect(() => {
-    const loadUser = async () => {
+    const loadUserData = async () => {
       try {
         setLoading(true);
-        const user = await getCurrentUser();
-        if (!user || !user.session) {
+        if (!userId && !currentUser) {
           navigate("/not-login");
           return;
         }
+        let profileData;
+        if (isOwnProfile) {
+          const user = await getCurrentUser();
+          if (!user || !user.session) {
+            navigate("/not-login");
+            return;
+          }
 
-        if (user.userData?.role === "admin") {
-          navigate("/admin");
-          return;
+          if (user.userData?.role === "admin") {
+            navigate("/admin");
+            return;
+          }
+          profileData = user.userData;
+        } else {
+          const userData = await getUserById(userId);
+          if (!userData) {
+            navigate("/not-found");
+            return;
+          }
+          profileData = userData;
         }
 
-        setUserData(user.userData);
+        setUserData(profileData);
+        setAvatarUrl(profileData.avatar_url || "");
+        if (!isOwnProfile) {
+          const profileUserId = profileData.id;
+          const favData = await getUserFavorites(profileUserId);
+
+          if (favData) {
+            const favMovieIds = favData.map((item) => item.movie_id);
+            const favMovies = movies.filter(
+              (movie) =>
+                favMovieIds.includes(movie.id) &&
+                (currentUser?.role === "admin" || !movie.isDisabled)
+            );
+            setProfileFavorites(favMovies);
+          }
+        }
       } catch (err) {
-        console.error("Error loading user data:", err);
-        navigate("/login");
+        console.error("Error loading profile data:", err);
+        navigate("/not-found");
       } finally {
         setLoading(false);
       }
     };
 
-    loadUser();
-  }, [navigate]);
+    loadUserData();
+  }, [userId, currentUser, navigate, isOwnProfile, movies]);
 
   const handleSubmit = async (values) => {
     try {
-      await updateUserProfile(userData.id, {
+      const updates = {
         username: values.username,
         name: values.name || values.username,
-      });
+        avatar_url: values.avatar_url || avatarUrl,
+      };
+
+      await updateUserProfile(userData.id, updates);
 
       setUserData({
         ...userData,
-        username: values.username,
-        name: values.name || values.username,
+        ...updates,
       });
 
       setSuccessMessage("Profile updated successfully!");
@@ -89,11 +128,14 @@ const ProfilePage = () => {
       <div className="profile-container">
         <div className="error-state">
           <div className="error-icon">⚠️</div>
-          <p>No user data available</p>
+          <p>Profile not found</p>
         </div>
       </div>
     );
   }
+
+  const displayFavorites = isOwnProfile ? syncedFavorites : profileFavorites;
+  const isLoadingFavorites = isOwnProfile ? loadingFavorites : loading;
 
   return (
     <div className="profile-container">
@@ -118,8 +160,16 @@ const ProfilePage = () => {
           </svg>
         </button>
         <div className="page-title-section">
-          <h1 className="profile-title">My Profile</h1>
-          <p className="profile-subtitle">Manage your account settings</p>
+          <h1 className="profile-title">
+            {isOwnProfile
+              ? "My Profile"
+              : `${userData.name || userData.username}'s Profile`}
+          </h1>
+          <p className="profile-subtitle">
+            {isOwnProfile
+              ? "Manage your account settings"
+              : "View profile and favorites"}
+          </p>
         </div>
       </div>
 
@@ -129,13 +179,41 @@ const ProfilePage = () => {
           <div className="success-message">{successMessage}</div>
         )}
 
+        <div className="profile-section avatar-section">
+          <div className="avatar-container">
+            {userData.avatar_url ? (
+              <img
+                src={userData.avatar_url}
+                alt={`${userData.name || userData.username}'s avatar`}
+                className="profile-avatar"
+              />
+            ) : (
+              <div className="default-avatar">
+                <span>
+                  {(userData.name || userData.username || "?")[0].toUpperCase()}
+                </span>
+              </div>
+            )}
+          </div>
+
+          <div className="user-meta">
+            <h2 className="user-displayname">
+              {userData.name || userData.username}
+            </h2>
+            <p className="username-display">@{userData.username}</p>
+            <div className="join-date">
+              Member since {new Date(userData.created_at).toLocaleDateString()}
+            </div>
+          </div>
+        </div>
+
         <div className="profile-section account-section">
           <div className="section-header">
             <div className="section-title">
               <div className="section-icon">👤</div>
               <h2>Account Information</h2>
             </div>
-            {!isEditing && (
+            {isOwnProfile && !isEditing && (
               <button
                 className="edit-button"
                 onClick={() => setIsEditing(true)}
@@ -146,11 +224,12 @@ const ProfilePage = () => {
             )}
           </div>
 
-          {isEditing ? (
+          {isOwnProfile && isEditing ? (
             <Formik
               initialValues={{
                 username: userData.username || "",
                 name: userData.name || "",
+                avatar_url: userData.avatar_url || "",
               }}
               validationSchema={ProfileSchema}
               onSubmit={handleSubmit}
@@ -175,6 +254,19 @@ const ProfilePage = () => {
                   <div className="form-group">
                     <label htmlFor="name">Display Name</label>
                     <Field type="text" name="name" id="name" />
+                  </div>
+
+                  <div className="form-group">
+                    <label htmlFor="avatar_url">Avatar URL</label>
+                    <Field
+                      type="text"
+                      name="avatar_url"
+                      id="avatar_url"
+                      placeholder="https://example.com/your-image.jpg"
+                    />
+                    <div className="field-help">
+                      Enter a URL to an image for your profile avatar
+                    </div>
                   </div>
 
                   <div className="form-actions">
@@ -206,10 +298,12 @@ const ProfilePage = () => {
                 <div className="info-icon">📧</div>
                 <div className="info-content">
                   <span className="label">Email</span>
-                  <span className="value">{userData.email}</span>
+                  <span className="value">
+                    {isOwnProfile ? userData.email : "•••••••••••••"}
+                  </span>
                 </div>
               </div>
-              
+
               <div className="info-item">
                 <div className="info-icon">👤</div>
                 <div className="info-content">
@@ -218,19 +312,21 @@ const ProfilePage = () => {
                 </div>
               </div>
 
-              <div className="info-item">
-                <div className="info-icon">🔒</div>
-                <div className="info-content">
-                  <span className="label">Account Status</span>
-                  <span
-                    className={`value status ${
-                      userData.isDisabled ? "disabled" : "active"
-                    }`}
-                  >
-                    {userData.isDisabled ? "Disabled" : "Active"}
-                  </span>
+              {isOwnProfile && (
+                <div className="info-item">
+                  <div className="info-icon">🔒</div>
+                  <div className="info-content">
+                    <span className="label">Account Status</span>
+                    <span
+                      className={`value status ${
+                        userData.isDisabled ? "disabled" : "active"
+                      }`}
+                    >
+                      {userData.isDisabled ? "Disabled" : "Active"}
+                    </span>
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
           )}
         </div>
@@ -239,25 +335,30 @@ const ProfilePage = () => {
           <div className="section-header">
             <div className="section-title">
               <div className="section-icon">❤️</div>
-              <h2>My Favorites</h2>
+              <h2>
+                {isOwnProfile
+                  ? "My Favorites"
+                  : `${userData.name || userData.username}'s Favorites`}
+              </h2>
             </div>
-            {syncedFavorites.length > 0 && (
+            {displayFavorites.length > 0 && (
               <div className="favorites-count">
-                {syncedFavorites.length} {syncedFavorites.length === 1 ? 'movie' : 'movies'}
+                {displayFavorites.length}{" "}
+                {displayFavorites.length === 1 ? "movie" : "movies"}
               </div>
             )}
           </div>
-          
-          {loadingFavorites ? (
+
+          {isLoadingFavorites ? (
             <div className="loading-state">
               <div className="loading-spinner"></div>
               <p>Loading favorites...</p>
             </div>
-          ) : syncedFavorites.length > 0 ? (
+          ) : displayFavorites.length > 0 ? (
             <div className="favorites-grid">
-              {syncedFavorites.map((movie, index) => (
-                <div 
-                  key={movie.id} 
+              {displayFavorites.map((movie, index) => (
+                <div
+                  key={movie.id}
                   className="favorite-item"
                   style={{ animationDelay: `${index * 0.1}s` }}
                 >
@@ -268,15 +369,22 @@ const ProfilePage = () => {
           ) : (
             <div className="no-favorites">
               <div className="empty-icon">💔</div>
-              <h3>No favorites yet</h3>
-              <p>Start building your collection by adding movies to your favorites!</p>
-              <button
-                className="browse-button"
-                onClick={() => navigate("/")}
-              >
-                <span className="button-icon">🎬</span>
-                <span className="button-text">Browse Movies</span>
-              </button>
+              <h3>
+                {isOwnProfile
+                  ? "No favorites yet"
+                  : `${userData.name || userData.username} hasn't added any favorites yet`}
+              </h3>
+              <p>
+                {isOwnProfile
+                  ? "Start building your collection by adding movies to your favorites!"
+                  : "Check back later to see what movies they've added."}
+              </p>
+              {isOwnProfile && (
+                <button className="browse-button" onClick={() => navigate("/")}>
+                  <span className="button-icon">🎬</span>
+                  <span className="button-text">Browse Movies</span>
+                </button>
+              )}
             </div>
           )}
         </div>

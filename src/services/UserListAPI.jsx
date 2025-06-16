@@ -116,3 +116,25 @@ export const updateUserProfile = async (userId, updates) => {
   if (error) throw error;
   return { success: true };
 };
+
+export const getUserById = async (userId) => {
+  try {
+    if (!userId) return null;
+
+    const { data, error } = await supabase
+      .from("Users")
+      .select("*")
+      .eq("id", userId)
+      .single();
+
+    if (error) {
+      console.warn("Error fetching user by ID:", error);
+      return null;
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Failed to fetch user:", error);
+    return null;
+  }
+};
