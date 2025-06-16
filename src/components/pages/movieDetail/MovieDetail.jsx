@@ -213,21 +213,42 @@ const MovieDetail = () => {
           <div key={review.id} className="review-item">
             <div className="review-header">
               <div className="reviewer-info">
-                <span className="reviewer-name">
-                  {review.user_public_profiles?.name || "User"}
-                </span>
-                <div className="review-rating">
-                  <span className="stars">
-                    {[...Array(10)].map((_, index) => (
-                      <span
-                        key={index}
-                        className={`star ${index < review.rating ? "filled" : ""}`}
-                      >
-                        ⭐
-                      </span>
-                    ))}
-                  </span>
-                  <span className="rating-value">{review.rating}/10</span>
+                <div className="reviewer-avatar">
+                  {review.user_public_profiles?.avatar_url ? (
+                    <img
+                      src={review.user_public_profiles.avatar_url}
+                      alt={`${review.user_public_profiles?.name || "User"}'s avatar`}
+                      className="avatar-image"
+                    />
+                  ) : (
+                    <div className="avatar-initial">
+                      {(review.user_public_profiles?.name || "?")[0].toUpperCase()}
+                    </div>
+                  )}
+                </div>
+                
+                <div className="reviewer-details">
+                  <Link 
+                    to={`/profile/${review.user_id}`} 
+                    className="reviewer-name-link"
+                  >
+                    <span className="reviewer-name">
+                      {review.user_public_profiles?.name || "User"}
+                    </span>
+                  </Link>
+                  <div className="review-rating">
+                    <span className="stars">
+                      {[...Array(10)].map((_, index) => (
+                        <span
+                          key={index}
+                          className={`star ${index < review.rating ? "filled" : ""}`}
+                        >
+                          ⭐
+                        </span>
+                      ))}
+                    </span>
+                    <span className="rating-value">{review.rating}/10</span>
+                  </div>
                 </div>
               </div>
               <div className="review-actions">

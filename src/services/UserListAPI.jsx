@@ -46,16 +46,14 @@ export const signUp = async ({ email, password, username, name }) => {
   if (error) throw error;
 
   if (data.user) {
-    const { error: insertError } = await supabase
-      .from("Users")
-      .insert({
-        id: data.user.id,
-        email: data.user.email,
-        name: name,
-        username: username,
-        role: "user",
-        isDisabled: false,
-      });
+    const { error: insertError } = await supabase.from("Users").insert({
+      id: data.user.id,
+      email: data.user.email,
+      name: name,
+      username: username,
+      role: "user",
+      isDisabled: false,
+    });
 
     if (insertError) throw insertError;
   }

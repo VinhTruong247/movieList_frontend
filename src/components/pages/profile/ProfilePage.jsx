@@ -32,12 +32,22 @@ const ProfilePage = () => {
     const loadUserData = async () => {
       try {
         setLoading(true);
-        if (!userId && !currentUser) {
-          navigate("/not-login");
-          return;
+        
+        // Only redirect to login when accessing "own profile" without a userId
+        if (!userId) {
+          // If no userId in URL, this might be an attempt to view "my profile"
+          if (!currentUser) {
+            // Guest trying to view "my profile" - redirect to login
+            navigate("/not-login");
+            return;
+          } else {
+            // Current user viewing their own profile - continue
+          }
         }
+        
         let profileData;
         if (isOwnProfile) {
+          // Viewing own profile (already logged in)
           const user = await getCurrentUser();
           if (!user || !user.session) {
             navigate("/not-login");
@@ -50,6 +60,7 @@ const ProfilePage = () => {
           }
           profileData = user.userData;
         } else {
+          // Viewing someone else's profile - anyone can do this (including guests)
           const userData = await getUserById(userId);
           if (!userData) {
             navigate("/not-found");
@@ -60,12 +71,15 @@ const ProfilePage = () => {
 
         setUserData(profileData);
         setAvatarUrl(profileData.avatar_url || "");
+        
+        // Load favorites for the profile being viewed
         if (!isOwnProfile) {
           const profileUserId = profileData.id;
           const favData = await getUserFavorites(profileUserId);
 
           if (favData) {
             const favMovieIds = favData.map((item) => item.movie_id);
+            // Only filter disabled movies if not admin
             const favMovies = movies.filter(
               (movie) =>
                 favMovieIds.includes(movie.id) &&
