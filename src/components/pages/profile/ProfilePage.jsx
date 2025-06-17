@@ -27,6 +27,7 @@ const ProfilePage = () => {
   const [loading, setLoading] = useState(true);
 
   const isOwnProfile = currentUser?.id === id || (!id && currentUser);
+  console.log(profileFavorites);
 
   useEffect(() => {
     const loadUserData = async () => {
@@ -49,7 +50,8 @@ const ProfilePage = () => {
             const favMovies = favData
               .map((item) => item.Movies)
               .filter(
-                (movie) => movie && (!movie.isDisabled || currentUser?.role === "admin")
+                (movie) =>
+                  movie && (!movie.isDisabled || currentUser?.role === "admin")
               );
 
             setProfileFavorites(favMovies);
@@ -193,8 +195,8 @@ const ProfilePage = () => {
               {userData.name || userData.username}
             </h2>
             {isOwnProfile && (
-              <p className="username-display">@{userData.username}</p>)
-            }
+              <p className="username-display">@{userData.username}</p>
+            )}
             <div className="join-date">
               Member since {new Date(userData.created_at).toLocaleDateString()}
             </div>
@@ -314,8 +316,9 @@ const ProfilePage = () => {
                   <div className="info-content">
                     <span className="label">Account Status</span>
                     <span
-                      className={`value status ${userData.isDisabled ? "disabled" : "active"
-                        }`}
+                      className={`value status ${
+                        userData.isDisabled ? "disabled" : "active"
+                      }`}
                     >
                       {userData.isDisabled ? "Disabled" : "Active"}
                     </span>
