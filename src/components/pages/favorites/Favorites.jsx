@@ -1,16 +1,15 @@
 import { useNavigate } from "react-router";
-import { useContext } from "react";
+import { useSelector } from "react-redux";
 import { useFavorites } from "../../../hooks/useFavorites";
-import { MovieContext } from "../../../context/MovieContext";
 import FavoriteComponent from "./FavoriteComponent";
 import NotFound from "../../common/NotFound";
 import NotLogin from "../../common/NotLogin";
 import "./Favorites.scss";
 
 const Favorites = () => {
-  const { syncedFavorites, loadingFavorites } = useFavorites();
+  const { loadingFavorites } = useFavorites();
   const navigate = useNavigate();
-  const { currentUser } = useContext(MovieContext);
+  const currentUser = useSelector((state) => state.auth.currentUser);
 
   if (!currentUser) {
     return <NotLogin />;
@@ -59,7 +58,7 @@ const Favorites = () => {
         </div>
       </div>
 
-      <FavoriteComponent syncedFavorites={syncedFavorites} />
+      <FavoriteComponent />
     </div>
   );
 };

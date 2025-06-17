@@ -1,8 +1,13 @@
 import { Link } from "react-router";
+import { useSelector } from "react-redux";
 import MovieCard from "../home/movieCard/MovieCard";
 import "./FavoriteComponent.scss";
 
-const FavoriteComponent = ({ syncedFavorites = [] }) => {
+const FavoriteComponent = () => {
+  const syncedFavorites = useSelector((state) => state.favorites.syncedItems);
+
+  console.log("Synced Favorites:", syncedFavorites);
+
   return (
     <div className="favorite-component">
       {!syncedFavorites || syncedFavorites.length === 0 ? (
