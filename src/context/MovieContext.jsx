@@ -1,255 +1,88 @@
-import { createContext, useState, useEffect, useCallback, useRef } from "react";
+import { createContext, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchCurrentUser } from "../redux/slices/authSlice";
+import { fetchMovies } from "../redux/slices/moviesSlice";
+import { fetchFavorites, toggleFavorite } from "../redux/slices/favoritesSlice";
 import supabase from "../supabase-client";
 
 export const MovieContext = createContext();
 
 export const MovieProvider = ({ children }) => {
-  const [movies, setMovies] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [currentUser, setCurrentUser] = useState(null);
-  const [favorites, setFavorites] = useState([]);
-  const [syncedFavorites, setSyncedFavorites] = useState([]);
+  const dispatch = useDispatch();
 
-  const pendingRequests = useRef({});
-  const fetchData = useCallback(async (key, fetcher) => {
-    if (pendingRequests.current[key]) {
-      return pendingRequests.current[key];
-    }
-    pendingRequests.current[key] = fetcher();
+  const currentUser = useSelector((state) => state.auth.currentUser);
+  const authLoading = useSelector((state) => state.auth.loading);
+  const authError = useSelector((state) => state.auth.error);
 
-    try {
-      const result = await pendingRequests.current[key];
-      return result;
-    } finally {
-      delete pendingRequests.current[key];
-    }
-  }, []);
+  const movies = useSelector((state) => state.movies.items);
+  const moviesLoading = useSelector((state) => state.movies.loading);
+  const moviesError = useSelector((state) => state.movies.error);
 
-  const loadMoviesBasedOnUserRole = useCallback(
-    async (user) => {
-      setLoading(true);
-      try {
-        const isAdmin = user?.role === "admin";
-        const queryKey = `movies_${isAdmin ? "admin" : "user"}`;
-        const data = await fetchData(queryKey, async () => {
-          const query = supabase.from("Movies").select(
-            `
-            *,
-            MovieGenres!inner(
-              genre_id,
-              Genres(id, name)
-            ),
-            MovieDirectors!inner(
-              director_id,
-              Directors(id, name)
-            )
-          `
-          );
-          if (!isAdmin) {
-            query.eq("isDisabled", false);
-          }
-
-          const { data, error } = await query;
-          if (error) throw error;
-          return data;
-        });
-
-        setMovies(data || []);
-      } catch (err) {
-        console.error("Error loading movies:", err);
-        setError("Failed to load movies");
-      } finally {
-        setLoading(false);
-      }
-    },
-    [fetchData]
-  );
-
-  const loadUserFavorites = useCallback(
-    async (userId) => {
-      if (!userId) return;
-
-      try {
-        const queryKey = `favorites_${userId}`;
-        const data = await fetchData(queryKey, async () => {
-          const { data, error } = await supabase
-            .from("Favorites")
-            .select(
-              `
-            movie_id,
-            Movies(*)
-          `
-            )
-            .eq("user_id", userId);
-
-          if (error) throw error;
-          return data;
-        });
-
-        if (data) {
-          const formattedFavorites = data.map((item) => ({
-            id: item.movie_id,
-            ...item.Movies,
-          }));
-
-          setFavorites(formattedFavorites);
-          setSyncedFavorites(
-            currentUser?.role === "admin"
-              ? formattedFavorites
-              : formattedFavorites.filter((movie) => !movie.isDisabled)
-          );
-        }
-      } catch (err) {
-        console.error("Error loading favorites:", err);
-      }
-    },
-    [fetchData, currentUser?.role]
-  );
+  const favorites = useSelector((state) => state.favorites.items);
+  const syncedFavorites = useSelector((state) => state.favorites.syncedItems);
+  const favoritesLoading = useSelector((state) => state.favorites.loading);
 
   useEffect(() => {
-    let isMounted = true;
-
-    const fetchCurrentUser = async () => {
-      try {
-        const {
-          data: { session },
-        } = await supabase.auth.getSession();
-
-        if (!session) {
-          if (isMounted) {
-            setCurrentUser(null);
-            setLoading(false);
-          }
-          return;
-        }
-
-        const { data: userData, error } = await supabase
-          .from("Users")
-          .select("*")
-          .eq("id", session.user.id)
-          .single();
-
-        if (!error && userData && !userData.isDisabled) {
-          if (isMounted) {
-            setCurrentUser(userData);
-          }
-        } else {
-          if (isMounted) {
-            setCurrentUser(null);
-          }
-        }
-      } catch (error) {
-        console.error("Error fetching current user:", error);
-        if (isMounted) {
-          setCurrentUser(null);
-        }
-      } finally {
-        if (isMounted) {
-          setLoading(false);
-        }
-      }
-    };
-
-    fetchCurrentUser();
+    dispatch(fetchCurrentUser());
 
     const { data: authListener } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        if (event === "SIGNED_IN" && session) {
+      async (event) => {
+        if (event === "SIGNED_IN") {
           setTimeout(() => {
-            if (isMounted) {
-              fetchCurrentUser();
-            }
+            dispatch(fetchCurrentUser());
           }, 300);
-        } else if (event === "SIGNED_OUT") {
-          if (isMounted) {
-            setCurrentUser(null);
-            setFavorites([]);
-            setSyncedFavorites([]);
-            setLoading(false);
-          }
         }
       }
     );
 
     return () => {
-      isMounted = false;
       if (authListener?.subscription?.unsubscribe) {
         authListener.subscription.unsubscribe();
       }
     };
-  }, []);
+  }, [dispatch]);
 
   useEffect(() => {
     if (currentUser) {
-      loadMoviesBasedOnUserRole(currentUser);
+      const isAdmin = currentUser?.role === "admin";
+      dispatch(fetchMovies(isAdmin));
     }
-  }, [currentUser?.role, loadMoviesBasedOnUserRole]);
+  }, [currentUser?.role, dispatch]);
 
   useEffect(() => {
     if (currentUser?.id) {
-      loadUserFavorites(currentUser.id);
-    } else {
-      setFavorites([]);
-      setSyncedFavorites([]);
+      dispatch(fetchFavorites(currentUser.id));
     }
-  }, [currentUser?.id, loadUserFavorites]);
+  }, [currentUser?.id, dispatch]);
 
-  const toggleFavorite = useCallback(
-    async (movieId) => {
-      if (!currentUser) return false;
+  const handleToggleFavorite = async (movieId) => {
+    if (!currentUser) return false;
 
-      try {
-        const { data, error } = await supabase.rpc("toggle_favorite", {
-          p_user_id: currentUser.id,
-          p_movie_id: movieId,
-        });
+    const result = await dispatch(
+      toggleFavorite({
+        movieId,
+        userId: currentUser.id,
+      })
+    );
 
-        if (error) throw error;
+    return !result.error;
+  };
 
-        if (data.action === "added") {
-          const movieToAdd = movies.find((m) => m.id === movieId);
-          if (movieToAdd) {
-            const newFavorites = [...favorites, movieToAdd];
-            setFavorites(newFavorites);
-
-            if (currentUser.role === "admin" || !movieToAdd.isDisabled) {
-              setSyncedFavorites([...syncedFavorites, movieToAdd]);
-            }
-          }
-          return true;
-        } else {
-          const newFavorites = favorites.filter((fav) => fav.id !== movieId);
-          setFavorites(newFavorites);
-          setSyncedFavorites(
-            syncedFavorites.filter((fav) => fav.id !== movieId)
-          );
-          return false;
-        }
-      } catch (err) {
-        console.error("Error toggling favorite:", err);
-        return null;
-      }
-    },
-    [currentUser, movies, favorites, syncedFavorites]
-  );
-
-  const refreshMovies = useCallback(async () => {
+  const refreshMovies = () => {
     if (currentUser) {
-      await loadMoviesBasedOnUserRole(currentUser);
+      const isAdmin = currentUser?.role === "admin";
+      dispatch(fetchMovies(isAdmin));
     }
-  }, [currentUser, loadMoviesBasedOnUserRole]);
+  };
 
   const value = {
     movies,
-    loading,
-    error,
+    loading: authLoading || moviesLoading || favoritesLoading,
+    error: authError || moviesError,
     currentUser,
     favorites,
     syncedFavorites,
-    toggleFavorite,
-    setCurrentUser,
-    setMovies,
+    toggleFavorite: handleToggleFavorite,
     refreshMovies,
   };
 
