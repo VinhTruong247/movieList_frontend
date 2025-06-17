@@ -1,28 +1,50 @@
-import { useState, useEffect } from "react";
-import { getMovies } from "../services/MovieListAPI";
+import { useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import {
+  fetchMovies,
+  setSearch,
+  setGenre,
+  setMovieType,
+  setSortType,
+  setViewMode,
+  resetFilters,
+} from "../redux/slices/moviesSlice";
 
-export const useMovies = (filters = {}) => {
-  const [movies, setMovies] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+export const useMovies = () => {
+  const dispatch = useDispatch();
+
+  const allMovies = useSelector((state) => state.movies.items);
+  const filteredMovies = useSelector((state) => state.movies.filteredItems);
+  const loading = useSelector((state) => state.movies.loading);
+  const error = useSelector((state) => state.movies.error);
+  const filters = useSelector((state) => state.movies.filters);
+  const viewMode = useSelector((state) => state.movies.viewMode);
+  const currentUser = useSelector((state) => state.auth.currentUser);
+  const isAdmin = currentUser?.role === "admin";
 
   useEffect(() => {
-    const fetchMovies = async () => {
-      setLoading(true);
-      try {
-        const data = await getMovies(filters);
-        setMovies(data);
-        setError(null);
-      } catch (err) {
-        console.error("Error fetching movies:", err);
-        setError("Failed to load movies");
-      } finally {
-        setLoading(false);
-      }
-    };
+    dispatch(fetchMovies(isAdmin));
+  }, [dispatch, isAdmin]);
 
-    fetchMovies();
-  }, [filters.title, filters.year, filters.genre]);
+  const setSearchQuery = (query) => dispatch(setSearch(query));
+  const selectGenre = (genre) => dispatch(setGenre(genre));
+  const selectMovieType = (type) => dispatch(setMovieType(type));
+  const selectSortType = (sortType) => dispatch(setSortType(sortType));
+  const changeViewMode = (mode) => dispatch(setViewMode(mode));
+  const clearFilters = () => dispatch(resetFilters());
 
-  return { movies, loading, error };
+  return {
+    allMovies,
+    movies: filteredMovies,
+    loading,
+    error,
+    filters,
+    viewMode,
+    setSearchQuery,
+    selectGenre,
+    selectMovieType,
+    selectSortType,
+    changeViewMode,
+    clearFilters,
+  };
 };

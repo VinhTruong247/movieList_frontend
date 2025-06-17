@@ -1,12 +1,11 @@
-import { useContext } from "react";
+import { useSelector } from "react-redux";
 import { Link } from "react-router";
 import { useFavorites } from "../../../../hooks/useFavorites";
-import { MovieContext } from "../../../../context/MovieContext";
 import "./MovieCard.scss";
 
 const MovieCard = ({ movie, viewMode = "grid" }) => {
+  const currentUser = useSelector((state) => state.auth.currentUser);
   const { toggleFavorite, isFavorite, isAdmin } = useFavorites();
-  const { currentUser } = useContext(MovieContext);
   const favorite = currentUser ? isFavorite(movie.id) : false;
 
   const formattedRuntime = () => {
@@ -31,15 +30,15 @@ const MovieCard = ({ movie, viewMode = "grid" }) => {
     return movie.MovieGenres.map((mg) => ({
       id: mg.genre_id,
       name: mg.Genres?.name,
-      isDisabled: mg.Genres?.isDisabled || false
-    })).filter(genre => genre.name);
+      isDisabled: mg.Genres?.isDisabled || false,
+    })).filter((genre) => genre.name);
   };
 
   const getVisibleGenres = () => {
     const genresWithStatus = getGenresWithStatus();
-    return isAdmin 
-      ? genresWithStatus 
-      : genresWithStatus.filter(genre => !genre.isDisabled);
+    return isAdmin
+      ? genresWithStatus
+      : genresWithStatus.filter((genre) => !genre.isDisabled);
   };
 
   const handleFavorite = async (e) => {
@@ -100,12 +99,17 @@ const MovieCard = ({ movie, viewMode = "grid" }) => {
                             <span
                               key={`tooltip-${genre.id}`}
                               className={`tooltip-genre-tag ${
-                                isAdmin && genre.isDisabled ? "disabled-genre" : ""
+                                isAdmin && genre.isDisabled
+                                  ? "disabled-genre"
+                                  : ""
                               }`}
                             >
                               {genre.name}
                               {isAdmin && genre.isDisabled && (
-                                <span className="disabled-indicator"> (disabled)</span>
+                                <span className="disabled-indicator">
+                                  {" "}
+                                  (disabled)
+                                </span>
                               )}
                             </span>
                           ))}
@@ -186,7 +190,10 @@ const MovieCard = ({ movie, viewMode = "grid" }) => {
                         >
                           {genre.name}
                           {isAdmin && genre.isDisabled && (
-                            <span className="disabled-indicator"> (disabled)</span>
+                            <span className="disabled-indicator">
+                              {" "}
+                              (disabled)
+                            </span>
                           )}
                         </span>
                       ))}

@@ -1,127 +1,36 @@
-import { useState, useEffect } from "react";
 import { Link } from "react-router";
+import { useMovies } from "../../../hooks/useMovies";
 import MovieCarousel from "./movieCarousel/MovieCarousel";
 import MovieCard from "./movieCard/MovieCard";
 import GenreList from "./movieGenreList/GenreList";
 import Loader from "../../common/Loader";
-import { useMovies } from "../../../hooks/useMovies";
 import "./Home.scss";
 
 const Home = () => {
-  const { movies, loading, error } = useMovies();
-  const [filteredMovies, setFilteredMovies] = useState([]);
-  const [selectedGenre, setSelectedGenre] = useState("all");
-  const [searchQuery, setSearchQuery] = useState("");
-  const [activeMovieType, setActiveMovieType] = useState("all");
-  const [activeSortType, setActiveSortType] = useState("all");
-  const [viewMode, setViewMode] = useState("grid");
+  const {
+    allMovies,
+    movies: filteredMovies,
+    loading,
+    error,
+    filters,
+    viewMode,
+    setSearchQuery,
+    selectGenre,
+    selectMovieType,
+    selectSortType,
+    changeViewMode,
+    clearFilters,
+  } = useMovies();
 
-  useEffect(() => {
-    if (movies && movies.length > 0) {
-      const sortedMovies = [...movies].sort((a, b) => {
-        const idA = parseInt(a.id.replace(/-/g, ""), 16) || 0;
-        const idB = parseInt(b.id.replace(/-/g, ""), 16) || 0;
-        return idA - idB;
-      });
-      setFilteredMovies(sortedMovies);
-    }
-  }, [movies]);
-
-  const handleGenreSelect = (genre) => {
-    setSelectedGenre(genre);
-    filterAndSortMovies(activeMovieType, activeSortType, genre);
-  };
+  const {
+    search: searchQuery,
+    genre: selectedGenre,
+    movieType: activeMovieType,
+    sortType: activeSortType,
+  } = filters;
 
   const handleSearch = (event) => {
-    const query = event.target.value;
-    setSearchQuery(query);
-    filterAndSortMovies(activeMovieType, activeSortType, selectedGenre, query);
-  };
-
-  const handleMovieTypeFilter = (type) => {
-    setActiveMovieType(type);
-    filterAndSortMovies(type, activeSortType);
-  };
-
-  const handleSortTypeFilter = (sortType) => {
-    setActiveSortType(sortType);
-    filterAndSortMovies(activeMovieType, sortType);
-  };
-
-  const filterAndSortMovies = (
-    movieType,
-    sortType,
-    genreOverride = null,
-    searchOverride = null
-  ) => {
-    if (!movies || !movies.length) return;
-
-    let filteredResults = [...movies];
-    const genreToUse = genreOverride !== null ? genreOverride : selectedGenre;
-    const searchToUse = searchOverride !== null ? searchOverride : searchQuery;
-
-    if (searchToUse) {
-      filteredResults = filteredResults.filter((movie) =>
-        movie.title?.toLowerCase().includes(searchToUse.toLowerCase())
-      );
-    }
-
-    if (genreToUse !== "all") {
-      filteredResults = filteredResults.filter((movie) => {
-        if (!movie.MovieGenres || !Array.isArray(movie.MovieGenres)) {
-          return false;
-        }
-
-        return movie.MovieGenres.some(
-          (genreItem) =>
-            genreItem.Genres &&
-            genreItem.Genres.name === genreToUse &&
-            !genreItem.Genres.isDisabled
-        );
-      });
-    }
-
-    if (movieType === "Movie") {
-      filteredResults = filteredResults.filter(
-        (movie) => movie.type === "Movie"
-      );
-    } else if (movieType === "TV Series") {
-      filteredResults = filteredResults.filter(
-        (movie) => movie.type === "TV Series"
-      );
-    }
-
-    if (sortType === "all") {
-      filteredResults.sort((a, b) => {
-        const idA = parseInt(a.id.replace(/-/g, ""), 16) || 0;
-        const idB = parseInt(b.id.replace(/-/g, ""), 16) || 0;
-        return idA - idB;
-      });
-    } else if (sortType === "top-rated") {
-      filteredResults.sort(
-        (a, b) => (b.imdb_rating || 0) - (a.imdb_rating || 0)
-      );
-    } else if (sortType === "latest") {
-      filteredResults.sort((a, b) => (b.year || 0) - (a.year || 0));
-    }
-
-    setFilteredMovies(filteredResults);
-  };
-
-  const resetFilters = () => {
-    setSearchQuery("");
-    setSelectedGenre("all");
-    setActiveMovieType("all");
-    setActiveSortType("all");
-
-    if (movies && movies.length > 0) {
-      const sortedMovies = [...movies].sort((a, b) => {
-        const idA = parseInt(a.id.replace(/-/g, ""), 16) || 0;
-        const idB = parseInt(b.id.replace(/-/g, ""), 16) || 0;
-        return idA - idB;
-      });
-      setFilteredMovies(sortedMovies);
-    }
+    setSearchQuery(event.target.value);
   };
 
   if (loading) return <Loader />;
@@ -130,7 +39,7 @@ const Home = () => {
 
   return (
     <div className="home-container">
-      <MovieCarousel movies={movies} />
+      <MovieCarousel movies={allMovies} />
       <div className="filter-section">
         <div className="filter-header">
           <div className="filter-title">
@@ -140,14 +49,14 @@ const Home = () => {
           <div className="view-controls">
             <button
               className={`view-btn ${viewMode === "grid" ? "active" : ""}`}
-              onClick={() => setViewMode("grid")}
+              onClick={() => changeViewMode("grid")}
             >
               <span className="icon">⊞</span>
               Grid
             </button>
             <button
               className={`view-btn ${viewMode === "list" ? "active" : ""}`}
-              onClick={() => setViewMode("list")}
+              onClick={() => changeViewMode("list")}
             >
               <span className="icon">☰</span>
               List
@@ -173,20 +82,26 @@ const Home = () => {
             <div className="tab-group">
               <span className="tab-label">Type:</span>
               <button
-                className={`tab-btn ${activeMovieType === "all" ? "active" : ""}`}
-                onClick={() => handleMovieTypeFilter("all")}
+                className={`tab-btn ${
+                  activeMovieType === "all" ? "active" : ""
+                }`}
+                onClick={() => selectMovieType("all")}
               >
                 All
               </button>
               <button
-                className={`tab-btn ${activeMovieType === "Movie" ? "active" : ""}`}
-                onClick={() => handleMovieTypeFilter("Movie")}
+                className={`tab-btn ${
+                  activeMovieType === "Movie" ? "active" : ""
+                }`}
+                onClick={() => selectMovieType("Movie")}
               >
                 Movies
               </button>
               <button
-                className={`tab-btn ${activeMovieType === "TV Series" ? "active" : ""}`}
-                onClick={() => handleMovieTypeFilter("TV Series")}
+                className={`tab-btn ${
+                  activeMovieType === "TV Series" ? "active" : ""
+                }`}
+                onClick={() => selectMovieType("TV Series")}
               >
                 TV Shows
               </button>
@@ -195,20 +110,26 @@ const Home = () => {
             <div className="tab-group">
               <span className="tab-label">Sort:</span>
               <button
-                className={`tab-btn ${activeSortType === "all" ? "active" : ""}`}
-                onClick={() => handleSortTypeFilter("all")}
+                className={`tab-btn ${
+                  activeSortType === "all" ? "active" : ""
+                }`}
+                onClick={() => selectSortType("all")}
               >
                 Default
               </button>
               <button
-                className={`tab-btn ${activeSortType === "top-rated" ? "active" : ""}`}
-                onClick={() => handleSortTypeFilter("top-rated")}
+                className={`tab-btn ${
+                  activeSortType === "top-rated" ? "active" : ""
+                }`}
+                onClick={() => selectSortType("top-rated")}
               >
                 Top Rated
               </button>
               <button
-                className={`tab-btn ${activeSortType === "latest" ? "active" : ""}`}
-                onClick={() => handleSortTypeFilter("latest")}
+                className={`tab-btn ${
+                  activeSortType === "latest" ? "active" : ""
+                }`}
+                onClick={() => selectSortType("latest")}
               >
                 Latest
               </button>
@@ -218,11 +139,11 @@ const Home = () => {
           <div className="genre-filter">
             <GenreList
               selectedGenre={selectedGenre}
-              onGenreSelect={handleGenreSelect}
+              onGenreSelect={selectGenre}
               activeMovieType={activeMovieType}
               activeSortType={activeSortType}
-              onMovieTypeChange={handleMovieTypeFilter}
-              onSortTypeChange={handleSortTypeFilter}
+              onMovieTypeChange={selectMovieType}
+              onSortTypeChange={selectSortType}
             />
           </div>
         </div>
@@ -241,7 +162,7 @@ const Home = () => {
             {(selectedGenre !== "all" ||
               searchQuery ||
               activeMovieType !== "all") && (
-              <button className="clear-filters" onClick={resetFilters}>
+              <button className="clear-filters" onClick={clearFilters}>
                 Clear All Filters
               </button>
             )}
@@ -273,7 +194,7 @@ const Home = () => {
               We couldn't find any movies matching your criteria. Try adjusting
               your filters or search terms.
             </p>
-            <button className="reset-filters-btn" onClick={resetFilters}>
+            <button className="reset-filters-btn" onClick={clearFilters}>
               Reset All Filters
             </button>
           </div>

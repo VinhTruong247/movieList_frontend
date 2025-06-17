@@ -17,8 +17,9 @@ const MovieCarousel = ({ movies }) => {
     );
   }
 
-  const featuredMovies = movies
-    .sort((a, b) => b.imdb_rating - a.imdb_rating)
+  const featuredMovies = [...movies]
+    .filter((movie) => movie.imdb_rating >= 7.0 && movie.banner_url)
+    .sort((a, b) => (b.imdb_rating || 0) - (a.imdb_rating || 0))
     .slice(0, 5);
 
   const resetTimer = () => {
@@ -71,7 +72,7 @@ const MovieCarousel = ({ movies }) => {
       .join(", ");
   };
 
-  const shortenDescription = (text, maxLength = 100) => {
+  const shortenDescription = (text, maxLength = 200) => {
     if (!text) return "No description available";
     if (text.length <= maxLength) return text;
     return text.substring(0, maxLength).trim() + "...";
@@ -95,7 +96,9 @@ const MovieCarousel = ({ movies }) => {
                 <span className="year">{movie.year}</span>
                 <span className="genre">{getGenreNames(movie)}</span>
               </div>
-              <p className="description">{shortenDescription(movie.description)}</p>
+              <p className="description">
+                {shortenDescription(movie.description)}
+              </p>
               <Link
                 to={`/movie/${movie.id}`}
                 className={`view-button ${index === currentSlide ? "active" : ""}`}
