@@ -5,6 +5,8 @@ import { Provider } from "react-redux";
 import { store } from "./redux/store";
 import { MovieProvider } from "./context/MovieContext";
 import AppRoutes from "./router/AppRoutes";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import "./main.scss";
 
 const AppRouter = () => {
@@ -17,6 +19,7 @@ function App() {
     <Provider store={store}>
       <MovieProvider>
         <Router>
+          <ToastContainer position="top-right" autoClose={3000} />
           <AppRouter />
         </Router>
       </MovieProvider>
