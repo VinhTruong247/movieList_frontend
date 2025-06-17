@@ -8,6 +8,7 @@ import {
   deleteReview,
 } from "../../../services/ReviewsAPI";
 import { useFavorites } from "../../../hooks/useFavorites";
+import { useToast } from "../../../hooks/useToast";
 import SimilarMovie from "./SimilarMovie/SimilarMovie";
 import Loader from "../../common/Loader";
 import NoMovie from "./NoMovie/NoMovie";
@@ -23,6 +24,7 @@ const MovieDetail = () => {
 
   const currentUser = useSelector((state) => state.auth.currentUser);
   const { toggleFavorite, isFavorite } = useFavorites();
+  const toast = useToast();
 
   const [activeTab, setActiveTab] = useState("overview");
   const [showTrailer, setShowTrailer] = useState(false);
@@ -324,6 +326,7 @@ const MovieDetail = () => {
     try {
       if (editingReview) {
         await updateReview(editingReview.id, values.rating, values.comment);
+        toast.success("Your review has been updated!");
       } else {
         await addReview(
           movie.id,
@@ -331,6 +334,7 @@ const MovieDetail = () => {
           values.rating,
           values.comment
         );
+        toast.success("Your review has been submitted!");
       }
 
       await refreshMovieData();
@@ -338,6 +342,7 @@ const MovieDetail = () => {
       setShowReviewForm(false);
       setEditingReview(null);
     } catch (error) {
+      toast.error("Error saving review. Please try again.");
       console.error("Error saving review:", error);
     } finally {
       setIsSubmittingReview(false);
@@ -351,7 +356,7 @@ const MovieDetail = () => {
 
   const handleDeleteReview = async (reviewId) => {
     if (!currentUser) return;
-
+    
     const confirmMessage =
       currentUser.role === "admin"
         ? "Are you sure you want to delete this review as an admin?"
@@ -362,7 +367,9 @@ const MovieDetail = () => {
       try {
         await deleteReview(reviewId);
         await refreshMovieData();
+        toast.info("Review has been deleted");
       } catch (error) {
+        toast.error("Error deleting review. Please try again.");
         console.error("Error deleting review:", error);
       } finally {
         setDeletingReviewId(null);
