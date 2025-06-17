@@ -15,7 +15,7 @@ import "./ProfilePage.scss";
 
 const ProfilePage = () => {
   const navigate = useNavigate();
-  const { userId } = useParams();
+  const { id } = useParams();
   const [userData, setUserData] = useState(null);
   const [profileFavorites, setProfileFavorites] = useState([]);
   const { syncedFavorites, loadingFavorites } = useFavorites();
@@ -26,14 +26,14 @@ const ProfilePage = () => {
   const { currentUser, refreshMovies, movies } = useContext(MovieContext);
   const [loading, setLoading] = useState(true);
 
-  const isOwnProfile = currentUser && (!userId || userId === currentUser.id);
+  const isOwnProfile = currentUser?.id === id || (!id && currentUser);
 
   useEffect(() => {
     const loadUserData = async () => {
       try {
         setLoading(true);
-        if (userId) {
-          const profileData = await getUserById(userId);
+        if (id) {
+          const profileData = await getUserById(id);
 
           if (!profileData) {
             navigate("/not-found");
@@ -43,15 +43,15 @@ const ProfilePage = () => {
           setUserData(profileData);
           setAvatarUrl(profileData.avatar_url || "");
 
-          const favData = await getUserFavorites(userId);
+          const favData = await getUserFavorites(id);
 
           if (favData) {
-            const favMovieIds = favData.map((item) => item.movie_id);
-            const favMovies = movies.filter(
-              (movie) =>
-                favMovieIds.includes(movie.id) &&
-                (currentUser?.role === "admin" || !movie.isDisabled)
-            );
+            const favMovies = favData
+              .map((item) => item.Movies)
+              .filter(
+                (movie) => movie && (!movie.isDisabled || currentUser?.role === "admin")
+              );
+
             setProfileFavorites(favMovies);
           }
         } else if (currentUser) {
@@ -63,7 +63,7 @@ const ProfilePage = () => {
           setUserData(user.userData);
           setAvatarUrl(user.userData.avatar_url || "");
         } else {
-          navigate("/");
+          setError("User not found");
           return;
         }
       } catch (err) {
@@ -75,7 +75,7 @@ const ProfilePage = () => {
     };
 
     loadUserData();
-  }, [userId, currentUser, navigate, movies]);
+  }, [id, currentUser, navigate, movies]);
 
   const handleSubmit = async (values) => {
     try {
@@ -192,7 +192,9 @@ const ProfilePage = () => {
             <h2 className="user-displayname">
               {userData.name || userData.username}
             </h2>
-            <p className="username-display">@{userData.username}</p>
+            {isOwnProfile && (
+              <p className="username-display">@{userData.username}</p>)
+            }
             <div className="join-date">
               Member since {new Date(userData.created_at).toLocaleDateString()}
             </div>
@@ -300,7 +302,9 @@ const ProfilePage = () => {
                 <div className="info-icon">👤</div>
                 <div className="info-content">
                   <span className="label">Username</span>
-                  <span className="value">{userData.username}</span>
+                  <span className="value">
+                    {isOwnProfile ? userData.username : "•••••••••••••"}
+                  </span>
                 </div>
               </div>
 
@@ -310,9 +314,8 @@ const ProfilePage = () => {
                   <div className="info-content">
                     <span className="label">Account Status</span>
                     <span
-                      className={`value status ${
-                        userData.isDisabled ? "disabled" : "active"
-                      }`}
+                      className={`value status ${userData.isDisabled ? "disabled" : "active"
+                        }`}
                     >
                       {userData.isDisabled ? "Disabled" : "Active"}
                     </span>
