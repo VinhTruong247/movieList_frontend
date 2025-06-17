@@ -37,8 +37,12 @@ export const signOut = createAsyncThunk(
     try {
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
-      return null;
+      localStorage.clear();
+      sessionStorage.clear();
+
+      return { success: true };
     } catch (error) {
+      console.error("Sign out error:", error);
       return rejectWithValue(error.message);
     }
   }
@@ -72,8 +76,17 @@ const authSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
+      .addCase(signOut.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
       .addCase(signOut.fulfilled, (state) => {
         state.currentUser = null;
+        state.loading = false;
+      })
+      .addCase(signOut.rejected, (state, action) => {
+        state.error = action.payload;
+        state.loading = false;
       });
   },
 });

@@ -1,23 +1,23 @@
 import { useContext } from "react";
 import { Link, useNavigate } from "react-router";
 import { MovieContext } from "../../../context/MovieContext";
+import { useAuth } from "../../../hooks/useAuth";
 import { useFavorites } from "../../../hooks/useFavorites";
-import { logoutUser } from "../../../services/UserListAPI";
 import "./styles/Header.scss";
 
 const Header = () => {
   const navigate = useNavigate();
   const context = useContext(MovieContext);
   const { currentUser, loading } = context;
+  const { logout, isAdmin } = useAuth();
   const { syncedFavorites } = useFavorites();
 
   const favoritesCount = syncedFavorites?.length || 0;
 
   const handleLogout = async () => {
-    try {
-      await logoutUser(navigate);
-    } catch (error) {
-      console.error("Logout failed:", error);
+    const result = await logout(navigate);
+    if (result.success && window.location.pathname !== "/login") {
+      window.location.href = "/login";
     }
   };
 
@@ -49,7 +49,7 @@ const Header = () => {
           </Link>
 
           <div className="nav-links">
-            {currentUser && currentUser.role !== "admin" && (
+            {currentUser && !isAdmin && (
               <Link to="/favorites" className="nav-link favorites-link">
                 <span className="icon">❤️</span>
                 <span className="text">Favorites</span>
@@ -67,22 +67,27 @@ const Header = () => {
                     currentUser?.username ??
                     currentUser?.role}
                 </span>
-                {currentUser.role === "admin" ? (
+                {isAdmin ? (
                   <Link to="/admin" className="nav-link admin-link">
                     Admin Dashboard
                   </Link>
                 ) : (
-                  <Link to={`/profile/${currentUser.id}`} className="nav-link profile-link">
+                  <Link
+                    to={`/profile/${currentUser.id}`}
+                    className="nav-link profile-link"
+                  >
                     <div className="header-avatar">
                       {currentUser.avatar_url ? (
-                        <img 
-                          src={currentUser.avatar_url} 
-                          alt="Profile" 
-                          className="avatar-image" 
+                        <img
+                          src={currentUser.avatar_url}
+                          alt="Profile"
+                          className="avatar-image"
                         />
                       ) : (
                         <div className="avatar-initial">
-                          {(currentUser.name || currentUser.username || "?")[0].toUpperCase()}
+                          {(currentUser.name ||
+                            currentUser.username ||
+                            "?")[0].toUpperCase()}
                         </div>
                       )}
                     </div>
