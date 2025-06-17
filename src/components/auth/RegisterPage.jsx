@@ -1,36 +1,31 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router";
+import { useSelector, useDispatch } from "react-redux";
 import { Formik, Form, Field } from "formik";
-import { signUp, getCurrentUser } from "../../services/UserListAPI";
+import { registerUser } from "../../redux/slices/authSlice";
+import { useToast } from "../../hooks/useToast";
 import { RegisterSchema } from "./Validation";
 import "./RegisterPage.scss";
 
 const RegisterPage = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const toast = useToast();
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-  const [checkingSession, setCheckingSession] = useState(true);
+
+  const currentUser = useSelector((state) => state.auth.currentUser);
+  const loading = useSelector((state) => state.auth.loading);
 
   useEffect(() => {
-    const checkExistingSession = async () => {
-      try {
-        const userData = await getCurrentUser();
-        if (userData && userData.userData) {
-          if (userData.userData.role === "admin") {
-            navigate("/admin");
-          } else {
-            navigate("/");
-          }
-        }
-      } catch (err) {
-        console.error("Session check error:", err);
-      } finally {
-        setCheckingSession(false);
+    if (!loading && currentUser) {
+      if (currentUser.role === "admin") {
+        navigate("/admin");
+      } else {
+        navigate("/");
       }
-    };
-
-    checkExistingSession();
-  }, [navigate]);
+    }
+  }, [currentUser, loading, navigate]);
 
   useEffect(() => {
     if (error) {
@@ -52,37 +47,44 @@ const RegisterPage = () => {
 
   const handleSubmit = async (values, { setSubmitting }) => {
     try {
-      await signUp({
-        email: values.email,
-        password: values.password,
-        username: values.username,
-        name: values.name || values.username,
-      });
+      await dispatch(
+        registerUser({
+          email: values.email,
+          password: values.password,
+          username: values.username,
+          name: values.name || values.username,
+        })
+      ).unwrap();
 
       setSuccess(
         "Registration successful! Please check your email to verify your account, then sign in."
       );
+      toast.success("Registration successful!");
 
       setTimeout(() => {
         navigate("/login");
       }, 3000);
     } catch (err) {
       console.error("Registration error:", err);
-      if (err.message.includes("already registered")) {
+
+      if (err.message && err.message.includes("already registered")) {
         setError(
           "This email is already registered. Please try signing in instead."
         );
-      } else if (err.message.includes("Password")) {
+        toast.error("Email already registered");
+      } else if (err.message && err.message.includes("Password")) {
         setError("Password must be at least 6 characters long.");
+        toast.error("Password too short");
       } else {
         setError(err.message || "Registration failed. Please try again.");
+        toast.error("Registration failed");
       }
     } finally {
       setSubmitting(false);
     }
   };
 
-  if (checkingSession) {
+  if (loading) {
     return (
       <div className="auth-container">
         <div className="auth-box checking-session">
@@ -123,9 +125,7 @@ const RegisterPage = () => {
                     type="text"
                     name="username"
                     id="username"
-                    className={`form-input ${
-                      errors.username && touched.username ? "error" : ""
-                    }`}
+                    className={`form-input ${errors.username && touched.username ? "error" : ""}`}
                     placeholder="Enter your username"
                   />
                 </div>
@@ -141,9 +141,7 @@ const RegisterPage = () => {
                     type="text"
                     name="name"
                     id="name"
-                    className={`form-input ${
-                      errors.name && touched.name ? "error" : ""
-                    }`}
+                    className={`form-input ${errors.name && touched.name ? "error" : ""}`}
                     placeholder="Enter your name (optional)"
                   />
                 </div>
@@ -159,9 +157,7 @@ const RegisterPage = () => {
                     type="email"
                     name="email"
                     id="email"
-                    className={`form-input ${
-                      errors.email && touched.email ? "error" : ""
-                    }`}
+                    className={`form-input ${errors.email && touched.email ? "error" : ""}`}
                     placeholder="Enter your email"
                   />
                 </div>
@@ -177,9 +173,7 @@ const RegisterPage = () => {
                     type="password"
                     name="password"
                     id="password"
-                    className={`form-input ${
-                      errors.password && touched.password ? "error" : ""
-                    }`}
+                    className={`form-input ${errors.password && touched.password ? "error" : ""}`}
                     placeholder="Enter your password"
                   />
                 </div>
@@ -195,11 +189,7 @@ const RegisterPage = () => {
                     type="password"
                     name="confirmPassword"
                     id="confirmPassword"
-                    className={`form-input ${
-                      errors.confirmPassword && touched.confirmPassword
-                        ? "error"
-                        : ""
-                    }`}
+                    className={`form-input ${errors.confirmPassword && touched.confirmPassword ? "error" : ""}`}
                     placeholder="Confirm your password"
                   />
                 </div>
@@ -210,14 +200,7 @@ const RegisterPage = () => {
 
               <button
                 type="submit"
-                className={`submit-btn ${
-                  !values.email ||
-                  !values.password ||
-                  !values.username ||
-                  !values.confirmPassword
-                    ? "disabled"
-                    : ""
-                }`}
+                className={`submit-btn ${!values.email || !values.password || !values.username || !values.confirmPassword ? "disabled" : ""}`}
                 disabled={
                   isSubmitting ||
                   !values.email ||
