@@ -1,4 +1,5 @@
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
 import { useParams, useNavigate, Link } from "react-router";
 import { getMovieById, movieCache } from "../../../services/MovieListAPI";
 import {
@@ -6,7 +7,6 @@ import {
   updateReview,
   deleteReview,
 } from "../../../services/ReviewsAPI";
-import { MovieContext } from "../../../context/MovieContext";
 import { useFavorites } from "../../../hooks/useFavorites";
 import SimilarMovie from "./SimilarMovie/SimilarMovie";
 import Loader from "../../common/Loader";
@@ -20,8 +20,10 @@ const MovieDetail = () => {
   const [movie, setMovie] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const { currentUser } = useContext(MovieContext);
+
+  const currentUser = useSelector((state) => state.auth.currentUser);
   const { toggleFavorite, isFavorite } = useFavorites();
+
   const [activeTab, setActiveTab] = useState("overview");
   const [showTrailer, setShowTrailer] = useState(false);
   const [showReviewForm, setShowReviewForm] = useState(false);
@@ -97,8 +99,11 @@ const MovieDetail = () => {
     return (
       <div className="cast-grid">
         {visibleActors.map((actorRole, index) => (
-          <Link to={`/actor/${actorRole.Actors?.id}`}>
-            <div key={index} className="cast-card">
+          <Link
+            to={`/actor/${actorRole.Actors?.id}`}
+            key={actorRole.Actors?.id || index}
+          >
+            <div className="cast-card">
               <div
                 className={`actor-name ${isAdmin && actorRole.Actors?.isDisabled ? "disabled-actor" : ""}`}
               >
@@ -133,9 +138,11 @@ const MovieDetail = () => {
     }
 
     return visibleDirectors.map((director, index) => (
-      <Link to={`/director/${director.Directors?.id}`}>
+      <Link
+        to={`/director/${director.Directors?.id}`}
+        key={director.Directors?.id || index}
+      >
         <span
-          key={index}
           className={`director-tag ${isAdmin && director.Directors?.isDisabled ? "disabled-director" : ""}`}
         >
           {director.Directors?.name}
@@ -222,14 +229,15 @@ const MovieDetail = () => {
                     />
                   ) : (
                     <div className="avatar-initial">
-                      {(review.user_public_profiles?.name || "?")[0].toUpperCase()}
+                      {(review.user_public_profiles?.name ||
+                        "?")[0].toUpperCase()}
                     </div>
                   )}
                 </div>
-                
+
                 <div className="reviewer-details">
-                  <Link 
-                    to={`/profile/${review.user_id}`} 
+                  <Link
+                    to={`/profile/${review.user_id}`}
                     className="reviewer-name-link"
                   >
                     <span className="reviewer-name">
@@ -331,7 +339,6 @@ const MovieDetail = () => {
       setEditingReview(null);
     } catch (error) {
       console.error("Error saving review:", error);
-      setLoading(false);
     } finally {
       setIsSubmittingReview(false);
     }
@@ -343,6 +350,8 @@ const MovieDetail = () => {
   };
 
   const handleDeleteReview = async (reviewId) => {
+    if (!currentUser) return;
+
     const confirmMessage =
       currentUser.role === "admin"
         ? "Are you sure you want to delete this review as an admin?"
@@ -354,8 +363,7 @@ const MovieDetail = () => {
         await deleteReview(reviewId);
         await refreshMovieData();
       } catch (error) {
-        console.error("Error saving review:", error);
-        setLoading(false);
+        console.error("Error deleting review:", error);
       } finally {
         setDeletingReviewId(null);
       }
@@ -595,6 +603,7 @@ const MovieDetail = () => {
                     <p>✅ You have already reviewed this movie</p>
                   </div>
                 )}
+
               {showReviewForm && editingReview && (
                 <div className="review-form-section">
                   <ReviewForm

@@ -1,7 +1,7 @@
-import { useEffect, useState, useContext } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router";
+import { useSelector } from "react-redux";
 import { getMovies } from "../../../../services/MovieListAPI";
-import { MovieContext } from "../../../../context/MovieContext";
 import Loader from "../../../common/Loader";
 import "./SimilarMovie.scss";
 
@@ -9,7 +9,8 @@ const SimilarMovie = ({ currentMovie }) => {
   const [similarMovies, setSimilarMovies] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const { currentUser } = useContext(MovieContext);
+
+  const currentUser = useSelector((state) => state.auth.currentUser);
   const isAdmin = currentUser?.role === "admin";
 
   const getGenreNames = (movie) => {
