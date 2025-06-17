@@ -1,8 +1,8 @@
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router";
+import { useSelector } from "react-redux";
 import { getDirectorById } from "../../../../services/DirectorsAPI";
 import { getMovies } from "../../../../services/MovieListAPI";
-import { MovieContext } from "../../../../context/MovieContext";
 import MovieCard from "../../home/movieCard/MovieCard";
 import Loader from "../../../common/Loader";
 import "./DirectorDetail.scss";
@@ -13,7 +13,7 @@ const DirectorDetail = () => {
   const [directorMovies, setDirectorMovies] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const { currentUser } = useContext(MovieContext);
+  const currentUser = useSelector((state) => state.auth.currentUser);
   const isAdmin = currentUser?.role === "admin";
 
   useEffect(() => {
