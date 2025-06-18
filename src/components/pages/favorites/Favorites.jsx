@@ -7,9 +7,9 @@ import NotLogin from "../../common/NotLogin";
 import "./Favorites.scss";
 
 const Favorites = () => {
-  const { loadingFavorites } = useFavorites();
   const navigate = useNavigate();
   const currentUser = useSelector((state) => state.auth.currentUser);
+  const { syncedFavorites, loadingFavorites } = useFavorites();
 
   if (!currentUser) {
     return <NotLogin />;
@@ -58,7 +58,7 @@ const Favorites = () => {
         </div>
       </div>
 
-      <FavoriteComponent />
+      <FavoriteComponent syncedFavorites={syncedFavorites} />
     </div>
   );
 };

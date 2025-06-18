@@ -3,10 +3,9 @@ import { useSelector } from "react-redux";
 import MovieCard from "../home/movieCard/MovieCard";
 import "./FavoriteComponent.scss";
 
-const FavoriteComponent = () => {
-  const syncedFavorites = useSelector((state) => state.favorites.syncedItems);
-
-  console.log("Synced Favorites:", syncedFavorites);
+const FavoriteComponent = ({ syncedFavorites = [] }) => {
+  const currentUser = useSelector((state) => state.auth.currentUser);
+  const username = currentUser?.name || currentUser?.username || "User";
 
   return (
     <div className="favorite-component">
@@ -26,8 +25,8 @@ const FavoriteComponent = () => {
           <div className="empty-content">
             <h3>No favorite movies yet</h3>
             <p>
-              Start building your personal movie collection by adding movies to
-              your favorites!
+              {username}, start building your personal movie collection by
+              adding movies to your favorites!
             </p>
             <Link to="/" className="browse-button">
               <span className="button-icon">🎬</span>

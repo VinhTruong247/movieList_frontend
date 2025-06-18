@@ -27,7 +27,6 @@ const ProfilePage = () => {
   const [loading, setLoading] = useState(true);
 
   const isOwnProfile = currentUser?.id === id || (!id && currentUser);
-  console.log(profileFavorites);
 
   useEffect(() => {
     const loadUserData = async () => {
