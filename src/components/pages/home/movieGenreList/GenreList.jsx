@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { getAllGenres } from "../../../../services/GenresAPI";
 import "./GenreList.scss";
@@ -8,36 +8,34 @@ const GenreList = ({ selectedGenre, onGenreSelect }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const isMounted = useRef(true);
   const currentUser = useSelector((state) => state.auth.currentUser);
   const isAdmin = currentUser?.role === "admin";
 
   useEffect(() => {
-    return () => {
-      isMounted.current = false;
-    };
-  }, []);
-
-  useEffect(() => {
-    const fetchGenres = async () => {
+    const loadGenres = async () => {
       try {
-        setLoading(true);
         const data = await getAllGenres(isAdmin);
-        if (isMounted.current) {
-          setGenres(data || []);
+        setLoading(false);
+
+        if (Array.isArray(data) && data.length > 0) {
+          setGenres(data);
+        } else {
+          setError("No genres found");
         }
-      } catch (err) {
-        console.error("Failed to load genres:", err);
-        if (isMounted.current) {
-          setError(err.message);
-        }
-      } finally {
-        if (isMounted.current) {
-          setLoading(false);
-        }
+      } catch (error) {
+        console.error("Error loading genres:", error);
+        setLoading(false);
+        setError(error.message);
       }
     };
-    fetchGenres();
+
+    loadGenres();
+
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 3000);
+
+    return () => clearTimeout(timer);
   }, [isAdmin]);
 
   return (
@@ -52,9 +50,9 @@ const GenreList = ({ selectedGenre, onGenreSelect }) => {
       ) : error ? (
         <div className="genre-error">
           <span className="error-icon">⚠️</span>
-          Error loading genres: {error}
+          Error: {error}
         </div>
-      ) : genres && genres.length > 0 ? (
+      ) : genres.length > 0 ? (
         <div className="genre-list">
           <button
             className={`genre-item ${selectedGenre === "all" ? "active" : ""}`}
@@ -80,10 +78,7 @@ const GenreList = ({ selectedGenre, onGenreSelect }) => {
           ))}
         </div>
       ) : (
-        <div className="genre-error">
-          <span className="error-icon">⚠️</span>
-          No genres available
-        </div>
+        <div className="genre-message">No genres available</div>
       )}
     </div>
   );
