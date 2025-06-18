@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Outlet, Navigate } from "react-router";
 import AdminHeader from "./Header";
 import { getCurrentUser } from "../../../services/UserListAPI";

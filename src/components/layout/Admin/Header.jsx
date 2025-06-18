@@ -1,11 +1,10 @@
-import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { useAuth } from "../../../hooks/useAuth";
 import "./styles/Header.scss";
 
 const AdminHeader = () => {
   const navigate = useNavigate();
-  const { currentUser, logout } = useAuth();
+  const { logout } = useAuth();
 
   const handleLogout = async () => {
     try {
