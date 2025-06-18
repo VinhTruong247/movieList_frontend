@@ -13,6 +13,14 @@ import { fetchMovies } from "../../../redux/slices/moviesSlice";
 import MovieCard from "../movie/movieCard/MovieCard";
 import { ProfileSchema } from "../../auth/Validation";
 import { useToast } from "../../../hooks/useToast";
+import {
+  followUser,
+  unfollowUser,
+  getFollowers,
+  getFollowing,
+  checkIfFollowing,
+  getSharedLists,
+} from "../../../services/SocialAPI";
 import "./ProfilePage.scss";
 
 const ProfilePage = () => {
@@ -29,6 +37,12 @@ const ProfilePage = () => {
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [loading, setLoading] = useState(true);
+
+  const [followers, setFollowers] = useState([]);
+  const [following, setFollowing] = useState([]);
+  const [sharedLists, setSharedLists] = useState([]);
+  const [isFollowing, setIsFollowing] = useState(false);
+  const [activeTab, setActiveTab] = useState("favorites");
 
   const currentUser = useSelector((state) => state.auth.currentUser);
   const { syncedFavorites, loadingFavorites } = useFavorites();
@@ -50,7 +64,12 @@ const ProfilePage = () => {
         setUserData(profileData);
         setAvatarUrl(profileData.avatar_url || "");
 
-        const favData = await getUserFavorites(userId);
+        const [favData, followersData, followingData, listsData] = await Promise.all([
+          getUserFavorites(userId),
+          getFollowers(userId),
+          getFollowing(userId),
+          getSharedLists(userId, !isOwnProfile ? true : null),
+        ]);
 
         if (favData) {
           const favMovies = favData
@@ -62,6 +81,15 @@ const ProfilePage = () => {
 
           setProfileFavorites(favMovies);
         }
+
+        setFollowers(followersData);
+        setFollowing(followingData);
+        setSharedLists(listsData);
+
+        if (currentUser && currentUser.userId !== userId) {
+          const following = await checkIfFollowing(currentUser.userId, userId);
+          setIsFollowing(following);
+        }
       } else if (currentUser) {
         const user = await getCurrentUser();
         if (user?.userData?.role === "admin") {
@@ -70,6 +98,16 @@ const ProfilePage = () => {
         }
         setUserData(user.userData);
         setAvatarUrl(user.userData.avatar_url || "");
+
+        const [followersData, followingData, listsData] = await Promise.all([
+          getFollowers(currentUser.userId),
+          getFollowing(currentUser.userId),
+          getSharedLists(currentUser.userId),
+        ]);
+
+        setFollowers(followersData);
+        setFollowing(followingData);
+        setSharedLists(listsData);
       } else {
         setError("User not found");
         if (!toastShown.current) {
@@ -88,7 +126,7 @@ const ProfilePage = () => {
     } finally {
       setLoading(false);
     }
-  }, [userId, currentUser, navigate]);
+  }, [userId, currentUser, navigate, isOwnProfile]);
 
   useEffect(() => {
     loadUserData();
@@ -121,6 +159,36 @@ const ProfilePage = () => {
       setError("Failed to update profile. Please try again.");
       toast.error("Failed to update profile");
       setTimeout(() => setError(""), 3000);
+    }
+  };
+
+  const handleFollowToggle = async () => {
+    if (!currentUser) {
+      navigate("/login");
+      return;
+    }
+
+    try {
+      if (isFollowing) {
+        await unfollowUser(currentUser.userId, userId);
+        setIsFollowing(false);
+        setFollowers(prev => prev.filter(f => f.follower_id !== currentUser.userId));
+      } else {
+        await followUser(currentUser.userId, userId);
+        setIsFollowing(true);
+        setFollowers(prev => [...prev, {
+          follower_id: currentUser.userId,
+          Users: {
+            id: currentUser.userId,
+            username: currentUser.username,
+            name: currentUser.name,
+            avatar_url: currentUser.avatar_url
+          }
+        }]);
+      }
+    } catch (error) {
+      console.error("Error toggling follow:", error);
+      toast.error("Failed to update follow status");
     }
   };
 
@@ -215,9 +283,34 @@ const ProfilePage = () => {
             {isOwnProfile && (
               <p className="username-display">@{userData.username}</p>
             )}
+
+            <div className="social-stats">
+              <div className="stat">
+                <span className="count">{followers.length}</span>
+                <span className="label">Followers</span>
+              </div>
+              <div className="stat">
+                <span className="count">{following.length}</span>
+                <span className="label">Following</span>
+              </div>
+              <div className="stat">
+                <span className="count">{sharedLists.length}</span>
+                <span className="label">Lists</span>
+              </div>
+            </div>
+
             <div className="join-date">
               Member since {new Date(userData.created_at).toLocaleDateString()}
             </div>
+
+            {!isOwnProfile && currentUser && (
+              <button
+                className={`follow-btn ${isFollowing ? "following" : ""}`}
+                onClick={handleFollowToggle}
+              >
+                {isFollowing ? "Following" : "Follow"}
+              </button>
+            )}
           </div>
         </div>
 
@@ -347,62 +440,240 @@ const ProfilePage = () => {
           )}
         </div>
 
-        <div className="profile-section favorites-section">
+        <div className="profile-section social-section">
           <div className="section-header">
             <div className="section-title">
-              <div className="section-icon">❤️</div>
+              <div className="section-icon">🎬</div>
               <h2>
-                {isOwnProfile
-                  ? "My Favorites"
-                  : `${userData.name || userData.username}'s Favorites`}
+                {isOwnProfile ? "My Content" : `${userData.name || userData.username}'s Content`}
               </h2>
             </div>
-            {displayFavorites.length > 0 && (
-              <div className="favorites-count">
-                {displayFavorites.length}{" "}
-                {displayFavorites.length === 1 ? "movie" : "movies"}
+          </div>
+
+          <div className="profile-tabs">
+            <button
+              className={`tab-btn ${activeTab === "favorites" ? "active" : ""}`}
+              onClick={() => setActiveTab("favorites")}
+            >
+              <span className="tab-icon">❤️</span>
+              Favorites
+              {displayFavorites.length > 0 && (
+                <span className="tab-count">{displayFavorites.length}</span>
+              )}
+            </button>
+            <button
+              className={`tab-btn ${activeTab === "lists" ? "active" : ""}`}
+              onClick={() => setActiveTab("lists")}
+            >
+              <span className="tab-icon">📋</span>
+              Shared Lists
+              {sharedLists.length > 0 && (
+                <span className="tab-count">{sharedLists.length}</span>
+              )}
+            </button>
+            <button
+              className={`tab-btn ${activeTab === "followers" ? "active" : ""}`}
+              onClick={() => setActiveTab("followers")}
+            >
+              <span className="tab-icon">👥</span>
+              Followers
+              {followers.length > 0 && (
+                <span className="tab-count">{followers.length}</span>
+              )}
+            </button>
+            <button
+              className={`tab-btn ${activeTab === "following" ? "active" : ""}`}
+              onClick={() => setActiveTab("following")}
+            >
+              <span className="tab-icon">👤</span>
+              Following
+              {following.length > 0 && (
+                <span className="tab-count">{following.length}</span>
+              )}
+            </button>
+          </div>
+
+          <div className="tab-content">
+            {activeTab === "favorites" && (
+              <div className="favorites-content">
+                {isLoadingFavorites ? (
+                  <div className="loading-state">
+                    <div className="loading-spinner"></div>
+                    <p>Loading favorites...</p>
+                  </div>
+                ) : displayFavorites.length > 0 ? (
+                  <div className="favorites-grid">
+                    {displayFavorites.map((movie, index) => (
+                      <div
+                        key={movie.userId}
+                        className="favorite-item"
+                        style={{ animationDelay: `${index * 0.1}s` }}
+                      >
+                        <MovieCard movie={movie} viewMode="grid" />
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="no-favorites">
+                    <div className="empty-icon">💔</div>
+                    <h3>
+                      {isOwnProfile
+                        ? "No favorites yet"
+                        : `${userData.name || userData.username} hasn't added any favorites yet`}
+                    </h3>
+                    <p>
+                      {isOwnProfile
+                        ? "Start building your collection by adding movies to your favorites!"
+                        : "Check back later to see what movies they've added."}
+                    </p>
+                    {isOwnProfile && (
+                      <button className="browse-button" onClick={() => navigate("/")}>
+                        <span className="button-icon">🎬</span>
+                        <span className="button-text">Browse Movies</span>
+                      </button>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {activeTab === "lists" && (
+              <div className="shared-lists-content">
+                {sharedLists.length > 0 ? (
+                  <div className="lists-grid">
+                    {sharedLists.map((list) => (
+                      <div key={list.id} className="list-card">
+                        <h3>{list.title}</h3>
+                        {list.description && <p>{list.description}</p>}
+                        <div className="list-movies">
+                          {list.SharedListMovies?.slice(0, 3).map((item) => (
+                            <div key={item.movie_id} className="movie-poster">
+                              <img
+                                src={item.Movies?.poster_url || "/placeholder.jpg"}
+                                alt={item.Movies?.title}
+                              />
+                            </div>
+                          ))}
+                          {list.SharedListMovies?.length > 3 && (
+                            <div className="more-count">
+                              +{list.SharedListMovies.length - 3}
+                            </div>
+                          )}
+                        </div>
+                        <div className="list-meta">
+                          <span>{list.SharedListMovies?.length || 0} movies</span>
+                          <span>{new Date(list.created_at).toLocaleDateString()}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="no-data">
+                    <div className="empty-icon">📋</div>
+                    <h3>No shared lists yet</h3>
+                    <p>
+                      {isOwnProfile 
+                        ? "Create your first shared list to showcase your movie collections!"
+                        : "This user hasn't created any public lists yet."}
+                    </p>
+                    {isOwnProfile && (
+                      <button 
+                        className="browse-button" 
+                        onClick={() => navigate("/shared-lists")}
+                      >
+                        <span className="button-icon">➕</span>
+                        <span className="button-text">Create List</span>
+                      </button>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {activeTab === "followers" && (
+              <div className="followers-content">
+                {followers.length > 0 ? (
+                  <div className="user-list">
+                    {followers.map((follower) => (
+                      <div key={follower.follower_id} className="user-item">
+                        <div className="user-avatar">
+                          {follower.Users?.avatar_url ? (
+                            <img src={follower.Users.avatar_url} alt={follower.Users.name} />
+                          ) : (
+                            <div className="avatar-placeholder">
+                              {follower.Users?.name?.charAt(0)?.toUpperCase() || "U"}
+                            </div>
+                          )}
+                        </div>
+                        <div className="user-info">
+                          <h4>{follower.Users?.name}</h4>
+                          <p>@{follower.Users?.username}</p>
+                        </div>
+                        <button
+                          className="view-profile-btn"
+                          onClick={() => navigate(`/profile/${follower.follower_id}`)}
+                        >
+                          View Profile
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="no-data">
+                    <div className="empty-icon">👥</div>
+                    <h3>No followers yet</h3>
+                    <p>
+                      {isOwnProfile 
+                        ? "Share your movie lists to attract followers!"
+                        : "This user doesn't have any followers yet."}
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {activeTab === "following" && (
+              <div className="following-content">
+                {following.length > 0 ? (
+                  <div className="user-list">
+                    {following.map((follow) => (
+                      <div key={follow.followee_id} className="user-item">
+                        <div className="user-avatar">
+                          {follow.Users?.avatar_url ? (
+                            <img src={follow.Users.avatar_url} alt={follow.Users.name} />
+                          ) : (
+                            <div className="avatar-placeholder">
+                              {follow.Users?.name?.charAt(0)?.toUpperCase() || "U"}
+                            </div>
+                          )}
+                        </div>
+                        <div className="user-info">
+                          <h4>{follow.Users?.name}</h4>
+                          <p>@{follow.Users?.username}</p>
+                        </div>
+                        <button
+                          className="view-profile-btn"
+                          onClick={() => navigate(`/profile/${follow.followee_id}`)}
+                        >
+                          View Profile
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="no-data">
+                    <div className="empty-icon">👤</div>
+                    <h3>Not following anyone yet</h3>
+                    <p>
+                      {isOwnProfile 
+                        ? "Discover other users and follow them to see their movie collections!"
+                        : "This user isn't following anyone yet."}
+                    </p>
+                  </div>
+                )}
               </div>
             )}
           </div>
-
-          {isLoadingFavorites ? (
-            <div className="loading-state">
-              <div className="loading-spinner"></div>
-              <p>Loading favorites...</p>
-            </div>
-          ) : displayFavorites.length > 0 ? (
-            <div className="favorites-grid">
-              {displayFavorites.map((movie, index) => (
-                <div
-                  key={movie.userId}
-                  className="favorite-item"
-                  style={{ animationDelay: `${index * 0.1}s` }}
-                >
-                  <MovieCard movie={movie} viewMode="grid" />
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="no-favorites">
-              <div className="empty-icon">💔</div>
-              <h3>
-                {isOwnProfile
-                  ? "No favorites yet"
-                  : `${userData.name || userData.username} hasn't added any favorites yet`}
-              </h3>
-              <p>
-                {isOwnProfile
-                  ? "Start building your collection by adding movies to your favorites!"
-                  : "Check back later to see what movies they've added."}
-              </p>
-              {isOwnProfile && (
-                <button className="browse-button" onClick={() => navigate("/")}>
-                  <span className="button-icon">🎬</span>
-                  <span className="button-text">Browse Movies</span>
-                </button>
-              )}
-            </div>
-          )}
         </div>
       </div>
     </div>
