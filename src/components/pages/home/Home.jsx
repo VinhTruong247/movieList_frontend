@@ -1,8 +1,8 @@
 import { Link } from "react-router";
 import { useMovies } from "../../../hooks/useMovies";
 import MovieCarousel from "./movieCarousel/MovieCarousel";
-import MovieCard from "./movieCard/MovieCard";
-import GenreList from "./movieGenreList/GenreList";
+import MovieCard from "../movie/movieCard/MovieCard";
+import GenreList from "../movie/movieGenreList/GenreList";
 import Loader from "../../common/Loader";
 import "./Home.scss";
 

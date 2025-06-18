@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
 import { useSelector } from "react-redux";
-import { getMovies } from "../../../../services/MovieListAPI";
-import Loader from "../../../common/Loader";
+import { getMovies } from "../../../../../services/MovieListAPI";
+import Loader from "../../../../common/Loader";
 import "./SimilarMovie.scss";
 
 const SimilarMovie = ({ currentMovie }) => {

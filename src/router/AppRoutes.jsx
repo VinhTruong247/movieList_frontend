@@ -1,5 +1,5 @@
 import Home from "../components/pages/home/Home";
-import MovieDetail from "../components/pages/movieDetail/MovieDetail";
+import MovieDetail from "../components/pages/movie/movieDetail/MovieDetail";
 import DirectorDetail from "../components/pages/director/DirectorDetail/DirectorDetail";
 import ActorDetail from "../components/pages/actor/ActorDetail/ActorDetail";
 import DirectorList from "../components/pages/director/DirectorList";
@@ -26,7 +26,6 @@ const AppRoutes = [
         path: "",
         element: <Home />,
       },
-
       {
         path: "profile/:userId",
         element: <ProfilePage />,

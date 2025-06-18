@@ -3,7 +3,7 @@ import { useParams, Link } from "react-router";
 import { useSelector } from "react-redux";
 import { getDirectorById } from "../../../../services/DirectorsAPI";
 import { getMovies } from "../../../../services/MovieListAPI";
-import MovieCard from "../../home/movieCard/MovieCard";
+import MovieCard from "../../movie/movieCard/MovieCard";
 import Loader from "../../../common/Loader";
 import "./DirectorDetail.scss";
 

@@ -1,6 +1,6 @@
 import { Link } from "react-router";
 import { useSelector } from "react-redux";
-import MovieCard from "../home/movieCard/MovieCard";
+import MovieCard from "../movie/movieCard/MovieCard";
 import "./FavoriteComponent.scss";
 
 const FavoriteComponent = ({ syncedFavorites = [] }) => {

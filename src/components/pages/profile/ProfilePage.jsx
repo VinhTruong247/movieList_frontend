@@ -10,7 +10,7 @@ import {
 import { useFavorites } from "../../../hooks/useFavorites";
 import { getUserFavorites } from "../../../services/FarvoritesAPI";
 import { fetchMovies } from "../../../redux/slices/moviesSlice";
-import MovieCard from "../home/movieCard/MovieCard";
+import MovieCard from "../movie/movieCard/MovieCard";
 import { ProfileSchema } from "../../auth/Validation";
 import { useToast } from "../../../hooks/useToast";
 import "./ProfilePage.scss";
