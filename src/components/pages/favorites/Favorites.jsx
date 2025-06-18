@@ -1,6 +1,8 @@
+import { useEffect } from "react";
 import { useNavigate } from "react-router";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { useFavorites } from "../../../hooks/useFavorites";
+import { fetchFavorites } from "../../../redux/slices/favoritesSlice";
 import FavoriteComponent from "./FavoriteComponent";
 import NotFound from "../../common/NotFound";
 import NotLogin from "../../common/NotLogin";
@@ -8,8 +10,16 @@ import "./Favorites.scss";
 
 const Favorites = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const currentUser = useSelector((state) => state.auth.currentUser);
   const { syncedFavorites, loadingFavorites } = useFavorites();
+
+  useEffect(() => {
+    if (currentUser?.id) {
+      console.log("Favorites component: Fetching favorites");
+      dispatch(fetchFavorites(currentUser.id));
+    }
+  }, [currentUser?.id, dispatch]);
 
   if (!currentUser) {
     return <NotLogin />;

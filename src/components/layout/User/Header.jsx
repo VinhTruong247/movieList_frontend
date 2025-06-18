@@ -1,12 +1,15 @@
+import { useEffect } from "react";
 import { Link, useNavigate } from "react-router";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { useAuth } from "../../../hooks/useAuth";
 import { useFavorites } from "../../../hooks/useFavorites";
 import { useToast } from "../../../hooks/useToast";
+import { fetchFavorites } from "../../../redux/slices/favoritesSlice";
 import "./styles/Header.scss";
 
 const Header = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const toast = useToast();
   const currentUser = useSelector((state) => state.auth.currentUser);
   const loading = useSelector((state) => state.auth.loading);
@@ -14,6 +17,13 @@ const Header = () => {
   const { syncedFavorites } = useFavorites();
 
   const favoritesCount = syncedFavorites?.length || 0;
+
+  useEffect(() => {
+    if (currentUser?.id) {
+      console.log("Fetching favorites for user:", currentUser.id);
+      dispatch(fetchFavorites(currentUser.id));
+    }
+  }, [currentUser?.id, dispatch]);
 
   const handleLogout = async () => {
     try {

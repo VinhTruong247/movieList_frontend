@@ -7,6 +7,7 @@ export const fetchFavorites = createAsyncThunk(
     if (!userId) return { favorites: [], syncedFavorites: [] };
 
     try {
+      console.log("Fetching favorites for user ID:", userId);
       const { data, error } = await supabase
         .from("Favorites")
         .select(
@@ -19,7 +20,9 @@ export const fetchFavorites = createAsyncThunk(
 
       if (error) throw error;
 
-      const formattedFavorites = data.map((item) => ({
+      console.log("Retrieved favorites data:", data?.length || 0);
+
+      const formattedFavorites = (data || []).map((item) => ({
         id: item.movie_id,
         ...item.Movies,
       }));
@@ -76,8 +79,11 @@ const favoritesSlice = createSlice({
         state.error = null;
       })
       .addCase(fetchFavorites.fulfilled, (state, action) => {
-        state.items = action.payload;
         state.loading = false;
+        state.items = action.payload || [];
+        state.syncedItems = action.payload || [];
+        if (!state.items) state.items = [];
+        if (!state.syncedItems) state.syncedItems = [];
       })
       .addCase(fetchFavorites.rejected, (state, action) => {
         state.error = action.payload;
