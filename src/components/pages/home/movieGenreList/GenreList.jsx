@@ -1,32 +1,42 @@
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect, useRef } from "react";
+import { useSelector } from "react-redux";
 import { getAllGenres } from "../../../../services/GenresAPI";
-import { MovieContext } from "../../../../context/MovieContext";
 import "./GenreList.scss";
 
-const GenreList = ({
-  selectedGenre,
-  onGenreSelect
-}) => {
+const GenreList = ({ selectedGenre, onGenreSelect }) => {
   const [genres, setGenres] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const { currentUser } = useContext(MovieContext);
+
+  const isMounted = useRef(true);
+  const currentUser = useSelector((state) => state.auth.currentUser);
   const isAdmin = currentUser?.role === "admin";
+
+  useEffect(() => {
+    return () => {
+      isMounted.current = false;
+    };
+  }, []);
 
   useEffect(() => {
     const fetchGenres = async () => {
       try {
         setLoading(true);
         const data = await getAllGenres(isAdmin);
-        setGenres(data);
+        if (isMounted.current) {
+          setGenres(data || []);
+        }
       } catch (err) {
         console.error("Failed to load genres:", err);
-        setError(err.message);
+        if (isMounted.current) {
+          setError(err.message);
+        }
       } finally {
-        setLoading(false);
+        if (isMounted.current) {
+          setLoading(false);
+        }
       }
     };
-
     fetchGenres();
   }, [isAdmin]);
 
@@ -44,7 +54,7 @@ const GenreList = ({
           <span className="error-icon">⚠️</span>
           Error loading genres: {error}
         </div>
-      ) : (
+      ) : genres && genres.length > 0 ? (
         <div className="genre-list">
           <button
             className={`genre-item ${selectedGenre === "all" ? "active" : ""}`}
@@ -68,6 +78,11 @@ const GenreList = ({
               )}
             </button>
           ))}
+        </div>
+      ) : (
+        <div className="genre-error">
+          <span className="error-icon">⚠️</span>
+          No genres available
         </div>
       )}
     </div>
