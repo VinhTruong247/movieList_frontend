@@ -96,7 +96,7 @@ const Header = () => {
               <span className="text">Home</span>
             </Link>
             <Link
-              to="/"
+              to="/movies"
               className={`nav-link ${isActive("/movies") ? "active" : ""}`}
             >
               <span className="icon">🎞️</span>
