@@ -15,6 +15,7 @@ import NotAuthen from "../components/common/NotAuthen";
 import NotFound from "../components/common/NotFound";
 import NotLogin from "../components/common/NotLogin";
 import { Navigate } from "react-router";
+import MovieList from "../components/pages/movie/MovieList";
 
 const AppRoutes = [
   {
@@ -31,7 +32,11 @@ const AppRoutes = [
         element: <ProfilePage />,
       },
       {
-        path: "movie/:movieId",
+        path: "movies",
+        element: <MovieList />,
+      },
+      {
+        path: "movies/:movieId",
         element: <MovieDetail />,
       },
       {

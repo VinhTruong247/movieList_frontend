@@ -61,7 +61,7 @@ const MovieCard = ({ movie, viewMode = "grid" }) => {
 
     return (
       <div className="movie-card list-view">
-        <Link to={`/movie/${movie.id}`} className="movie-link">
+        <Link to={`/movies/${movie.id}`} className="movie-link">
           <div className="movie-poster-list">
             <img src={movie.poster_url} alt={movie.title} />
             <div className="movie-type">{movie.type}</div>
