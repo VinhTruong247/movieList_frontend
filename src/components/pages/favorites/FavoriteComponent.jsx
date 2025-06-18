@@ -28,7 +28,7 @@ const FavoriteComponent = ({ syncedFavorites = [] }) => {
               {username}, start building your personal movie collection by
               adding movies to your favorites!
             </p>
-            <Link to="/" className="browse-button">
+            <Link to="/movies" className="browse-button">
               <span className="button-icon">🎬</span>
               <span className="button-text">Browse Movies</span>
               <div className="button-shine"></div>

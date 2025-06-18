@@ -108,7 +108,7 @@ const SimilarMovie = ({ currentMovie }) => {
 
           return (
             <Link
-              to={`/movie/${movie.id}`}
+              to={`/movies/${movie.id}`}
               key={movie.id}
               className="similar-movie-card"
             >

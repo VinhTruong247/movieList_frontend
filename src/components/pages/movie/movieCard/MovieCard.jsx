@@ -143,7 +143,7 @@ const MovieCard = ({ movie, viewMode = "grid" }) => {
 
   return (
     <div className="movie-card grid-view">
-      <Link to={`/movie/${movie.id}`} className="movie-link">
+      <Link to={`/movies/${movie.id}`} className="movie-link">
         <div className="movie-poster">
           <img src={movie.poster_url} alt={movie.title} />
           <div className="movie-type">{movie.type}</div>
@@ -207,7 +207,7 @@ const MovieCard = ({ movie, viewMode = "grid" }) => {
         </div>
       </Link>
       <div className="movie-actions">
-        <Link to={`/movie/${movie.id}`} className="view-button">
+        <Link to={`/movies/${movie.id}`} className="view-button">
           Watch Now
         </Link>
         {currentUser && currentUser.role !== "admin" && (

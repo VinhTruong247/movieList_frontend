@@ -100,7 +100,7 @@ const MovieCarousel = ({ movies }) => {
                 {shortenDescription(movie.description)}
               </p>
               <Link
-                to={`/movie/${movie.id}`}
+                to={`/movies/${movie.id}`}
                 className={`view-button ${index === currentSlide ? "active" : ""}`}
               >
                 View Details
