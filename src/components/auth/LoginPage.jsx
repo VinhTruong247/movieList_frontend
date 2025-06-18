@@ -1,15 +1,21 @@
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router";
+import { useSelector, useDispatch } from "react-redux";
 import { Formik, Form, Field } from "formik";
-import { loginUser } from "../../services/UserListAPI";
-import { MovieContext } from "../../context/MovieContext";
+import { loginUser } from "../../redux/slices/authSlice";
+import { useToast } from "../../hooks/useToast";
 import { LoginSchema } from "./Validation";
 import "./LoginPage.scss";
 
 const LoginPage = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const toast = useToast();
   const [error, setError] = useState("");
-  const { currentUser, loading } = useContext(MovieContext);
+
+  const currentUser = useSelector((state) => state.auth.currentUser);
+  const loading = useSelector((state) => state.auth.loading);
+  const authError = useSelector((state) => state.auth.error);
 
   useEffect(() => {
     if (!loading && currentUser) {
@@ -22,6 +28,12 @@ const LoginPage = () => {
   }, [currentUser, loading, navigate]);
 
   useEffect(() => {
+    if (authError) {
+      toast.error(authError);
+    }
+  }, [authError, toast]);
+
+  useEffect(() => {
     if (error) {
       const timer = setTimeout(() => {
         setError("");
@@ -32,21 +44,29 @@ const LoginPage = () => {
 
   const handleSubmit = async (values, { setSubmitting }) => {
     try {
-      const response = await loginUser({
-        email: values.email,
-        password: values.password,
-      });
+      const resultAction = await dispatch(
+        loginUser({
+          email: values.email,
+          password: values.password,
+        })
+      ).unwrap();
 
-      if (response.userData.role === "admin") {
-        navigate("/admin");
-      } else {
-        navigate("/");
+      if (resultAction.userData) {
+        toast.success("Welcome back!");
+
+        if (resultAction.userData.role === "admin") {
+          navigate("/admin");
+        } else {
+          navigate("/");
+        }
       }
     } catch (err) {
-      if (err.message.includes("disabled")) {
+      if (err.message && err.message.includes("disabled")) {
         setError("Your account has been disabled. Please contact support.");
+        toast.error("Your account has been disabled");
       } else {
         setError("Invalid email or password. Please try again.");
+        toast.error("Login failed");
       }
     } finally {
       setSubmitting(false);
@@ -71,9 +91,7 @@ const LoginPage = () => {
 
         {error && (
           <div
-            className={`auth-error ${
-              error.includes("disabled") ? "disabled" : ""
-            }`}
+            className={`auth-error ${error.includes("disabled") ? "disabled" : ""}`}
           >
             {error}
           </div>
@@ -96,9 +114,7 @@ const LoginPage = () => {
                   type="email"
                   name="email"
                   id="email"
-                  className={`form-input ${
-                    errors.email && touched.email ? "error" : ""
-                  }`}
+                  className={`form-input ${errors.email && touched.email ? "error" : ""}`}
                   placeholder="Enter your email"
                 />
                 {errors.email && touched.email && (
@@ -113,9 +129,7 @@ const LoginPage = () => {
                     type="password"
                     name="password"
                     id="password"
-                    className={`form-input ${
-                      errors.password && touched.password ? "error" : ""
-                    }`}
+                    className={`form-input ${errors.password && touched.password ? "error" : ""}`}
                     placeholder="Enter your password"
                   />
                 </div>
@@ -133,9 +147,7 @@ const LoginPage = () => {
 
               <button
                 type="submit"
-                className={`submit-btn ${
-                  !values.email || !values.password ? "disabled" : ""
-                }`}
+                className={`submit-btn ${!values.email || !values.password ? "disabled" : ""}`}
                 disabled={isSubmitting || !values.email || !values.password}
               >
                 {isSubmitting ? "Signing in..." : "Sign In"}

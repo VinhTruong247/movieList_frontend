@@ -46,16 +46,28 @@ export const signUp = async ({ email, password, username, name }) => {
   if (error) throw error;
 
   if (data.user) {
-    const { error: insertError } = await supabase.from("Users").insert({
-      id: data.user.id,
-      email: data.user.email,
-      name: name,
-      username: username,
-      role: "user",
-      isDisabled: false,
-    });
+    try {
+      const { error: insertError } = await supabase.from("Users").upsert(
+        {
+          id: data.user.id,
+          email: data.user.email,
+          name: name,
+          username: username,
+          role: "user",
+          isDisabled: false,
+        },
+        {
+          onConflict: "id",
+          ignoreDuplicates: false,
+        }
+      );
 
-    if (insertError) throw insertError;
+      if (insertError) {
+        console.warn("Insert error (non-fatal):", insertError);
+      }
+    } catch (insertErr) {
+      console.warn("Insert error caught (non-fatal):", insertErr);
+    }
   }
 
   return data;
