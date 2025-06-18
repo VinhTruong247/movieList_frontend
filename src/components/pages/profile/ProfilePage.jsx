@@ -1,82 +1,97 @@
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Formik, Form, Field } from "formik";
 import { useNavigate, useParams } from "react-router";
+import { useSelector, useDispatch } from "react-redux";
 import {
   getCurrentUser,
   updateUserProfile,
-  getUserById,
+  getOwnOrPublicProfile,
 } from "../../../services/UserListAPI";
 import { useFavorites } from "../../../hooks/useFavorites";
 import { getUserFavorites } from "../../../services/FarvoritesAPI";
+import { fetchMovies } from "../../../redux/slices/moviesSlice";
 import MovieCard from "../home/movieCard/MovieCard";
 import { ProfileSchema } from "../../auth/Validation";
-import { MovieContext } from "../../../context/MovieContext";
+import { useToast } from "../../../hooks/useToast";
 import "./ProfilePage.scss";
 
 const ProfilePage = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const toast = useToast();
   const { id } = useParams();
+  const toastShown = useRef(false);
+
   const [userData, setUserData] = useState(null);
   const [profileFavorites, setProfileFavorites] = useState([]);
-  const { syncedFavorites, loadingFavorites } = useFavorites();
   const [isEditing, setIsEditing] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState("");
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
-  const { currentUser, refreshMovies, movies } = useContext(MovieContext);
   const [loading, setLoading] = useState(true);
+
+  const currentUser = useSelector((state) => state.auth.currentUser);
+  const { syncedFavorites, loadingFavorites } = useFavorites();
 
   const isOwnProfile = currentUser?.id === id || (!id && currentUser);
 
-  useEffect(() => {
-    const loadUserData = async () => {
-      try {
-        setLoading(true);
-        if (id) {
-          const profileData = await getUserById(id);
+  const loadUserData = useCallback(async () => {
+    try {
+      setLoading(true);
+      if (id) {
+        const profileData = await getOwnOrPublicProfile(id);
 
-          if (!profileData) {
-            navigate("/not-found");
-            return;
-          }
-
-          setUserData(profileData);
-          setAvatarUrl(profileData.avatar_url || "");
-
-          const favData = await getUserFavorites(id);
-
-          if (favData) {
-            const favMovies = favData
-              .map((item) => item.Movies)
-              .filter(
-                (movie) =>
-                  movie && (!movie.isDisabled || currentUser?.role === "admin")
-              );
-
-            setProfileFavorites(favMovies);
-          }
-        } else if (currentUser) {
-          const user = await getCurrentUser();
-          if (user?.userData?.role === "admin") {
-            navigate("/admin");
-            return;
-          }
-          setUserData(user.userData);
-          setAvatarUrl(user.userData.avatar_url || "");
-        } else {
-          setError("User not found");
+        if (!profileData) {
+          navigate("/not-found");
           return;
         }
-      } catch (err) {
-        console.error("Error loading profile data:", err);
-        setError("Failed to load profile data");
-      } finally {
-        setLoading(false);
-      }
-    };
 
+        setUserData(profileData);
+        setAvatarUrl(profileData.avatar_url || "");
+
+        const favData = await getUserFavorites(id);
+
+        if (favData) {
+          const favMovies = favData
+            .map((item) => item.Movies)
+            .filter(
+              (movie) =>
+                movie && (!movie.isDisabled || currentUser?.role === "admin")
+            );
+
+          setProfileFavorites(favMovies);
+        }
+      } else if (currentUser) {
+        const user = await getCurrentUser();
+        if (user?.userData?.role === "admin") {
+          navigate("/admin");
+          return;
+        }
+        setUserData(user.userData);
+        setAvatarUrl(user.userData.avatar_url || "");
+      } else {
+        setError("User not found");
+        if (!toastShown.current) {
+          toast.error("User not found");
+          toastShown.current = true;
+        }
+        return;
+      }
+    } catch (err) {
+      console.error("Error loading profile data:", err);
+      setError("Failed to load profile data");
+      if (!toastShown.current) {
+        toast.error("Failed to load profile data");
+        toastShown.current = true;
+      }
+    } finally {
+      setLoading(false);
+    }
+  }, [id, currentUser, navigate]);
+
+  useEffect(() => {
     loadUserData();
-  }, [id, currentUser, navigate, movies]);
+  }, [loadUserData]);
 
   const handleSubmit = async (values) => {
     try {
@@ -93,14 +108,17 @@ const ProfilePage = () => {
         ...updates,
       });
 
+      dispatch(fetchMovies(currentUser?.role === "admin"));
+
       setSuccessMessage("Profile updated successfully!");
+      toast.success("Profile updated successfully!");
       setIsEditing(false);
-      if (refreshMovies) {
-        await refreshMovies();
-      }
+
       setTimeout(() => setSuccessMessage(""), 3000);
     } catch (err) {
+      console.error("Profile update error:", err);
       setError("Failed to update profile. Please try again.");
+      toast.error("Failed to update profile");
       setTimeout(() => setError(""), 3000);
     }
   };

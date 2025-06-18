@@ -1,23 +1,32 @@
-import { useContext } from "react";
 import { Link, useNavigate } from "react-router";
-import { MovieContext } from "../../../context/MovieContext";
+import { useSelector } from "react-redux";
 import { useAuth } from "../../../hooks/useAuth";
 import { useFavorites } from "../../../hooks/useFavorites";
+import { useToast } from "../../../hooks/useToast";
 import "./styles/Header.scss";
 
 const Header = () => {
   const navigate = useNavigate();
-  const context = useContext(MovieContext);
-  const { currentUser, loading } = context;
+  const toast = useToast();
+  const currentUser = useSelector((state) => state.auth.currentUser);
+  const loading = useSelector((state) => state.auth.loading);
   const { logout, isAdmin } = useAuth();
   const { syncedFavorites } = useFavorites();
 
   const favoritesCount = syncedFavorites?.length || 0;
 
   const handleLogout = async () => {
-    const result = await logout(navigate);
-    if (result.success && window.location.pathname !== "/login") {
-      window.location.href = "/login";
+    try {
+      const result = await logout(navigate);
+      if (result.success) {
+        toast.success("Successfully logged out");
+        if (window.location.pathname !== "/login") {
+          window.location.href = "/login";
+        }
+      }
+    } catch (error) {
+      toast.error("Logout failed");
+      console.error("Logout failed:", error);
     }
   };
 
@@ -67,6 +76,7 @@ const Header = () => {
                     currentUser?.username ??
                     currentUser?.role}
                 </span>
+
                 {isAdmin ? (
                   <Link to="/admin" className="nav-link admin-link">
                     Admin Dashboard

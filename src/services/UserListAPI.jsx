@@ -148,3 +148,36 @@ export const getUserById = async (userId) => {
     return null;
   }
 };
+
+export const getOwnOrPublicProfile = async (userId) => {
+  try {
+    if (!userId) return null;
+
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+
+    if (session && session.user && session.user.id === userId) {
+      const { data: userData, error: userError } = await supabase
+        .from("Users")
+        .select("*")
+        .eq("id", userId)
+        .single();
+
+      if (userError) {
+        console.warn("Error fetching own user data:", userError);
+        return null;
+      }
+
+      return {
+        ...userData,
+        isFullProfile: true,
+      };
+    }
+
+    return await getUserById(userId);
+  } catch (error) {
+    console.error("Failed to fetch profile:", error);
+    return null;
+  }
+};
