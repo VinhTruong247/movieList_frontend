@@ -8,7 +8,7 @@ import Loader from "../../../common/Loader";
 import "./DirectorDetail.scss";
 
 const DirectorDetail = () => {
-  const { id } = useParams();
+  const { directorId } = useParams();
   const [director, setDirector] = useState(null);
   const [directorMovies, setDirectorMovies] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -20,7 +20,7 @@ const DirectorDetail = () => {
     const fetchDirectorData = async () => {
       try {
         setLoading(true);
-        const directorData = await getDirectorById(id);
+        const directorData = await getDirectorById(directorId);
         if (directorData.isDisabled && !isAdmin) {
           setError("Director not found or is currently unavailable.");
           return;
@@ -36,7 +36,7 @@ const DirectorDetail = () => {
           return movie.MovieDirectors.some(
             (md) =>
               md.Directors &&
-              md.Directors.id === id &&
+              md.Directors.id === directorId &&
               (isAdmin || !md.Directors.isDisabled)
           );
         });
@@ -57,10 +57,10 @@ const DirectorDetail = () => {
       }
     };
 
-    if (id) {
+    if (directorId) {
       fetchDirectorData();
     }
-  }, [id, isAdmin]);
+  }, [directorId, isAdmin]);
 
   if (loading) return <Loader />;
 

@@ -17,7 +17,7 @@ import ReviewForm from "./ReviewForm/ReviewForm";
 import "./MovieDetail.scss";
 
 const MovieDetail = () => {
-  const { id } = useParams();
+  const { movieId } = useParams();
   const [movie, setMovie] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -40,7 +40,7 @@ const MovieDetail = () => {
     const fetchMovie = async () => {
       try {
         setLoading(true);
-        const movieData = await getMovieById(id);
+        const movieData = await getMovieById(movieId);
         setMovie(movieData);
       } catch (err) {
         console.error("Error fetching movie:", err);
@@ -50,10 +50,10 @@ const MovieDetail = () => {
       }
     };
 
-    if (id) {
+    if (movieId) {
       fetchMovie();
     }
-  }, [id]);
+  }, [movieId]);
 
   const formatRuntime = () => {
     if (!movie.runtime) return "Not specified";
@@ -80,8 +80,8 @@ const MovieDetail = () => {
   };
 
   const refreshMovieData = async () => {
-    movieCache.delete(id);
-    const updatedMovieData = await getMovieById(id);
+    movieCache.delete(movieId);
+    const updatedMovieData = await getMovieById(movieId);
     setMovie(updatedMovieData);
   };
 
@@ -102,7 +102,7 @@ const MovieDetail = () => {
       <div className="cast-grid">
         {visibleActors.map((actorRole, index) => (
           <Link
-            to={`/actor/${actorRole.Actors?.id}`}
+            to={`/actors/${actorRole.Actors?.id}`}
             key={actorRole.Actors?.id || index}
           >
             <div className="cast-card">
@@ -141,7 +141,7 @@ const MovieDetail = () => {
 
     return visibleDirectors.map((director, index) => (
       <Link
-        to={`/director/${director.Directors?.id}`}
+        to={`/directors/${director.Directors?.id}`}
         key={director.Directors?.id || index}
       >
         <span
@@ -356,7 +356,7 @@ const MovieDetail = () => {
 
   const handleDeleteReview = async (reviewId) => {
     if (!currentUser) return;
-    
+
     const confirmMessage =
       currentUser.role === "admin"
         ? "Are you sure you want to delete this review as an admin?"

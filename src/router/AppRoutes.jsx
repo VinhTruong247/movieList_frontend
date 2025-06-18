@@ -28,11 +28,11 @@ const AppRoutes = [
       },
 
       {
-        path: "profile/:id",
+        path: "profile/:userId",
         element: <ProfilePage />,
       },
       {
-        path: "movie/:id",
+        path: "movie/:movieId",
         element: <MovieDetail />,
       },
       {
@@ -40,7 +40,7 @@ const AppRoutes = [
         element: <DirectorList />,
       },
       {
-        path: "director/:id",
+        path: "directors/:directorId",
         element: <DirectorDetail />,
       },
       {
@@ -48,7 +48,7 @@ const AppRoutes = [
         element: <ActorList />,
       },
       {
-        path: "actor/:id",
+        path: "actors/:actorId",
         element: <ActorDetail />,
       },
       {

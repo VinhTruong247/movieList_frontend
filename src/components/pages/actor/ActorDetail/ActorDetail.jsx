@@ -8,7 +8,7 @@ import Loader from "../../../common/Loader";
 import "./ActorDetail.scss";
 
 const ActorDetail = () => {
-  const { id } = useParams();
+  const { actorId } = useParams();
   const [actor, setActor] = useState(null);
   const [actorMovies, setActorMovies] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -20,7 +20,7 @@ const ActorDetail = () => {
     const fetchActorData = async () => {
       try {
         setLoading(true);
-        const actorData = await getActorById(id);
+        const actorData = await getActorById(actorId);
         if (actorData.isDisabled && !isAdmin) {
           setError("Actor not found or is currently unavailable.");
           return;
@@ -36,7 +36,7 @@ const ActorDetail = () => {
           return movie.MovieActors.some(
             (ma) =>
               ma.Actors &&
-              ma.Actors.id === id &&
+              ma.Actors.id === actorId &&
               (isAdmin || !ma.Actors.isDisabled)
           );
         });
@@ -57,10 +57,10 @@ const ActorDetail = () => {
       }
     };
 
-    if (id) {
+    if (actorId) {
       fetchActorData();
     }
-  }, [id, isAdmin]);
+  }, [actorId, isAdmin]);
 
   if (loading) return <Loader />;
 

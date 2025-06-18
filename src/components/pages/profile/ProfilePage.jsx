@@ -19,7 +19,7 @@ const ProfilePage = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const toast = useToast();
-  const { id } = useParams();
+  const { userId } = useParams();
   const toastShown = useRef(false);
 
   const [userData, setUserData] = useState(null);
@@ -33,13 +33,14 @@ const ProfilePage = () => {
   const currentUser = useSelector((state) => state.auth.currentUser);
   const { syncedFavorites, loadingFavorites } = useFavorites();
 
-  const isOwnProfile = currentUser?.id === id || (!id && currentUser);
+  const isOwnProfile =
+    currentUser?.userId === userId || (!userId && currentUser);
 
   const loadUserData = useCallback(async () => {
     try {
       setLoading(true);
-      if (id) {
-        const profileData = await getOwnOrPublicProfile(id);
+      if (userId) {
+        const profileData = await getOwnOrPublicProfile(userId);
 
         if (!profileData) {
           navigate("/not-found");
@@ -49,7 +50,7 @@ const ProfilePage = () => {
         setUserData(profileData);
         setAvatarUrl(profileData.avatar_url || "");
 
-        const favData = await getUserFavorites(id);
+        const favData = await getUserFavorites(userId);
 
         if (favData) {
           const favMovies = favData
@@ -87,7 +88,7 @@ const ProfilePage = () => {
     } finally {
       setLoading(false);
     }
-  }, [id, currentUser, navigate]);
+  }, [userId, currentUser, navigate]);
 
   useEffect(() => {
     loadUserData();
@@ -101,7 +102,7 @@ const ProfilePage = () => {
         avatar_url: values.avatar_url || avatarUrl,
       };
 
-      await updateUserProfile(userData.id, updates);
+      await updateUserProfile(userData.userId, updates);
 
       setUserData({
         ...userData,
@@ -254,7 +255,7 @@ const ProfilePage = () => {
                     <Field
                       type="text"
                       name="username"
-                      id="username"
+                      userId="username"
                       className={
                         errors.username && touched.username ? "error" : ""
                       }
@@ -266,7 +267,7 @@ const ProfilePage = () => {
 
                   <div className="form-group">
                     <label htmlFor="name">Display Name</label>
-                    <Field type="text" name="name" id="name" />
+                    <Field type="text" name="name" userId="name" />
                   </div>
 
                   <div className="form-group">
@@ -274,7 +275,7 @@ const ProfilePage = () => {
                     <Field
                       type="text"
                       name="avatar_url"
-                      id="avatar_url"
+                      userId="avatar_url"
                       placeholder="https://example.com/your-image.jpg"
                     />
                     <div className="field-help">
@@ -373,7 +374,7 @@ const ProfilePage = () => {
             <div className="favorites-grid">
               {displayFavorites.map((movie, index) => (
                 <div
-                  key={movie.id}
+                  key={movie.userId}
                   className="favorite-item"
                   style={{ animationDelay: `${index * 0.1}s` }}
                 >

@@ -36,7 +36,7 @@ const DirectorList = () => {
         <div className="directors-grid">
           {directors.map((director) => (
             <Link
-              to={`/director/${director.id}`}
+              to={`/directors/${director.id}`}
               className="director-card"
               key={director.id}
             >
