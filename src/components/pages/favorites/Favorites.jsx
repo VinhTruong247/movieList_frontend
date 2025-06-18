@@ -16,7 +16,6 @@ const Favorites = () => {
 
   useEffect(() => {
     if (currentUser?.id) {
-      console.log("Favorites component: Fetching favorites");
       dispatch(fetchFavorites(currentUser.id));
     }
   }, [currentUser?.id, dispatch]);

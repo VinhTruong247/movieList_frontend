@@ -223,7 +223,6 @@ export const updateMovie = async (movieId, movieData) => {
       const { data: actorDeleteResult, error: deleteActorError } =
         await supabase.from("MovieActors").delete().eq("movie_id", movieId);
       if (deleteActorError) throw deleteActorError;
-      console.log("Deleted actors:", actorDeleteResult);
       if (movieData.actors.length > 0) {
         const actorAssociations = movieData.actors.map((actor) => ({
           movie_id: movieId,

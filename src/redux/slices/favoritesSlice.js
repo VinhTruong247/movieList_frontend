@@ -7,7 +7,6 @@ export const fetchFavorites = createAsyncThunk(
     if (!userId) return { favorites: [], syncedFavorites: [] };
 
     try {
-      console.log("Fetching favorites for user ID:", userId);
       const { data, error } = await supabase
         .from("Favorites")
         .select(
@@ -19,8 +18,6 @@ export const fetchFavorites = createAsyncThunk(
         .eq("user_id", userId);
 
       if (error) throw error;
-
-      console.log("Retrieved favorites data:", data?.length || 0);
 
       const formattedFavorites = (data || []).map((item) => ({
         id: item.movie_id,
