@@ -8,19 +8,12 @@ import {
   getOwnOrPublicProfile,
 } from "../../../services/UserListAPI";
 import { useFavorites } from "../../../hooks/useFavorites";
+import { useSocial } from "../../../hooks/useSocial";
 import { getUserFavorites } from "../../../services/FarvoritesAPI";
 import { fetchMovies } from "../../../redux/slices/moviesSlice";
 import MovieCard from "../movie/movieCard/MovieCard";
 import { ProfileSchema } from "../../auth/Validation";
 import { useToast } from "../../../hooks/useToast";
-import {
-  followUser,
-  unfollowUser,
-  getFollowers,
-  getFollowing,
-  checkIfFollowing,
-  getSharedLists,
-} from "../../../services/SocialAPI";
 import "./ProfilePage.scss";
 
 const ProfilePage = () => {
@@ -36,22 +29,30 @@ const ProfilePage = () => {
   const [avatarUrl, setAvatarUrl] = useState("");
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
-  const [loading, setLoading] = useState(true);
-
-  const [followers, setFollowers] = useState([]);
-  const [following, setFollowing] = useState([]);
-  const [sharedLists, setSharedLists] = useState([]);
-  const [isFollowing, setIsFollowing] = useState(false);
   const [activeTab, setActiveTab] = useState("favorites");
 
   const currentUser = useSelector((state) => state.auth.currentUser);
   const { syncedFavorites, loadingFavorites } = useFavorites();
 
+  const {
+    followers,
+    following,
+    userLists,
+    followersLoading,
+    followingLoading,
+    listsLoading,
+    handleFollowUser,
+    handleUnfollowUser,
+    isFollowing: checkIsFollowing,
+    loadUserSocialData,
+  } = useSocial();
+
   const isOwnProfile = currentUser?.id === userId || (!userId && currentUser);
+  const loading =
+    followersLoading || followingLoading || listsLoading || loadingFavorites;
 
   const loadUserData = useCallback(async () => {
     try {
-      setLoading(true);
       if (userId) {
         const profileData = await getOwnOrPublicProfile(userId);
 
@@ -62,15 +63,9 @@ const ProfilePage = () => {
 
         setUserData(profileData);
         setAvatarUrl(profileData.avatar_url || "");
+        loadUserSocialData(userId);
 
-        const [favData, followersData, followingData, listsData] =
-          await Promise.all([
-            getUserFavorites(userId),
-            getFollowers(userId),
-            getFollowing(userId),
-            getSharedLists(userId, !isOwnProfile ? true : null),
-          ]);
-
+        const favData = await getUserFavorites(userId);
         if (favData) {
           const favMovies = favData
             .map((item) => item.Movies)
@@ -81,15 +76,6 @@ const ProfilePage = () => {
 
           setProfileFavorites(favMovies);
         }
-
-        setFollowers(followersData);
-        setFollowing(followingData);
-        setSharedLists(listsData);
-
-        if (currentUser && currentUser.id !== userId) {
-          const following = await checkIfFollowing(currentUser.id, userId);
-          setIsFollowing(following);
-        }
       } else if (currentUser) {
         const user = await getCurrentUser();
         if (user?.userData?.role === "admin") {
@@ -98,16 +84,7 @@ const ProfilePage = () => {
         }
         setUserData(user.userData);
         setAvatarUrl(user.userData.avatar_url || "");
-
-        const [followersData, followingData, listsData] = await Promise.all([
-          getFollowers(currentUser.id),
-          getFollowing(currentUser.id),
-          getSharedLists(currentUser.id),
-        ]);
-
-        setFollowers(followersData);
-        setFollowing(followingData);
-        setSharedLists(listsData);
+        loadUserSocialData(currentUser.id);
       } else {
         setError("User not found");
         if (!toastShown.current) {
@@ -123,10 +100,8 @@ const ProfilePage = () => {
         toast.error("Failed to load profile data");
         toastShown.current = true;
       }
-    } finally {
-      setLoading(false);
     }
-  }, [userId, currentUser, navigate, isOwnProfile]);
+  }, [userId, currentUser, navigate, loadUserSocialData]);
 
   useEffect(() => {
     loadUserData();
@@ -169,35 +144,23 @@ const ProfilePage = () => {
     }
 
     try {
-      if (isFollowing) {
-        await unfollowUser(currentUser.id, userId);
-        setIsFollowing(false);
-        setFollowers((prev) =>
-          prev.filter((f) => f.follower_id !== currentUser.id)
-        );
+      if (checkIsFollowing(userId)) {
+        await handleUnfollowUser(userId);
       } else {
-        await followUser(currentUser.id, userId);
-        setIsFollowing(true);
-        setFollowers((prev) => [
-          ...prev,
-          {
-            follower_id: currentUser.id,
-            Users: {
-              id: currentUser.id,
-              username: currentUser.username,
-              name: currentUser.name,
-              avatar_url: currentUser.avatar_url,
-            },
-          },
-        ]);
+        const followeeData = {
+          id: userData.id,
+          username: userData.username,
+          name: userData.name,
+          avatar_url: userData.avatar_url,
+        };
+        await handleFollowUser(userId, followeeData);
       }
     } catch (error) {
       console.error("Error toggling follow:", error);
-      toast.error("Failed to update follow status");
     }
   };
 
-  if (loading) {
+  if (loading && !userData) {
     return (
       <div className="profile-container">
         <div className="loading-state">
@@ -221,6 +184,7 @@ const ProfilePage = () => {
 
   const displayFavorites = isOwnProfile ? syncedFavorites : profileFavorites;
   const isLoadingFavorites = isOwnProfile ? loadingFavorites : loading;
+  const sharedLists = userLists;
 
   return (
     <div className="profile-container">
@@ -310,10 +274,10 @@ const ProfilePage = () => {
 
             {!isOwnProfile && currentUser && (
               <button
-                className={`follow-btn ${isFollowing ? "following" : ""}`}
+                className={`follow-btn ${checkIsFollowing(userId) ? "following" : ""}`}
                 onClick={handleFollowToggle}
               >
-                {isFollowing ? "Following" : "Follow"}
+                {checkIsFollowing(userId) ? "Following" : "Follow"}
               </button>
             )}
           </div>
