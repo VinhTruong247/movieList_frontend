@@ -170,7 +170,10 @@ const SocialPage = () => {
                       <h3>Trending Movies</h3>
                       <button
                         className="see-all-btn"
-                        onClick={() => setActiveTab("trending")}
+                        onClick={() => {
+                          setActiveTab("trending");
+                          window.scrollTo({ top: 0, behavior: "smooth" });
+                        }}
                       >
                         See All
                       </button>
@@ -192,7 +195,10 @@ const SocialPage = () => {
                         <h3>People You Follow</h3>
                         <button
                           className="see-all-btn"
-                          onClick={() => setActiveTab("network")}
+                          onClick={() => {
+                            setActiveTab("network");
+                            window.scrollTo({ top: 0, behavior: "smooth" });
+                          }}
                         >
                           See All
                         </button>
@@ -251,7 +257,10 @@ const SocialPage = () => {
                       <h3>Featured Lists</h3>
                       <button
                         className="see-all-btn"
-                        onClick={() => setActiveTab("lists")}
+                        onClick={() => {
+                          setActiveTab("lists");
+                          window.scrollTo({ top: 0, behavior: "smooth" });
+                        }}
                       >
                         See All
                       </button>
