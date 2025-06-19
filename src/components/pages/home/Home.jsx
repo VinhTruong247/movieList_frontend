@@ -168,11 +168,11 @@ const Home = () => {
             )}
 
             <div className="browse-home-section">
-              <Link to="/actors" className="browse-btn actors-btn">
+              <Link to="/actors" className="home-browse-btn actors-btn">
                 <span className="icon">🎭</span>
                 <span className="text">Browse Actors</span>
               </Link>
-              <Link to="/directors" className="browse-btn directors-btn">
+              <Link to="/directors" className="home-browse-btn directors-btn">
                 <span className="icon">🎬</span>
                 <span className="text">Browse Directors</span>
               </Link>

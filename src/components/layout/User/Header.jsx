@@ -103,7 +103,7 @@ const Header = () => {
               <span className="text">Movies</span>
             </Link>
             <Link
-              to="/"
+              to="/social"
               className={`nav-link ${isActive("/social") ? "active" : ""}`}
             >
               <span className="icon">👥</span>

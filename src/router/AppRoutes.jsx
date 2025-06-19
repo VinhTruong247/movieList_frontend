@@ -5,6 +5,7 @@ import ActorDetail from "../components/pages/actor/ActorDetail/ActorDetail";
 import DirectorList from "../components/pages/director/DirectorList";
 import ActorList from "../components/pages/actor/ActorList";
 import Favorites from "../components/pages/favorites/Favorites";
+import SocialPage from "../components/pages/social/SocialPage";
 import LoginPage from "../components/auth/LoginPage";
 import RegisterPage from "../components/auth/RegisterPage";
 import Layout from "../components/layout/User/Layout";
@@ -58,6 +59,10 @@ const AppRoutes = [
       {
         path: "favorites",
         element: <Favorites />,
+      },
+      {
+        path: "social",
+        element: <SocialPage />,
       },
       {
         path: "login",
