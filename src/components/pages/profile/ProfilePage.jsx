@@ -47,8 +47,7 @@ const ProfilePage = () => {
   const currentUser = useSelector((state) => state.auth.currentUser);
   const { syncedFavorites, loadingFavorites } = useFavorites();
 
-  const isOwnProfile =
-    currentUser?.userId === userId || (!userId && currentUser);
+  const isOwnProfile = currentUser?.id === userId || (!userId && currentUser);
 
   const loadUserData = useCallback(async () => {
     try {
@@ -64,12 +63,13 @@ const ProfilePage = () => {
         setUserData(profileData);
         setAvatarUrl(profileData.avatar_url || "");
 
-        const [favData, followersData, followingData, listsData] = await Promise.all([
-          getUserFavorites(userId),
-          getFollowers(userId),
-          getFollowing(userId),
-          getSharedLists(userId, !isOwnProfile ? true : null),
-        ]);
+        const [favData, followersData, followingData, listsData] =
+          await Promise.all([
+            getUserFavorites(userId),
+            getFollowers(userId),
+            getFollowing(userId),
+            getSharedLists(userId, !isOwnProfile ? true : null),
+          ]);
 
         if (favData) {
           const favMovies = favData
@@ -86,8 +86,8 @@ const ProfilePage = () => {
         setFollowing(followingData);
         setSharedLists(listsData);
 
-        if (currentUser && currentUser.userId !== userId) {
-          const following = await checkIfFollowing(currentUser.userId, userId);
+        if (currentUser && currentUser.id !== userId) {
+          const following = await checkIfFollowing(currentUser.id, userId);
           setIsFollowing(following);
         }
       } else if (currentUser) {
@@ -100,9 +100,9 @@ const ProfilePage = () => {
         setAvatarUrl(user.userData.avatar_url || "");
 
         const [followersData, followingData, listsData] = await Promise.all([
-          getFollowers(currentUser.userId),
-          getFollowing(currentUser.userId),
-          getSharedLists(currentUser.userId),
+          getFollowers(currentUser.id),
+          getFollowing(currentUser.id),
+          getSharedLists(currentUser.id),
         ]);
 
         setFollowers(followersData);
@@ -140,7 +140,7 @@ const ProfilePage = () => {
         avatar_url: values.avatar_url || avatarUrl,
       };
 
-      await updateUserProfile(userData.userId, updates);
+      await updateUserProfile(userData.id, updates);
 
       setUserData({
         ...userData,
@@ -170,21 +170,26 @@ const ProfilePage = () => {
 
     try {
       if (isFollowing) {
-        await unfollowUser(currentUser.userId, userId);
+        await unfollowUser(currentUser.id, userId);
         setIsFollowing(false);
-        setFollowers(prev => prev.filter(f => f.follower_id !== currentUser.userId));
+        setFollowers((prev) =>
+          prev.filter((f) => f.follower_id !== currentUser.id)
+        );
       } else {
-        await followUser(currentUser.userId, userId);
+        await followUser(currentUser.id, userId);
         setIsFollowing(true);
-        setFollowers(prev => [...prev, {
-          follower_id: currentUser.userId,
-          Users: {
-            id: currentUser.userId,
-            username: currentUser.username,
-            name: currentUser.name,
-            avatar_url: currentUser.avatar_url
-          }
-        }]);
+        setFollowers((prev) => [
+          ...prev,
+          {
+            follower_id: currentUser.id,
+            Users: {
+              id: currentUser.id,
+              username: currentUser.username,
+              name: currentUser.name,
+              avatar_url: currentUser.avatar_url,
+            },
+          },
+        ]);
       }
     } catch (error) {
       console.error("Error toggling follow:", error);
@@ -445,7 +450,9 @@ const ProfilePage = () => {
             <div className="section-title">
               <div className="section-icon">🎬</div>
               <h2>
-                {isOwnProfile ? "My Content" : `${userData.name || userData.username}'s Content`}
+                {isOwnProfile
+                  ? "My Content"
+                  : `${userData.name || userData.username}'s Content`}
               </h2>
             </div>
           </div>
@@ -505,7 +512,7 @@ const ProfilePage = () => {
                   <div className="favorites-grid">
                     {displayFavorites.map((movie, index) => (
                       <div
-                        key={movie.userId}
+                        key={movie.id}
                         className="favorite-item"
                         style={{ animationDelay: `${index * 0.1}s` }}
                       >
@@ -527,7 +534,10 @@ const ProfilePage = () => {
                         : "Check back later to see what movies they've added."}
                     </p>
                     {isOwnProfile && (
-                      <button className="browse-button" onClick={() => navigate("/")}>
+                      <button
+                        className="browse-button"
+                        onClick={() => navigate("/")}
+                      >
                         <span className="button-icon">🎬</span>
                         <span className="button-text">Browse Movies</span>
                       </button>
@@ -549,7 +559,9 @@ const ProfilePage = () => {
                           {list.SharedListMovies?.slice(0, 3).map((item) => (
                             <div key={item.movie_id} className="movie-poster">
                               <img
-                                src={item.Movies?.poster_url || "/placeholder.jpg"}
+                                src={
+                                  item.Movies?.poster_url || "/placeholder.jpg"
+                                }
                                 alt={item.Movies?.title}
                               />
                             </div>
@@ -561,8 +573,12 @@ const ProfilePage = () => {
                           )}
                         </div>
                         <div className="list-meta">
-                          <span>{list.SharedListMovies?.length || 0} movies</span>
-                          <span>{new Date(list.created_at).toLocaleDateString()}</span>
+                          <span>
+                            {list.SharedListMovies?.length || 0} movies
+                          </span>
+                          <span>
+                            {new Date(list.created_at).toLocaleDateString()}
+                          </span>
                         </div>
                       </div>
                     ))}
@@ -572,13 +588,13 @@ const ProfilePage = () => {
                     <div className="empty-icon">📋</div>
                     <h3>No shared lists yet</h3>
                     <p>
-                      {isOwnProfile 
+                      {isOwnProfile
                         ? "Create your first shared list to showcase your movie collections!"
                         : "This user hasn't created any public lists yet."}
                     </p>
                     {isOwnProfile && (
-                      <button 
-                        className="browse-button" 
+                      <button
+                        className="browse-button"
                         onClick={() => navigate("/shared-lists")}
                       >
                         <span className="button-icon">➕</span>
@@ -598,10 +614,14 @@ const ProfilePage = () => {
                       <div key={follower.follower_id} className="user-item">
                         <div className="user-avatar">
                           {follower.Users?.avatar_url ? (
-                            <img src={follower.Users.avatar_url} alt={follower.Users.name} />
+                            <img
+                              src={follower.Users.avatar_url}
+                              alt={follower.Users.name}
+                            />
                           ) : (
                             <div className="avatar-placeholder">
-                              {follower.Users?.name?.charAt(0)?.toUpperCase() || "U"}
+                              {follower.Users?.name?.charAt(0)?.toUpperCase() ||
+                                "U"}
                             </div>
                           )}
                         </div>
@@ -611,7 +631,9 @@ const ProfilePage = () => {
                         </div>
                         <button
                           className="view-profile-btn"
-                          onClick={() => navigate(`/profile/${follower.follower_id}`)}
+                          onClick={() =>
+                            navigate(`/profile/${follower.follower_id}`)
+                          }
                         >
                           View Profile
                         </button>
@@ -623,7 +645,7 @@ const ProfilePage = () => {
                     <div className="empty-icon">👥</div>
                     <h3>No followers yet</h3>
                     <p>
-                      {isOwnProfile 
+                      {isOwnProfile
                         ? "Share your movie lists to attract followers!"
                         : "This user doesn't have any followers yet."}
                     </p>
@@ -640,10 +662,14 @@ const ProfilePage = () => {
                       <div key={follow.followee_id} className="user-item">
                         <div className="user-avatar">
                           {follow.Users?.avatar_url ? (
-                            <img src={follow.Users.avatar_url} alt={follow.Users.name} />
+                            <img
+                              src={follow.Users.avatar_url}
+                              alt={follow.Users.name}
+                            />
                           ) : (
                             <div className="avatar-placeholder">
-                              {follow.Users?.name?.charAt(0)?.toUpperCase() || "U"}
+                              {follow.Users?.name?.charAt(0)?.toUpperCase() ||
+                                "U"}
                             </div>
                           )}
                         </div>
@@ -653,7 +679,9 @@ const ProfilePage = () => {
                         </div>
                         <button
                           className="view-profile-btn"
-                          onClick={() => navigate(`/profile/${follow.followee_id}`)}
+                          onClick={() =>
+                            navigate(`/profile/${follow.followee_id}`)
+                          }
                         >
                           View Profile
                         </button>
@@ -665,7 +693,7 @@ const ProfilePage = () => {
                     <div className="empty-icon">👤</div>
                     <h3>Not following anyone yet</h3>
                     <p>
-                      {isOwnProfile 
+                      {isOwnProfile
                         ? "Discover other users and follow them to see their movie collections!"
                         : "This user isn't following anyone yet."}
                     </p>
