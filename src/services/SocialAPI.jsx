@@ -30,16 +30,18 @@ export const unfollowUser = async (followerId, followeeId) => {
 export const getFollowers = async (userId) => {
   const { data, error } = await supabase
     .from("Followers")
-    .select(`
+    .select(
+      `
       follower_id,
       followed_at,
-      Users!Followers_follower_id_fkey (
+      user_public_profiles!Followers_follower_id_fkey (
         id,
         username,
         name,
         avatar_url
       )
-    `)
+    `
+    )
     .eq("followee_id", userId);
 
   if (error) throw error;
@@ -49,16 +51,18 @@ export const getFollowers = async (userId) => {
 export const getFollowing = async (userId) => {
   const { data, error } = await supabase
     .from("Followers")
-    .select(`
+    .select(
+      `
       followee_id,
       followed_at,
-      Users!Followers_followee_id_fkey (
+      user_public_profiles!Followers_followee_id_fkey (
         id,
         username,
         name,
         avatar_url
       )
-    `)
+    `
+    )
     .eq("follower_id", userId);
 
   if (error) throw error;
@@ -77,7 +81,12 @@ export const checkIfFollowing = async (followerId, followeeId) => {
   return !!data;
 };
 
-export const createSharedList = async (userId, title, description = null, isPublic = true) => {
+export const createSharedList = async (
+  userId,
+  title,
+  description = null,
+  isPublic = true
+) => {
   const { data, error } = await supabase
     .from("SharedList")
     .insert([
@@ -97,9 +106,7 @@ export const createSharedList = async (userId, title, description = null, isPubl
 };
 
 export const getSharedLists = async (userId = null, isPublic = null) => {
-  let query = supabase
-    .from("SharedList")
-    .select(`
+  let query = supabase.from("SharedList").select(`
       *,
       Users (
         id,
@@ -120,7 +127,7 @@ export const getSharedLists = async (userId = null, isPublic = null) => {
   if (userId) {
     query = query.eq("user_id", userId);
   }
-  
+
   if (isPublic !== null) {
     query = query.eq("isPublic", isPublic);
   }
@@ -159,15 +166,9 @@ export const removeMovieFromSharedList = async (listId, movieId) => {
 };
 
 export const deleteSharedList = async (listId) => {
-  await supabase
-    .from("SharedListMovies")
-    .delete()
-    .eq("list_id", listId);
+  await supabase.from("SharedListMovies").delete().eq("list_id", listId);
 
-  const { error } = await supabase
-    .from("SharedList")
-    .delete()
-    .eq("id", listId);
+  const { error } = await supabase.from("SharedList").delete().eq("id", listId);
 
   if (error) throw error;
   return true;

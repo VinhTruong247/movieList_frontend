@@ -272,14 +272,22 @@ const ProfilePage = () => {
               Member since {new Date(userData.created_at).toLocaleDateString()}
             </div>
 
-            {!isOwnProfile && currentUser && (
-              <button
-                className={`follow-btn ${checkIsFollowing(userId) ? "following" : ""}`}
-                onClick={handleFollowToggle}
-              >
-                {checkIsFollowing(userId) ? "Following" : "Follow"}
-              </button>
-            )}
+            {!isOwnProfile &&
+              (currentUser ? (
+                <button
+                  className={`follow-btn ${checkIsFollowing(userId) ? "following" : ""}`}
+                  onClick={handleFollowToggle}
+                >
+                  {checkIsFollowing(userId) ? "Following" : "Follow"}
+                </button>
+              ) : (
+                <button
+                  className="follow-btn guest-btn"
+                  onClick={() => navigate("/login")}
+                >
+                  Log-in to access social features
+                </button>
+              ))}
           </div>
         </div>
 
@@ -577,21 +585,21 @@ const ProfilePage = () => {
                     {followers.map((follower) => (
                       <div key={follower.follower_id} className="user-item">
                         <div className="user-avatar">
-                          {follower.Users?.avatar_url ? (
+                          {follower.user_public_profiles?.avatar_url ? (
                             <img
-                              src={follower.Users.avatar_url}
-                              alt={follower.Users.name}
+                              src={follower.user_public_profiles.avatar_url}
+                              alt={follower.user_public_profiles.name}
                             />
                           ) : (
                             <div className="avatar-placeholder">
-                              {follower.Users?.name?.charAt(0)?.toUpperCase() ||
+                              {follower.user_public_profiles?.name?.charAt(0)?.toUpperCase() ||
                                 "U"}
                             </div>
                           )}
                         </div>
                         <div className="user-info">
-                          <h4>{follower.Users?.name}</h4>
-                          <p>@{follower.Users?.username}</p>
+                          <h4>{follower.user_public_profiles?.name}</h4>
+                          <p>@{follower.user_public_profiles?.username}</p>
                         </div>
                         <button
                           className="view-profile-btn"
@@ -625,21 +633,21 @@ const ProfilePage = () => {
                     {following.map((follow) => (
                       <div key={follow.followee_id} className="user-item">
                         <div className="user-avatar">
-                          {follow.Users?.avatar_url ? (
+                          {follow.user_public_profiles?.avatar_url ? (
                             <img
-                              src={follow.Users.avatar_url}
-                              alt={follow.Users.name}
+                              src={follow.user_public_profiles.avatar_url}
+                              alt={follow.user_public_profiles.name}
                             />
                           ) : (
                             <div className="avatar-placeholder">
-                              {follow.Users?.name?.charAt(0)?.toUpperCase() ||
+                              {follow.user_public_profiles?.name?.charAt(0)?.toUpperCase() ||
                                 "U"}
                             </div>
                           )}
                         </div>
                         <div className="user-info">
-                          <h4>{follow.Users?.name}</h4>
-                          <p>@{follow.Users?.username}</p>
+                          <h4>{follow.user_public_profiles?.name}</h4>
+                          <p>@{follow.user_public_profiles?.username}</p>
                         </div>
                         <button
                           className="view-profile-btn"

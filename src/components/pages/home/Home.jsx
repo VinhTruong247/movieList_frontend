@@ -167,7 +167,7 @@ const Home = () => {
               </button>
             )}
 
-            <div className="browse-section">
+            <div className="browse-home-section">
               <Link to="/actors" className="browse-btn actors-btn">
                 <span className="icon">🎭</span>
                 <span className="text">Browse Actors</span>
