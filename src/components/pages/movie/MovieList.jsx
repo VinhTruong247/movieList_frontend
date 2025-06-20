@@ -60,14 +60,37 @@ const MovieList = () => {
 
     if (searchQuery) {
       const searchText = searchQuery.toLowerCase();
-      result = result.filter(
-        (movie) =>
-          movie.title?.toLowerCase().includes(searchText) ||
-          movie.description?.toLowerCase().includes(searchText)
-      );
+      result = result.filter((movie) => {
+        if (movie.title?.toLowerCase().includes(searchText)) {
+          return true;
+        }
+        if (movie.MovieDirectors && Array.isArray(movie.MovieDirectors)) {
+          if (
+            movie.MovieDirectors.some((director) =>
+              director.Directors?.name?.toLowerCase().includes(searchText)
+            )
+          ) {
+            return true;
+          }
+        }
+        if (movie.MovieActors && Array.isArray(movie.MovieActors)) {
+          if (
+            movie.MovieActors.some(
+              (actor) =>
+                actor.Actors?.name?.toLowerCase().includes(searchText) ||
+                actor.character_name?.toLowerCase().includes(searchText)
+            )
+          ) {
+            return true;
+          }
+        }
+
+        return false;
+      });
     }
 
     if (filters.genre !== "all") {
+      D;
       result = result.filter((movie) => {
         if (!movie.MovieGenres || !Array.isArray(movie.MovieGenres)) {
           return false;
