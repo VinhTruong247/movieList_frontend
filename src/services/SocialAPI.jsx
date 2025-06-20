@@ -185,3 +185,54 @@ export const updateSharedList = async (listId, updates) => {
   if (error) throw error;
   return data;
 };
+
+export const searchUsers = async (options = {}) => {
+  try {
+    const { query, userIds, followeeId, sortBy, limit = 20 } = options;
+
+    let queryBuilder = supabase
+      .from("user_public_profiles")
+      .select("id, username, name, avatar_url");
+    if (query) {
+      queryBuilder = queryBuilder.or(
+        `name.ilike.%${query}%,username.ilike.%${query}%`
+      );
+    }
+    if (userIds && userIds.length > 0) {
+      queryBuilder = queryBuilder.in("id", userIds);
+    }
+    if (followeeId) {
+      const { data: followerIds } = await supabase
+        .from("Followers")
+        .select("follower_id")
+        .eq("followee_id", followeeId);
+
+      if (followerIds && followerIds.length > 0) {
+        const ids = followerIds.map((item) => item.follower_id);
+        queryBuilder = queryBuilder.in("id", ids);
+      } else {
+        return [];
+      }
+    }
+
+    if (sortBy === "followers") {
+      const { data: popularUsers } = await supabase
+        .from("user_public_profiles")
+        .select("id, username, name, avatar_url")
+        .order("id", { ascending: false })
+        .limit(limit);
+
+      return popularUsers || [];
+    }
+
+    queryBuilder = queryBuilder.limit(limit);
+
+    const { data, error } = await queryBuilder;
+
+    if (error) throw error;
+    return data || [];
+  } catch (error) {
+    console.error("Error searching users:", error);
+    throw error;
+  }
+};

@@ -29,8 +29,6 @@ const SocialPage = () => {
     loadUserSocialData,
   } = useSocial();
 
-  const { syncedFavorites } = useFavorites();
-
   useEffect(() => {
     if (currentUser) {
       loadUserSocialData(currentUser.id);
@@ -281,7 +279,10 @@ const SocialPage = () => {
 
                           <div className="list-movies-preview">
                             {list.SharedListMovies?.slice(0, 3).map((item) => (
-                              <div key={item.movie_id} className="movie-poster">
+                              <div
+                                key={`${list.id}-${item.movie_id}`}
+                                className="movie-poster"
+                              >
                                 <img
                                   src={
                                     item.Movies?.poster_url ||
@@ -424,7 +425,10 @@ const SocialPage = () => {
                           <p>You aren't following anyone yet</p>
                           <button
                             className="explore-btn"
-                            onClick={() => setActiveTab("discover")}
+                            onClick={() => {
+                              navigate(`/social/discover`);
+                              window.scrollTo({ top: 0, behavior: "smooth" });
+                            }}
                           >
                             Discover People
                           </button>
@@ -577,19 +581,25 @@ const SocialPage = () => {
                         </p>
 
                         <div className="list-movies">
-                          {list.SharedListMovies?.slice(0, 3).map((item) => (
-                            <div key={item.movie_id} className="movie-poster">
-                              <img
-                                src={
-                                  item.Movies?.poster_url || "/placeholder.jpg"
-                                }
-                                alt={item.Movies?.title}
-                                onClick={() =>
-                                  navigate(`/movie/${item.movie_id}`)
-                                }
-                              />
-                            </div>
-                          ))}
+                          {list.SharedListMovies?.slice(0, 3).map(
+                            (item, index) => (
+                              <div
+                                key={`${list.id}-${item.movie_id}-${index}`}
+                                className="movie-poster"
+                              >
+                                <img
+                                  src={
+                                    item.Movies?.poster_url ||
+                                    "/placeholder.jpg"
+                                  }
+                                  alt={item.Movies?.title}
+                                  onClick={() =>
+                                    navigate(`/movie/${item.movie_id}`)
+                                  }
+                                />
+                              </div>
+                            )
+                          )}
                           {list.SharedListMovies?.length > 3 && (
                             <div className="more-count">
                               +{list.SharedListMovies.length - 3}
