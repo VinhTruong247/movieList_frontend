@@ -753,6 +753,46 @@
         }
       }
     }
+
+    .empty-preview-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 12px;
+      padding: 2rem;
+      grid-column: span 2;
+      text-align: center;
+      place-items: center;
+
+      .empty-icon {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+        opacity: 0.7;
+      }
+
+      p {
+        margin-bottom: 1.5rem;
+        color: rgba(255, 255, 255, 0.7);
+      }
+
+      .create-list-btn {
+        background: color.adjust($primary-color, $lightness: 10%);
+        color: white;
+        border: none;
+        border-radius: 50px;
+        padding: 0.6rem 1.2rem;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+
+        &:hover {
+          background: color.adjust($accent-color, $lightness: 10%);
+          transform: translateY(-2px);
+        }
+      }
+    }
   }
 }
 

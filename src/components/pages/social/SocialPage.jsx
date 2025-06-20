@@ -263,82 +263,100 @@ const SocialPage = () => {
                         See All
                       </button>
                     </div>
-                    <div className="lists-preview-grid">
-                      {publicLists.slice(0, 2).map((list) => (
-                        <div key={list.id} className="list-card">
-                          <div className="list-header">
-                            <h4>{list.title}</h4>
-                            <span className="movie-count">
-                              {list.SharedListMovies?.length || 0} movies
-                            </span>
-                          </div>
 
-                          <p className="list-description">
-                            {list.description || "No description provided"}
-                          </p>
-
-                          <div className="list-movies-preview">
-                            {list.SharedListMovies?.slice(0, 3).map((item) => (
-                              <div
-                                key={`${list.id}-${item.movie_id}`}
-                                className="movie-poster"
-                              >
-                                <img
-                                  src={
-                                    item.Movies?.poster_url ||
-                                    "/placeholder.jpg"
-                                  }
-                                  alt={item.Movies?.title}
-                                  onClick={() =>
-                                    navigate(`/movie/${item.movie_id}`)
-                                  }
-                                />
-                              </div>
-                            ))}
-                            {list.SharedListMovies?.length > 3 && (
-                              <div className="more-count">
-                                +{list.SharedListMovies.length - 3}
-                              </div>
-                            )}
-                          </div>
-
-                          <div className="list-footer">
-                            <div className="list-creator">
-                              <div className="creator-avatar">
-                                {list.Users?.avatar_url ? (
-                                  <img
-                                    src={list.Users.avatar_url}
-                                    alt={`${list.Users.name || list.Users.username}'s avatar`}
-                                  />
-                                ) : (
-                                  <span>
-                                    {(list.Users?.name ||
-                                      list.Users?.username ||
-                                      "?")[0].toUpperCase()}
-                                  </span>
-                                )}
-                              </div>
-                              <span
-                                className="creator-name"
-                                onClick={() =>
-                                  navigate(`/profile/${list.user_id}`)
-                                }
-                              >
-                                {list.Users?.name || list.Users?.username}
+                    {publicLists.length > 0 ? (
+                      publicLists.slice(0, 2).map((list) => (
+                        <div className="lists-preview-grid">
+                          <div key={list.id} className="list-card">
+                            <div className="list-header">
+                              <h4>{list.title}</h4>
+                              <span className="movie-count">
+                                {list.SharedListMovies?.length || 0} movies
                               </span>
                             </div>
-                            <button
-                              className="view-list-btn"
-                              onClick={() =>
-                                navigate(`/shared-list/${list.id}`)
-                              }
-                            >
-                              View List
-                            </button>
+
+                            <p className="list-description">
+                              {list.description || "No description provided"}
+                            </p>
+
+                            <div className="list-movies-preview">
+                              {list.SharedListMovies?.slice(0, 3).map(
+                                (item) => (
+                                  <div
+                                    key={`${list.id}-${item.movie_id}`}
+                                    className="movie-poster"
+                                  >
+                                    <img
+                                      src={
+                                        item.Movies?.poster_url ||
+                                        "/placeholder.jpg"
+                                      }
+                                      alt={item.Movies?.title}
+                                      onClick={() =>
+                                        navigate(`/movie/${item.movie_id}`)
+                                      }
+                                    />
+                                  </div>
+                                )
+                              )}
+                              {list.SharedListMovies?.length > 3 && (
+                                <div className="more-count">
+                                  +{list.SharedListMovies.length - 3}
+                                </div>
+                              )}
+                            </div>
+
+                            <div className="list-footer">
+                              <div className="list-creator">
+                                <div className="creator-avatar">
+                                  {list.Users?.avatar_url ? (
+                                    <img
+                                      src={list.Users.avatar_url}
+                                      alt={`${list.Users.name || list.Users.username}'s avatar`}
+                                    />
+                                  ) : (
+                                    <span>
+                                      {(list.Users?.name ||
+                                        list.Users?.username ||
+                                        "?")[0].toUpperCase()}
+                                    </span>
+                                  )}
+                                </div>
+                                <span
+                                  className="creator-name"
+                                  onClick={() =>
+                                    navigate(`/profile/${list.user_id}`)
+                                  }
+                                >
+                                  {list.Users?.name || list.Users?.username}
+                                </span>
+                              </div>
+                              <button
+                                className="view-list-btn"
+                                onClick={() =>
+                                  navigate(`/shared-list/${list.id}`)
+                                }
+                              >
+                                View List
+                              </button>
+                            </div>
                           </div>
                         </div>
-                      ))}
-                    </div>
+                      ))
+                    ) : (
+                      <div className="empty-preview-state">
+                        <div className="empty-icon">📋</div>
+                        <p>No public lists available yet</p>
+                        {currentUser && (
+                          <button
+                            className="create-list-btn"
+                            onClick={() => navigate("/shared-lists")}
+                          >
+                            Create First List
+                          </button>
+                        )}
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
