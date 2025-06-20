@@ -167,10 +167,8 @@ const DiscoverPeople = () => {
     try {
       if (isFollowing(userId)) {
         await handleUnfollowUser(userId);
-        toast.success("Unfollowed successfully");
       } else {
         await handleFollowUser(userId, userData);
-        toast.success("Followed successfully");
       }
     } catch (error) {
       console.error("Error toggling follow:", error);
