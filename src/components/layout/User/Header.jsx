@@ -110,7 +110,7 @@ const Header = () => {
               <span className="text">Social</span>
             </Link>
 
-            {currentUser && (
+            {currentUser && !isAdmin && (
               <Link
                 to="/favorites"
                 className={`nav-link favorites-link ${
