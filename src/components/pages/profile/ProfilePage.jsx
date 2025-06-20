@@ -30,6 +30,7 @@ const ProfilePage = () => {
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [activeTab, setActiveTab] = useState("favorites");
+  const [isTimeout, setIsTimeout] = useState(false);
 
   const currentUser = useSelector((state) => state.auth.currentUser);
   const { syncedFavorites, loadingFavorites } = useFavorites();
@@ -107,6 +108,16 @@ const ProfilePage = () => {
     loadUserData();
   }, [loadUserData]);
 
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (loading && !userData) {
+        setIsTimeout(true);
+      }
+    }, 10000);
+
+    return () => clearTimeout(timer);
+  }, [loading, userData]);
+
   const handleSubmit = async (values) => {
     try {
       const updates = {
@@ -160,12 +171,21 @@ const ProfilePage = () => {
     }
   };
 
-  if (loading && !userData) {
+  if (loading) {
     return (
       <div className="profile-container">
         <div className="loading-state">
           <div className="loading-spinner"></div>
-          <p>Loading profile...</p>
+          <p>
+            {isTimeout
+              ? "Taking longer than expected..."
+              : "Loading profile..."}
+          </p>
+          {isTimeout && (
+            <button className="retry-button" onClick={loadUserData}>
+              Retry
+            </button>
+          )}
         </div>
       </div>
     );
@@ -592,8 +612,9 @@ const ProfilePage = () => {
                             />
                           ) : (
                             <div className="avatar-placeholder">
-                              {follower.user_public_profiles?.name?.charAt(0)?.toUpperCase() ||
-                                "U"}
+                              {follower.user_public_profiles?.name
+                                ?.charAt(0)
+                                ?.toUpperCase() || "U"}
                             </div>
                           )}
                         </div>
@@ -640,8 +661,9 @@ const ProfilePage = () => {
                             />
                           ) : (
                             <div className="avatar-placeholder">
-                              {follow.user_public_profiles?.name?.charAt(0)?.toUpperCase() ||
-                                "U"}
+                              {follow.user_public_profiles?.name
+                                ?.charAt(0)
+                                ?.toUpperCase() || "U"}
                             </div>
                           )}
                         </div>
