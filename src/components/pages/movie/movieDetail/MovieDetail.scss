@@ -793,6 +793,42 @@
         }
       }
 
+      .review-rating {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-top: 0.5rem;
+
+        .stars {
+          display: flex;
+          align-items: center;
+
+          .star {
+            font-size: 1.2rem;
+            margin-right: 2px;
+
+            &.filled {
+              color: #ffd700;
+              text-shadow: 0 0 2px rgba(255, 215, 0, 0.7);
+            }
+
+            &.empty {
+              color: rgba(255, 255, 255, 0.3);
+            }
+          }
+        }
+
+        .rating-value {
+          font-weight: 600;
+          color: #ffd700;
+          background: rgba(255, 215, 0, 0.1);
+          padding: 0.3rem 0.6rem;
+          border-radius: 4px;
+          border: 1px solid rgba(255, 215, 0, 0.3);
+          font-size: 0.9rem;
+        }
+      }
+
       @media (max-width: 768px) {
         padding: 1.5rem;
 

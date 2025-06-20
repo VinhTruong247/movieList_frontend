@@ -251,9 +251,9 @@ const MovieDetail = () => {
                       {[...Array(10)].map((_, index) => (
                         <span
                           key={index}
-                          className={`star ${index < review.rating ? "filled" : ""}`}
+                          className={`star ${index < review.rating ? "filled" : "empty"}`}
                         >
-                          ⭐
+                          {index < review.rating ? "★" : "☆"}
                         </span>
                       ))}
                     </span>
