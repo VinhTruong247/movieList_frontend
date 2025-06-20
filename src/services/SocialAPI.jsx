@@ -194,13 +194,17 @@ export const searchUsers = async (options = {}) => {
       .from("user_public_profiles")
       .select("id, username, name, avatar_url");
     if (query) {
+      const searchTerm = `%${query.toLowerCase().trim()}%`;
+
       queryBuilder = queryBuilder.or(
-        `name.ilike.%${query}%,username.ilike.%${query}%`
+        `name.ilike.${searchTerm},username.ilike.${searchTerm}`
       );
     }
+
     if (userIds && userIds.length > 0) {
       queryBuilder = queryBuilder.in("id", userIds);
     }
+
     if (followeeId) {
       const { data: followerIds } = await supabase
         .from("Followers")
@@ -229,7 +233,11 @@ export const searchUsers = async (options = {}) => {
 
     const { data, error } = await queryBuilder;
 
-    if (error) throw error;
+    if (error) {
+      console.error("Search error details:", error);
+      throw error;
+    }
+
     return data || [];
   } catch (error) {
     console.error("Error searching users:", error);

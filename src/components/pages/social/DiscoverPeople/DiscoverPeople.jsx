@@ -18,23 +18,13 @@ const DiscoverPeople = () => {
 
   const currentUser = useSelector((state) => state.auth.currentUser);
   const {
-    followers,
     following,
     followersLoading,
     followingLoading,
     handleFollowUser,
     handleUnfollowUser,
     isFollowing,
-    loadUserSocialData,
   } = useSocial();
-
-  useEffect(() => {
-    if (currentUser) {
-      loadUserSocialData(currentUser.id);
-    } else {
-      navigate("/login?redirect=/social/discover");
-    }
-  }, [currentUser, loadUserSocialData, navigate]);
 
   const dataLoadedRef = useRef(false);
 
@@ -148,8 +138,16 @@ const DiscoverPeople = () => {
     setIsSearching(true);
 
     try {
+      console.log("Searching for:", searchQuery);
       const results = await searchUsers({ query: searchQuery });
-      setSearchResults(results.filter((user) => user.id !== currentUser?.id));
+      console.log("Raw search results:", results);
+
+      const filteredResults = results.filter(
+        (user) => user.id !== currentUser?.id
+      );
+
+      console.log("Filtered results:", filteredResults);
+      setSearchResults(filteredResults);
     } catch (error) {
       console.error("Search failed:", error);
       toast.error("Search failed");
