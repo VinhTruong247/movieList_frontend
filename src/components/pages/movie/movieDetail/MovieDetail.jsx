@@ -23,7 +23,7 @@ const MovieDetail = () => {
   const [error, setError] = useState(null);
 
   const currentUser = useSelector((state) => state.auth.currentUser);
-  const { toggleFavorite, isFavorite } = useFavorites();
+  const { toggleFavorite, isFavorite, isTogglingFavorite } = useFavorites();
   const toast = useToast();
 
   const [activeTab, setActiveTab] = useState("overview");
@@ -467,10 +467,17 @@ const MovieDetail = () => {
                 <button
                   className={`favorite-btn ${favorite ? "is-favorite" : ""}`}
                   onClick={handleFavorite}
+                  disabled={isTogglingFavorite(movie.id)}
                 >
-                  {favorite
-                    ? "❤️ Remove from Favorites"
-                    : "🤍 Add to Favorites"}
+                  {isTogglingFavorite(movie.id) ? (
+                    <span className="loading-heart">
+                      <span className="loading-spinner small"></span>
+                    </span>
+                  ) : favorite ? (
+                    "❤️ Remove from Favorites"
+                  ) : (
+                    "🤍 Add to Favorites"
+                  )}
                 </button>
               )}
             </div>

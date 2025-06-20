@@ -5,7 +5,8 @@ import "./MovieCard.scss";
 
 const MovieCard = ({ movie, viewMode = "grid" }) => {
   const currentUser = useSelector((state) => state.auth.currentUser);
-  const { toggleFavorite, isFavorite, isAdmin } = useFavorites();
+  const { toggleFavorite, isFavorite, isTogglingFavorite } = useFavorites();
+  const isAdmin = currentUser?.role === "admin";
   const favorite = currentUser ? isFavorite(movie.id) : false;
 
   const formattedRuntime = () => {
@@ -124,10 +125,17 @@ const MovieCard = ({ movie, viewMode = "grid" }) => {
               <button className="quick-view-btn">Quick View</button>
               {currentUser && currentUser.role !== "admin" && (
                 <button
-                  className={`favorite-button-list ${favorite ? "is-favorite" : ""}`}
+                  className={`favorite-icon ${isFavorite(movie.id) ? "is-favorite" : ""}`}
                   onClick={handleFavorite}
+                  disabled={isTogglingFavorite(movie.id)}
                 >
-                  {favorite ? "❤️" : "🤍"}
+                  {isTogglingFavorite(movie.id) ? (
+                    <span className="loading-spinner-icon"></span>
+                  ) : isFavorite(movie.id) ? (
+                    <span>❤️</span>
+                  ) : (
+                    <span>🤍</span>
+                  )}
                 </button>
               )}
             </div>
@@ -212,10 +220,17 @@ const MovieCard = ({ movie, viewMode = "grid" }) => {
         </Link>
         {currentUser && currentUser.role !== "admin" && (
           <button
-            className={`favorite-button ${favorite ? "is-favorite" : ""}`}
+            className={`favorite-button ${isFavorite(movie.id) ? "is-favorite" : ""}`}
             onClick={handleFavorite}
+            disabled={isTogglingFavorite(movie.id)}
           >
-            {favorite ? "❤️" : "🤍"}
+            {isTogglingFavorite(movie.id) ? (
+              <span className="loading-spinner-icon"></span>
+            ) : isFavorite(movie.id) ? (
+              <span>❤️</span>
+            ) : (
+              <span>🤍</span>
+            )}
           </button>
         )}
       </div>
