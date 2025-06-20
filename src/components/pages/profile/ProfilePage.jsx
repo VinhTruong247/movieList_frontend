@@ -30,7 +30,6 @@ const ProfilePage = () => {
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [activeTab, setActiveTab] = useState("favorites");
-  const [isTimeout, setIsTimeout] = useState(false);
 
   const currentUser = useSelector((state) => state.auth.currentUser);
   const { syncedFavorites, loadingFavorites } = useFavorites();
@@ -108,16 +107,6 @@ const ProfilePage = () => {
     loadUserData();
   }, [loadUserData]);
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      if (loading && !userData) {
-        setIsTimeout(true);
-      }
-    }, 10000);
-
-    return () => clearTimeout(timer);
-  }, [loading, userData]);
-
   const handleSubmit = async (values) => {
     try {
       const updates = {
@@ -171,21 +160,12 @@ const ProfilePage = () => {
     }
   };
 
-  if (loading) {
+  if (loading && !userData) {
     return (
       <div className="profile-container">
         <div className="loading-state">
           <div className="loading-spinner"></div>
-          <p>
-            {isTimeout
-              ? "Taking longer than expected..."
-              : "Loading profile..."}
-          </p>
-          {isTimeout && (
-            <button className="retry-button" onClick={loadUserData}>
-              Retry
-            </button>
-          )}
+          <p>Loading profile...</p>
         </div>
       </div>
     );
@@ -624,9 +604,10 @@ const ProfilePage = () => {
                         </div>
                         <button
                           className="view-profile-btn"
-                          onClick={() =>
-                            navigate(`/profile/${follower.follower_id}`)
-                          }
+                          onClick={() => {
+                            navigate(`/profile/${follower.follower_id}`);
+                            window.scrollTo({ top: 0 });
+                          }}
                         >
                           View Profile
                         </button>
@@ -673,9 +654,10 @@ const ProfilePage = () => {
                         </div>
                         <button
                           className="view-profile-btn"
-                          onClick={() =>
-                            navigate(`/profile/${follow.followee_id}`)
-                          }
+                          onClick={() => {
+                            navigate(`/profile/${follow.followee_id}`);
+                            window.scrollTo({ top: 0 });
+                          }}
                         >
                           View Profile
                         </button>
