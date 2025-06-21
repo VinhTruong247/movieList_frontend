@@ -265,7 +265,7 @@ const SharedList = () => {
                   <div className="list-movies">
                     {list.SharedListMovies && list.SharedListMovies.length > 0 ? (
                       <div className="movies-preview">
-                        {list.SharedListMovies.slice(0, 6).map((item) => (
+                        {list.SharedListMovies.slice(0, 5).map((item) => (
                           <div key={item.movie_id} className="movie-poster-container">
                             <img
                               src={item.Movies?.poster_url || "/placeholder.jpg"}
@@ -282,9 +282,9 @@ const SharedList = () => {
                             </button>
                           </div>
                         ))}
-                        {list.SharedListMovies.length > 6 && (
+                        {list.SharedListMovies.length > 5 && (
                           <div className="more-movies-indicator">
-                            <span>+{list.SharedListMovies.length - 6}</span>
+                            <span>+{list.SharedListMovies.length - 5}</span>
                             <small>more</small>
                           </div>
                         )}
