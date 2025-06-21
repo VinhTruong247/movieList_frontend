@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
 import { useSelector } from "react-redux";
 import { useSocial } from "../../../hooks/useSocial";
-import { useFavorites } from "../../../hooks/useFavorites";
 import MovieCard from "../movie/movieCard/MovieCard";
 import "./SocialPage.scss";
 

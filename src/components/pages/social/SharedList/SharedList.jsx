@@ -10,7 +10,6 @@ const SharedList = () => {
   const navigate = useNavigate();
   const toast = useToast();
   const currentUser = useSelector((state) => state.auth.currentUser);
-  const { movies } = useSelector((state) => state.movies);
   
   const {
     userLists,
@@ -346,7 +345,6 @@ const SharedList = () => {
         </div>
       )}
 
-      {/* Create List Modal */}
       {showCreateForm && (
         <div className="modal-overlay">
           <div className="modal-content create-list-modal">
