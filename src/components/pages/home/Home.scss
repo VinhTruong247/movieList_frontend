@@ -263,10 +263,12 @@
             font-size: 1.3rem;
             font-weight: 600;
             margin: 0;
+            color: white;
           }
 
           .movie-count {
             background: rgba(255, 255, 255, 0.1);
+            color: white;
             padding: 0.3rem 0.8rem;
             border-radius: 20px;
             font-size: 0.8rem;
@@ -351,6 +353,7 @@
             }
 
             .creator-name {
+              color: white;
               font-size: 0.95rem;
               cursor: pointer;
 

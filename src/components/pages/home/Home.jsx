@@ -143,8 +143,8 @@ const Home = () => {
       <section className="content-section">
         <div className="section-header">
           <h2>Featured Lists</h2>
-          <Link to="/social" className="see-all-link">
-            Explore Social <span className="arrow-icon">→</span>
+          <Link to="/shared-lists" className="see-all-link">
+            Create your list <span className="arrow-icon">→</span>
           </Link>
         </div>
         {isLoading ? (

@@ -170,6 +170,15 @@ const Header = () => {
                       My Profile
                     </Link>
 
+                    <Link
+                      to={`/shared-lists`}
+                      className="dropdown-item"
+                      onClick={() => setDropdownOpen(false)}
+                    >
+                      <span className="item-icon">📋</span>
+                      My Share Lists
+                    </Link>
+
                     {isAdmin && (
                       <Link
                         to="/admin"
