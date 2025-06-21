@@ -333,7 +333,7 @@ const SocialPage = () => {
                               <button
                                 className="view-list-btn"
                                 onClick={() =>
-                                  navigate(`/shared-list/${list.id}`)
+                                  navigate(`/shared-lists/${list.id}`)
                                 }
                               >
                                 View List
@@ -651,7 +651,7 @@ const SocialPage = () => {
                           </div>
                           <button
                             className="view-list-btn"
-                            onClick={() => navigate(`/shared-list/${list.id}`)}
+                            onClick={() => navigate(`/shared-lists/${list.id}`)}
                           >
                             View List
                           </button>

@@ -7,7 +7,6 @@ const MovieCard = ({ movie, viewMode = "grid" }) => {
   const currentUser = useSelector((state) => state.auth.currentUser);
   const { toggleFavorite, isFavorite, isTogglingFavorite } = useFavorites();
   const isAdmin = currentUser?.role === "admin";
-  const favorite = currentUser ? isFavorite(movie.id) : false;
 
   const formattedRuntime = () => {
     if (!movie.runtime) return "";

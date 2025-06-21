@@ -203,7 +203,7 @@ const Home = () => {
                   </div>
                   <button
                     className="view-list-btn"
-                    onClick={() => navigate(`/shared-list/${list.id}`)}
+                    onClick={() => navigate(`/shared-lists/${list.id}`)}
                   >
                     View List
                   </button>

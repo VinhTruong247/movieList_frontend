@@ -19,12 +19,13 @@ import NotLogin from "../components/common/NotLogin";
 import { Navigate } from "react-router";
 import MovieList from "../components/pages/movie/MovieList";
 import SharedList from "../components/pages/social/SharedList/SharedList";
+import SharedListDetail from "../components/pages/social/SharedList/SharedListDetail";
 
 const AppRoutes = [
   {
     path: "/",
     element: <Layout />,
-    errorElement: <NotFound />,
+    // errorElement: <NotFound />,
     children: [
       {
         path: "",
@@ -75,6 +76,10 @@ const AppRoutes = [
         element: <SharedList />,
       },
       {
+        path: "shared-lists/:listId",
+        element: <SharedListDetail />,
+      },
+      {
         path: "login",
         element: <LoginPage />,
       },
@@ -102,14 +107,14 @@ const AppRoutes = [
     path: "/not-login",
     element: <NotLogin />,
   },
-  {
-    path: "/404",
-    element: <NotFound />,
-  },
-  {
-    path: "*",
-    element: <Navigate to="/404" replace />,
-  },
+  // {
+  //   path: "/404",
+  //   element: <NotFound />,
+  // },
+  // {
+  //   path: "*",
+  //   element: <Navigate to="/404" replace />,
+  // },
 ];
 
 export default AppRoutes;

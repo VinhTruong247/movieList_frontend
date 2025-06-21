@@ -312,7 +312,7 @@ const SharedList = () => {
                     </span>
                     <button
                       className="view-full-list"
-                      onClick={() => navigate(`/shared-list/${list.id}`)}
+                      onClick={() => navigate(`/shared-lists/${list.id}`)}
                     >
                       View Full List →
                     </button>
