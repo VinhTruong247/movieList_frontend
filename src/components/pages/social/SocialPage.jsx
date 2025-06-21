@@ -1,18 +1,23 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { fetchMovies } from "../../../redux/slices/moviesSlice";
 import { useSocial } from "../../../hooks/useSocial";
 import MovieCard from "../movie/movieCard/MovieCard";
 import "./SocialPage.scss";
 
 const SocialPage = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [activeTab, setActiveTab] = useState("discover");
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearching, setIsSearching] = useState(false);
 
   const currentUser = useSelector((state) => state.auth.currentUser);
-  const movies = useSelector((state) => state.movies.items);
+  const { items: movies, loading: moviesLoading } = useSelector(
+    (state) => state.movies
+  );
+  const isAdmin = currentUser?.role === "admin";
 
   const {
     followers,
@@ -29,6 +34,10 @@ const SocialPage = () => {
   } = useSocial();
 
   useEffect(() => {
+    dispatch(fetchMovies(isAdmin));
+  }, [dispatch, isAdmin]);
+
+  useEffect(() => {
     if (currentUser) {
       loadUserSocialData(currentUser.id);
     }
@@ -36,11 +45,11 @@ const SocialPage = () => {
   }, [currentUser, loadUserSocialData, loadPublicLists]);
 
   const getTrendingMovies = () => {
-    console.log(movies);
     if (!movies || movies.length === 0) return [];
+
     return [...movies]
-      .filter((movie) => !movie.isDisabled)
-      .sort((a, b) => b.imdb_rating - a.imdb_rating)
+      .filter((movie) => !movie.isDisabled && movie.imdb_rating)
+      .sort((a, b) => (b.imdb_rating || 0) - (a.imdb_rating || 0))
       .slice(0, 8);
   };
 
@@ -79,7 +88,10 @@ const SocialPage = () => {
               .includes(searchQuery.toLowerCase()))
       )
     : publicLists;
-  const isLoading = followersLoading || followingLoading || listsLoading;
+
+  const isLoading =
+    followersLoading || followingLoading || listsLoading || moviesLoading;
+  const trendingMovies = getTrendingMovies();
 
   return (
     <div className="social-page-container">
@@ -180,15 +192,27 @@ const SocialPage = () => {
                         See All
                       </button>
                     </div>
-                    <div className="trending-movies-grid">
-                      {getTrendingMovies()
-                        .slice(0, 4)
-                        .map((movie) => (
+
+                    {trendingMovies.length > 0 ? (
+                      <div className="trending-movies-grid">
+                        {trendingMovies.slice(0, 4).map((movie) => (
                           <div key={movie.id} className="trending-movie-item">
                             <MovieCard movie={movie} viewMode="compact" />
                           </div>
                         ))}
-                    </div>
+                      </div>
+                    ) : (
+                      <div className="empty-trending-preview">
+                        <div className="empty-icon">🎬</div>
+                        <p>No trending movies available</p>
+                        <button
+                          className="browse-movies-btn"
+                          onClick={() => navigate("/movies")}
+                        >
+                          Browse All Movies
+                        </button>
+                      </div>
+                    )}
                   </div>
 
                   {currentUser && following.length > 0 && (
@@ -269,8 +293,8 @@ const SocialPage = () => {
                     </div>
 
                     {publicLists.length > 0 ? (
-                      publicLists.slice(0, 2).map((list) => (
-                        <div className="lists-preview-grid">
+                      <div className="lists-preview-grid">
+                        {publicLists.slice(0, 2).map((list) => (
                           <div key={list.id} className="list-card">
                             <div className="list-header">
                               <h4>{list.title}</h4>
@@ -297,7 +321,7 @@ const SocialPage = () => {
                                       }
                                       alt={item.Movies?.title}
                                       onClick={() =>
-                                        navigate(`/movie/${item.movie_id}`)
+                                        navigate(`/movies/${item.movie_id}`)
                                       }
                                     />
                                   </div>
@@ -344,8 +368,8 @@ const SocialPage = () => {
                               </button>
                             </div>
                           </div>
-                        </div>
-                      ))
+                        ))}
+                      </div>
                     ) : (
                       <div className="empty-preview-state">
                         <div className="empty-icon">📋</div>
@@ -372,13 +396,40 @@ const SocialPage = () => {
                   <p>Popular films among our community</p>
                 </div>
 
-                <div className="trending-movies-grid full-grid">
-                  {getTrendingMovies().map((movie) => (
-                    <div key={movie.id} className="trending-movie-item">
-                      <MovieCard movie={movie} viewMode="grid" />
+                {trendingMovies.length > 0 ? (
+                  <div className="trending-movies-grid full-grid">
+                    {trendingMovies.map((movie) => (
+                      <div key={movie.id} className="trending-movie-item">
+                        <MovieCard movie={movie} viewMode="grid" />
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="empty-trending-state">
+                    <div className="empty-icon">🔥</div>
+                    <h3>No Trending Movies</h3>
+                    <p>
+                      We're still gathering data on popular movies. Check back
+                      soon!
+                    </p>
+                    <div className="empty-actions">
+                      <button
+                        className="browse-movies-btn"
+                        onClick={() => navigate("/movies")}
+                      >
+                        Browse All Movies
+                      </button>
+                      {currentUser && (
+                        <button
+                          className="create-list-btn secondary"
+                          onClick={() => navigate("/shared-lists")}
+                        >
+                          Create Your List
+                        </button>
+                      )}
                     </div>
-                  ))}
-                </div>
+                  </div>
+                )}
               </div>
             )}
 
@@ -447,7 +498,7 @@ const SocialPage = () => {
                           <button
                             className="explore-btn"
                             onClick={() => {
-                              navigate(`/social/discover`);
+                              setActiveTab("discover");
                               window.scrollTo({ top: 0, behavior: "smooth" });
                             }}
                           >
@@ -581,7 +632,9 @@ const SocialPage = () => {
                     <h3>
                       {filteredLists.length === 0
                         ? "No lists found"
-                        : `Found ${filteredLists.length} list${filteredLists.length === 1 ? "" : "s"}`}
+                        : `Found ${filteredLists.length} list${
+                            filteredLists.length === 1 ? "" : "s"
+                          }`}
                     </h3>
                   </div>
                 )}
@@ -615,7 +668,7 @@ const SocialPage = () => {
                                   }
                                   alt={item.Movies?.title}
                                   onClick={() =>
-                                    navigate(`/movie/${item.movie_id}`)
+                                    navigate(`/movies/${item.movie_id}`)
                                   }
                                 />
                               </div>
@@ -669,6 +722,7 @@ const SocialPage = () => {
                     {isSearching ? (
                       <>
                         <div className="empty-icon">🔍</div>
+                        <h3>No Results Found</h3>
                         <p>No lists matching "{searchQuery}"</p>
                         <button
                           className="clear-search-btn"
@@ -683,14 +737,33 @@ const SocialPage = () => {
                     ) : (
                       <>
                         <div className="empty-icon">📋</div>
-                        <p>No public lists available</p>
-                        {currentUser && (
+                        <h3>No Public Lists Yet</h3>
+                        <p>
+                          Be the first to share your movie collection with the
+                          community!
+                        </p>
+                        {currentUser ? (
                           <button
                             className="create-list-btn"
                             onClick={() => navigate("/shared-lists")}
                           >
-                            Create First List
+                            Create Your First List
                           </button>
+                        ) : (
+                          <div className="auth-buttons">
+                            <button
+                              className="login-btn"
+                              onClick={() => navigate("/login")}
+                            >
+                              Log In
+                            </button>
+                            <button
+                              className="signup-btn"
+                              onClick={() => navigate("/register")}
+                            >
+                              Sign Up
+                            </button>
+                          </div>
                         )}
                       </>
                     )}
