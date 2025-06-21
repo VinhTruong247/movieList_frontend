@@ -36,6 +36,7 @@ const SocialPage = () => {
   }, [currentUser, loadUserSocialData, loadPublicLists]);
 
   const getTrendingMovies = () => {
+    console.log(movies);
     if (!movies || movies.length === 0) return [];
     return [...movies]
       .filter((movie) => !movie.isDisabled)
@@ -68,8 +69,12 @@ const SocialPage = () => {
             list.description
               .toLowerCase()
               .includes(searchQuery.toLowerCase())) ||
-          (list.Users?.username &&
-            list.Users.username
+          (list.user_public_profiles?.username &&
+            list.user_public_profiles.username
+              .toLowerCase()
+              .includes(searchQuery.toLowerCase())) ||
+          (list.user_public_profiles?.name &&
+            list.user_public_profiles.name
               .toLowerCase()
               .includes(searchQuery.toLowerCase()))
       )
@@ -308,15 +313,15 @@ const SocialPage = () => {
                             <div className="list-footer">
                               <div className="list-creator">
                                 <div className="creator-avatar">
-                                  {list.Users?.avatar_url ? (
+                                  {list.user_public_profiles?.avatar_url ? (
                                     <img
-                                      src={list.Users.avatar_url}
-                                      alt={`${list.Users.name || list.Users.username}'s avatar`}
+                                      src={list.user_public_profiles.avatar_url}
+                                      alt={`${list.user_public_profiles.name || list.user_public_profiles.username}'s avatar`}
                                     />
                                   ) : (
                                     <span>
-                                      {(list.Users?.name ||
-                                        list.Users?.username ||
+                                      {(list.user_public_profiles?.name ||
+                                        list.user_public_profiles?.username ||
                                         "?")[0].toUpperCase()}
                                     </span>
                                   )}
@@ -327,14 +332,13 @@ const SocialPage = () => {
                                     navigate(`/profile/${list.user_id}`)
                                   }
                                 >
-                                  {list.Users?.name || list.Users?.username}
+                                  {list.user_public_profiles?.name ||
+                                    list.user_public_profiles?.username}
                                 </span>
                               </div>
                               <button
                                 className="view-list-btn"
-                                onClick={() =>
-                                  navigate(`/shared-lists/${list.id}`)
-                                }
+                                onClick={() => navigate(`/shared-list/${list.id}`)}
                               >
                                 View List
                               </button>
@@ -627,15 +631,15 @@ const SocialPage = () => {
                         <div className="list-footer">
                           <div className="list-creator">
                             <div className="creator-avatar">
-                              {list.Users?.avatar_url ? (
+                              {list.user_public_profiles?.avatar_url ? (
                                 <img
-                                  src={list.Users.avatar_url}
-                                  alt={`${list.Users.name || list.Users.username}'s avatar`}
+                                  src={list.user_public_profiles.avatar_url}
+                                  alt={`${list.user_public_profiles.name || list.user_public_profiles.username}'s avatar`}
                                 />
                               ) : (
                                 <span>
-                                  {(list.Users?.name ||
-                                    list.Users?.username ||
+                                  {(list.user_public_profiles?.name ||
+                                    list.user_public_profiles?.username ||
                                     "?")[0].toUpperCase()}
                                 </span>
                               )}
@@ -646,12 +650,13 @@ const SocialPage = () => {
                                 navigate(`/profile/${list.user_id}`)
                               }
                             >
-                              {list.Users?.name || list.Users?.username}
+                              {list.user_public_profiles?.name ||
+                                list.user_public_profiles?.username}
                             </span>
                           </div>
                           <button
                             className="view-list-btn"
-                            onClick={() => navigate(`/shared-lists/${list.id}`)}
+                            onClick={() => navigate(`/shared-list/${list.id}`)}
                           >
                             View List
                           </button>

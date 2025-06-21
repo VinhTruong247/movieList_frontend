@@ -111,7 +111,7 @@ export const getSharedListById = async (listId) => {
       .from("SharedList")
       .select(`
         *,
-        Users (
+        user_public_profiles!SharedList_user_id_fkey (
           id,
           username,
           name,
@@ -172,7 +172,7 @@ export const getSharedLists = async (userId, publicOnly = false) => {
       .from("SharedList")
       .select(`
         *,
-        Users (
+        user_public_profiles!SharedList_user_id_fkey (
           id,
           username,
           name,

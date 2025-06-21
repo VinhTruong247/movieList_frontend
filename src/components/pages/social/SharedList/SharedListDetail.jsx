@@ -314,7 +314,7 @@ const SharedListDetail = () => {
                 <span className="created-date">
                   Created {new Date(listData.created_at).toLocaleDateString()}
                 </span>
-                {listData.Users && (
+                {listData.user_public_profiles && (
                   <div className="owner-info">
                     <span>by</span>
                     <button 
@@ -322,15 +322,15 @@ const SharedListDetail = () => {
                       onClick={() => navigate(`/profile/${listData.user_id}`)}
                     >
                       <div className="owner-avatar">
-                        {listData.Users.avatar_url ? (
-                          <img src={listData.Users.avatar_url} alt={listData.Users.name} />
+                        {listData.user_public_profiles.avatar_url ? (
+                          <img src={listData.user_public_profiles.avatar_url} alt={listData.user_public_profiles.name} />
                         ) : (
                           <div className="avatar-placeholder">
-                            {listData.Users.name?.charAt(0)?.toUpperCase() || 'U'}
+                            {listData.user_public_profiles.name?.charAt(0)?.toUpperCase() || 'U'}
                           </div>
                         )}
                       </div>
-                      <span className="owner-name">{listData.Users.name}</span>
+                      <span className="owner-name">{listData.user_public_profiles.name}</span>
                     </button>
                   </div>
                 )}

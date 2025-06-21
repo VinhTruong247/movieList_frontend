@@ -20,7 +20,6 @@ const SharedList = () => {
     handleDeleteList,
   } = useSocial();
 
-  const [activeTab, setActiveTab] = useState("my-lists");
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [showMovieSelector, setShowMovieSelector] = useState(false);
   const [selectedList, setSelectedList] = useState(null);
