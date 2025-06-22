@@ -46,6 +46,13 @@ export const useSocial = () => {
         return false;
       }
 
+      if (followingStatus[followeeId]) {
+        toast.info(
+          `You're already following ${followeeData?.name || followeeData?.username}`
+        );
+        return true;
+      }
+
       try {
         dispatch(optimisticFollow({ followeeId, followeeData }));
         const result = await dispatch(
@@ -61,12 +68,18 @@ export const useSocial = () => {
         );
         return true;
       } catch (error) {
+        if (error.status === 409) {
+          toast.info(
+            `You're already following ${followeeData?.name || followeeData?.username}`
+          );
+          return true;
+        }
         dispatch(optimisticUnfollow({ followeeId }));
         toast.error("Failed to follow user");
         return false;
       }
     },
-    [currentUser, dispatch, toast]
+    [currentUser, dispatch, toast, followingStatus]
   );
 
   const handleUnfollowUser = useCallback(

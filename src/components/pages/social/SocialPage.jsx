@@ -498,7 +498,7 @@ const SocialPage = () => {
                           <button
                             className="explore-btn"
                             onClick={() => {
-                              setActiveTab("discover");
+                              navigate(`/social/discover`);
                               window.scrollTo({ top: 0, behavior: "smooth" });
                             }}
                           >
