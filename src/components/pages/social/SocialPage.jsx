@@ -595,6 +595,16 @@ const SocialPage = () => {
                     </div>
                   </div>
                 </div>
+
+                <div className="discover-more-section">
+                  <button
+                    className="discover-people-btn"
+                    onClick={() => navigate("/social/discover")}
+                  >
+                    <span className="btn-icon">🔍</span>
+                    Discover More People
+                  </button>
+                </div>
               </div>
             )}
 
