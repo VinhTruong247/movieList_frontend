@@ -233,6 +233,26 @@ const ProfilePage = () => {
 
   return (
     <div className="profile-container">
+      {userData.isDisabled && currentUser?.role === "admin" && (
+        <div className="admin-warning-banner">
+          <div className="warning-icon">⚠️</div>
+          <div className="warning-content">
+            <h3>Disabled User Account</h3>
+            <p>
+              You're viewing this profile in admin mode. This user account has
+              been disabled and is not visible to regular users.
+            </p>
+          </div>
+          <button
+            className="action-button"
+            onClick={handleToggleDisabled}
+            title="Enable this user account"
+          >
+            Enable Account
+          </button>
+        </div>
+      )}
+
       <div className="profile-header">
         <button
           className="back-button"

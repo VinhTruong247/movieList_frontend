@@ -4,7 +4,7 @@
 .profile-container {
   min-height: 100vh;
   background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
-  padding-top: calc($header-height + 2rem);
+  padding-top: calc($header-height);
   color: white;
 
   .profile-header {
@@ -1074,7 +1074,6 @@
   }
 }
 
-/* Mobile responsiveness */
 @media (max-width: 768px) {
   .profile-tabs {
     .tab-btn {
@@ -1140,6 +1139,94 @@
 
     &:hover {
       background-color: rgba(46, 204, 113, 0.2);
+    }
+  }
+}
+
+.admin-warning-banner {
+  background: linear-gradient(
+    135deg,
+    rgba(231, 76, 60, 0.9),
+    rgba(192, 57, 43, 0.9)
+  );
+  color: white;
+  padding: 1rem 1.5rem;
+  margin-bottom: 2rem;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  backdrop-filter: blur(5px);
+  box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  position: relative;
+
+  .warning-icon {
+    font-size: 2rem;
+  }
+
+  .warning-content {
+    flex: 1;
+
+    h3 {
+      margin: 0 0 0.5rem 0;
+      font-weight: 600;
+    }
+
+    p {
+      margin: 0;
+      font-size: 0.95rem;
+      opacity: 0.9;
+    }
+  }
+
+  .action-button {
+    background: white;
+    color: #c0392b;
+    font-weight: 600;
+    padding: 0.6rem 1.2rem;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.9);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+  }
+
+  .profile-container.disabled-profile {
+    .profile-header:after {
+      content: "DISABLED ACCOUNT";
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) rotate(-30deg);
+      color: rgba(231, 76, 60, 0.2);
+      font-size: 3rem;
+      font-weight: 800;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .avatar-container {
+      opacity: 0.7;
+      filter: grayscale(0.5);
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .admin-warning-banner {
+    flex-direction: column;
+    text-align: center;
+    padding: 1.5rem;
+
+    .action-button {
+      width: 100%;
+      margin-top: 0.5rem;
     }
   }
 }

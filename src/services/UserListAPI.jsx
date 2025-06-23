@@ -157,6 +157,32 @@ export const getOwnOrPublicProfile = async (userId) => {
       data: { session },
     } = await supabase.auth.getSession();
 
+    let currentUser = null;
+    if (session && session.user) {
+      const { data: userData } = await supabase
+        .from("Users")
+        .select("*")
+        .eq("id", session.user.id)
+        .single();
+      currentUser = userData;
+    }
+
+    if (currentUser?.role === "admin") {
+      const { data, error } = await supabase
+        .from("Users")
+        .select("*")
+        .eq("id", userId)
+        .single();
+      if (error) {
+        console.warn("Error fetching user as admin:", error);
+        return null;
+      }
+      return {
+        ...data,
+        isFullProfile: true,
+      };
+    }
+
     if (session && session.user && session.user.id === userId) {
       const { data: userData, error: userError } = await supabase
         .from("Users")
@@ -175,7 +201,19 @@ export const getOwnOrPublicProfile = async (userId) => {
       };
     }
 
-    return await getUserById(userId);
+    const { data, error } = await supabase
+      .from("user_public_profiles")
+      .select("*")
+      .eq("id", userId)
+      .eq("isDisabled", false)
+      .single();
+
+    if (error) {
+      console.warn("Error fetching public user data:", error);
+      return null;
+    }
+
+    return data;
   } catch (error) {
     console.error("Failed to fetch profile:", error);
     return null;
