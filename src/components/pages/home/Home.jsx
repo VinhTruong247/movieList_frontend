@@ -148,12 +148,9 @@ const Home = () => {
               Create your list <span className="arrow-icon">→</span>
             </Link>
           ) : (
-            <button
-              className="see-all-link"
-              onClick={() => navigate("/not-login")}
-            >
+            <Link to="/not-login" className="see-all-link">
               Create your list <span className="arrow-icon">→</span>
-            </button>
+            </Link>
           )}
         </div>
         {isLoading ? (
