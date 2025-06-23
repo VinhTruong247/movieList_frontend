@@ -30,6 +30,7 @@ const ProfilePage = () => {
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [activeTab, setActiveTab] = useState("favorites");
+  const [hasAttemptedLoad, setHasAttemptedLoad] = useState(false);
 
   const currentUser = useSelector((state) => state.auth.currentUser);
   const { syncedFavorites, loadingFavorites } = useFavorites();
@@ -92,8 +93,9 @@ const ProfilePage = () => {
           toast.error("User not found");
           toastShown.current = true;
         }
-        return;
       }
+
+      setHasAttemptedLoad(true);
     } catch (err) {
       console.error("Error loading profile data:", err);
       setError("Failed to load profile data");
@@ -101,6 +103,7 @@ const ProfilePage = () => {
         toast.error("Failed to load profile data");
         toastShown.current = true;
       }
+      setHasAttemptedLoad(true);
     }
   }, [userId, currentUser, navigate, loadUserSocialData]);
 
@@ -176,7 +179,7 @@ const ProfilePage = () => {
     }
   }, [currentUser, userId, checkUserFollowingStatus]);
 
-  if (loading && !userData) {
+  if (loading || (!userData && !hasAttemptedLoad)) {
     return (
       <div className="profile-container">
         <div className="loading-state">
@@ -187,7 +190,7 @@ const ProfilePage = () => {
     );
   }
 
-  if (!userData) {
+  if (!userData && hasAttemptedLoad) {
     return (
       <div className="profile-container">
         <div className="error-state">
@@ -246,10 +249,10 @@ const ProfilePage = () => {
 
         <div className="profile-section avatar-section">
           <div className="avatar-container">
-            {userData.avatar_url ? (
+            {userData?.avatar_url ? (
               <img
                 src={userData.avatar_url}
-                alt={`${userData.name || userData.username}'s avatar`}
+                alt={`${userData?.name || userData?.username}'s avatar`}
                 className="profile-avatar"
               />
             ) : (
