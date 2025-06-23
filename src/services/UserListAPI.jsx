@@ -205,7 +205,6 @@ export const getOwnOrPublicProfile = async (userId) => {
       .from("user_public_profiles")
       .select("*")
       .eq("id", userId)
-      .eq("isDisabled", false)
       .single();
 
     if (error) {
