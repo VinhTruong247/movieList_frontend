@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { Formik, Form, Field } from "formik";
 import { useNavigate, useParams, Link } from "react-router";
 import { useSelector, useDispatch } from "react-redux";
+import supabase from "../../../supabase-client";
 import {
   getCurrentUser,
   updateUserProfile,
@@ -173,6 +174,31 @@ const ProfilePage = () => {
     }
   };
 
+  const handleToggleDisabled = async () => {
+    try {
+      const { error } = await supabase
+        .from("Users")
+        .update({
+          isDisabled: !userData.isDisabled,
+        })
+        .eq("id", userId);
+
+      if (error) throw error;
+
+      setUserData({
+        ...userData,
+        isDisabled: !userData.isDisabled,
+      });
+
+      toast.success(
+        `User ${userData.isDisabled ? "enabled" : "disabled"} successfully`
+      );
+    } catch (error) {
+      console.error("Error toggling user status:", error);
+      toast.error("Failed to update user status");
+    }
+  };
+
   useEffect(() => {
     if (currentUser && userId && userId !== currentUser.id) {
       checkUserFollowingStatus(userId);
@@ -293,12 +319,21 @@ const ProfilePage = () => {
 
             {!isOwnProfile &&
               (currentUser ? (
-                <button
-                  className={`follow-btn ${checkIsFollowing(userId) ? "following" : ""}`}
-                  onClick={handleFollowToggle}
-                >
-                  {checkIsFollowing(userId) ? "Following" : "Follow"}
-                </button>
+                currentUser.role === "admin" ? (
+                  <button
+                    className={`admin-toggle-btn ${userData.isDisabled ? "disabled" : "active"}`}
+                    onClick={handleToggleDisabled}
+                  >
+                    {userData.isDisabled ? "Enable User" : "Disable User"}
+                  </button>
+                ) : (
+                  <button
+                    className={`follow-btn ${checkIsFollowing(userId) ? "following" : ""}`}
+                    onClick={handleFollowToggle}
+                  >
+                    {checkIsFollowing(userId) ? "Following" : "Follow"}
+                  </button>
+                )
               ) : (
                 <button
                   className="follow-btn guest-btn"

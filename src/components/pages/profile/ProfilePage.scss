@@ -1113,3 +1113,33 @@
     }
   }
 }
+
+.admin-toggle-btn {
+  padding: 0.75rem 1.5rem;
+  border-radius: 50px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 1rem;
+
+  &.active {
+    background-color: rgba(231, 76, 60, 0.1);
+    color: #e74c3c;
+    border: 1px solid rgba(231, 76, 60, 0.3);
+
+    &:hover {
+      background-color: rgba(231, 76, 60, 0.2);
+    }
+  }
+
+  &.disabled {
+    background-color: rgba(46, 204, 113, 0.1);
+    color: #27ae60;
+    border: 1px solid rgba(46, 204, 113, 0.3);
+
+    &:hover {
+      background-color: rgba(46, 204, 113, 0.2);
+    }
+  }
+}
