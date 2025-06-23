@@ -235,13 +235,26 @@ const ProfilePage = () => {
     <div className="profile-container">
       {userData.isDisabled && currentUser?.role === "admin" && (
         <div className="admin-warning-banner">
+          <div className="warning-badge">ADMIN VIEW</div>
           <div className="warning-icon">⚠️</div>
           <div className="warning-content">
             <h3>Disabled User Account</h3>
             <p>
-              You're viewing this profile in admin mode. This user account has
+              You're viewing this profile with admin privileges. This account has
               been disabled and is not visible to regular users.
             </p>
+            <div className="user-details">
+              <div className="detail-item">
+                <span className="detail-label">User ID:</span>
+                <span className="detail-value">{userData.id}</span>
+              </div>
+              <div className="detail-item">
+                <span className="detail-label">Registered:</span>
+                <span className="detail-value">
+                  {new Date(userData.created_at).toLocaleString()}
+                </span>
+              </div>
+            </div>
           </div>
           <button
             className="action-button"

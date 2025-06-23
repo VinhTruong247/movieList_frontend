@@ -1144,39 +1144,81 @@
 }
 
 .admin-warning-banner {
+  position: relative;
   background: linear-gradient(
     135deg,
-    rgba(231, 76, 60, 0.9),
-    rgba(192, 57, 43, 0.9)
+    rgba(231, 76, 60, 0.95),
+    rgba(192, 57, 43, 0.95)
   );
   color: white;
-  padding: 1rem 1.5rem;
+  padding: 1.5rem;
   margin-bottom: 2rem;
   border-radius: 8px;
   display: flex;
-  align-items: center;
-  gap: 1rem;
-  backdrop-filter: blur(5px);
-  box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  position: relative;
+  align-items: flex-start;
+  gap: 1.5rem;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 20px rgba(231, 76, 60, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+
+  .warning-badge {
+    position: absolute;
+    top: -12px;
+    right: 20px;
+    background: white;
+    color: red;
+    font-weight: bold;
+    font-size: 0.75rem;
+    padding: 5px 10px;
+    border-radius: 4px;
+    letter-spacing: 1px;
+  }
 
   .warning-icon {
-    font-size: 2rem;
+    font-size: 2.5rem;
+    margin-top: 0.5rem;
   }
 
   .warning-content {
     flex: 1;
 
     h3 {
-      margin: 0 0 0.5rem 0;
+      margin: 0 0 0.75rem 0;
       font-weight: 600;
+      font-size: 1.3rem;
     }
 
     p {
-      margin: 0;
-      font-size: 0.95rem;
+      margin: 0 0 1rem 0;
+      font-size: 1rem;
       opacity: 0.9;
+      line-height: 1.5;
+    }
+
+    .user-details {
+      background: rgba(0, 0, 0, 0.2);
+      padding: 0.75rem;
+      border-radius: 6px;
+      margin-top: 0.75rem;
+      font-size: 0.9rem;
+
+      .detail-item {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 0.5rem;
+
+        &:last-child {
+          margin-bottom: 0;
+        }
+
+        .detail-label {
+          font-weight: 600;
+        }
+
+        .detail-value {
+          opacity: 0.9;
+        }
+      }
     }
   }
 
@@ -1189,6 +1231,7 @@
     border-radius: 6px;
     cursor: pointer;
     transition: all 0.2s ease;
+    align-self: center;
 
     &:hover {
       background: rgba(255, 255, 255, 0.9);
@@ -1197,36 +1240,24 @@
     }
   }
 
-  .profile-container.disabled-profile {
-    .profile-header:after {
-      content: "DISABLED ACCOUNT";
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%) rotate(-30deg);
-      color: rgba(231, 76, 60, 0.2);
-      font-size: 3rem;
-      font-weight: 800;
-      pointer-events: none;
-      z-index: 1;
-    }
-
-    .avatar-container {
-      opacity: 0.7;
-      filter: grayscale(0.5);
-    }
-  }
-}
-
-@media (max-width: 768px) {
-  .admin-warning-banner {
+  @media (max-width: 768px) {
     flex-direction: column;
     text-align: center;
     padding: 1.5rem;
 
+    .warning-icon {
+      margin: 0 auto 1rem;
+    }
+
     .action-button {
       width: 100%;
-      margin-top: 0.5rem;
+      margin-top: 1rem;
     }
+  }
+}
+
+.profile-container.admin-view {
+  .profile-info .info-item .value {
+    color: #e74c3c;
   }
 }
