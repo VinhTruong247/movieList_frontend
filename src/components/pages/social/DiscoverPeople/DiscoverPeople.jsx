@@ -17,6 +17,8 @@ const DiscoverPeople = () => {
   const [initialLoading, setInitialLoading] = useState(true);
 
   const currentUser = useSelector((state) => state.auth.currentUser);
+  const isAdmin = currentUser?.role === "admin";
+
   const {
     following,
     followersLoading,
@@ -292,14 +294,16 @@ const DiscoverPeople = () => {
                   </div>
 
                   <div className="user-actions">
-                    <button
-                      className={`follow-btn ${
-                        isFollowing(user.id) ? "following" : ""
-                      }`}
-                      onClick={() => handleFollowToggle(user.id, user)}
-                    >
-                      {isFollowing(user.id) ? "Following" : "Follow"}
-                    </button>
+                    {!isAdmin && (
+                      <button
+                        className={`follow-btn ${
+                          isFollowing(user.id) ? "following" : ""
+                        }`}
+                        onClick={() => handleFollowToggle(user.id, user)}
+                      >
+                        {isFollowing(user.id) ? "Following" : "Follow"}
+                      </button>
+                    )}
                     <button
                       className="profile-btn"
                       onClick={() => navigate(`/profile/${user.id}`)}
@@ -353,14 +357,16 @@ const DiscoverPeople = () => {
                     </div>
 
                     <div className="user-actions">
-                      <button
-                        className={`follow-btn ${
-                          isFollowing(user.id) ? "following" : ""
-                        }`}
-                        onClick={() => handleFollowToggle(user.id, user)}
-                      >
-                        {isFollowing(user.id) ? "Following" : "Follow"}
-                      </button>
+                      {!isAdmin && (
+                        <button
+                          className={`follow-btn ${
+                            isFollowing(user.id) ? "following" : ""
+                          }`}
+                          onClick={() => handleFollowToggle(user.id, user)}
+                        >
+                          {isFollowing(user.id) ? "Following" : "Follow"}
+                        </button>
+                      )}
                       <button
                         className="profile-btn"
                         onClick={() => navigate(`/profile/${user.id}`)}
