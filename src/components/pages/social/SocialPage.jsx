@@ -184,10 +184,7 @@ const SocialPage = () => {
                       <h3>Trending Movies</h3>
                       <button
                         className="see-all-btn"
-                        onClick={() => {
-                          setActiveTab("trending");
-                          window.scrollTo({ top: 0, behavior: "smooth" });
-                        }}
+                        onClick={() => setActiveTab("trending")}
                       >
                         See All
                       </button>
@@ -221,10 +218,7 @@ const SocialPage = () => {
                         <h3>People You Follow</h3>
                         <button
                           className="see-all-btn"
-                          onClick={() => {
-                            setActiveTab("network");
-                            window.scrollTo({ top: 0, behavior: "smooth" });
-                          }}
+                          onClick={() => setActiveTab("network")}
                         >
                           See All
                         </button>
@@ -283,10 +277,7 @@ const SocialPage = () => {
                       <h3>Featured Lists</h3>
                       <button
                         className="see-all-btn"
-                        onClick={() => {
-                          setActiveTab("lists");
-                          window.scrollTo({ top: 0, behavior: "smooth" });
-                        }}
+                        onClick={() => setActiveTab("lists")}
                       >
                         See All
                       </button>
@@ -362,7 +353,9 @@ const SocialPage = () => {
                               </div>
                               <button
                                 className="view-list-btn"
-                                onClick={() => navigate(`/shared-lists/${list.id}`)}
+                                onClick={() =>
+                                  navigate(`/shared-lists/${list.id}`)
+                                }
                               >
                                 View List
                               </button>
@@ -497,10 +490,7 @@ const SocialPage = () => {
                           <p>You aren't following anyone yet</p>
                           <button
                             className="explore-btn"
-                            onClick={() => {
-                              navigate(`/social/discover`);
-                              window.scrollTo({ top: 0, behavior: "smooth" });
-                            }}
+                            onClick={() => navigate(`/social/discover`)}
                           >
                             Discover People
                           </button>

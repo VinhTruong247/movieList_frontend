@@ -387,10 +387,7 @@ const DiscoverPeople = () => {
               </p>
               <button
                 className="social-btn"
-                onClick={() => {
-                  navigate("/social");
-                  window.scrollTo({ top: 0 });
-                }}
+                onClick={() => navigate(`/shared-lists/${list.id}`)}
               >
                 Go to Social Hub
               </button>

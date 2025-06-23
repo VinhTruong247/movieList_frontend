@@ -168,7 +168,7 @@ const Home = () => {
                       <img
                         src={item.Movies?.poster_url || "/placeholder.jpg"}
                         alt={item.Movies?.title}
-                        onClick={() => navigate(`/movie/${item.movie_id}`)}
+                        onClick={() => navigate(`/movies/${item.movie_id}`)}
                       />
                     </div>
                   ))}
@@ -196,10 +196,7 @@ const Home = () => {
                     </div>
                     <span
                       className="creator-name"
-                      onClick={() => {
-                        navigate(`/profile/${list.user_id}`);
-                        window.scrollTo({ top: 0 });
-                      }}
+                      onClick={() => navigate(`/profile/${list.user_id}`)}
                     >
                       {list.user_public_profiles?.name ||
                         list.user_public_profiles?.username}
@@ -207,10 +204,7 @@ const Home = () => {
                   </div>
                   <button
                     className="view-list-btn"
-                    onClick={() => {
-                      navigate(`/shared-lists/${list.id}`);
-                      window.scrollTo({ top: 0 });
-                    }}
+                    onClick={() => navigate(`/shared-lists/${list.id}`)}
                   >
                     View List
                   </button>

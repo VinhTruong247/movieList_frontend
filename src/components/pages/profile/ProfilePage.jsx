@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { Formik, Form, Field } from "formik";
-import { useNavigate, useParams } from "react-router";
+import { useNavigate, useParams, Link } from "react-router";
 import { useSelector, useDispatch } from "react-redux";
 import {
   getCurrentUser,
@@ -540,35 +540,38 @@ const ProfilePage = () => {
                 {sharedLists.length > 0 ? (
                   <div className="lists-grid">
                     {sharedLists.map((list) => (
-                      <div key={list.id} className="list-card">
-                        <h3>{list.title}</h3>
-                        {list.description && <p>{list.description}</p>}
-                        <div className="list-movies">
-                          {list.SharedListMovies?.slice(0, 3).map((item) => (
-                            <div key={item.movie_id} className="movie-poster">
-                              <img
-                                src={
-                                  item.Movies?.poster_url || "/placeholder.jpg"
-                                }
-                                alt={item.Movies?.title}
-                              />
-                            </div>
-                          ))}
-                          {list.SharedListMovies?.length > 3 && (
-                            <div className="more-count">
-                              +{list.SharedListMovies.length - 3}
-                            </div>
-                          )}
+                      <Link to={`/shared-lists/${list.id}`}>
+                        <div key={list.id} className="list-card">
+                          <h3>{list.title}</h3>
+                          {list.description && <p>{list.description}</p>}
+                          <div className="list-movies">
+                            {list.SharedListMovies?.slice(0, 3).map((item) => (
+                              <div key={item.movie_id} className="movie-poster">
+                                <img
+                                  src={
+                                    item.Movies?.poster_url ||
+                                    "/placeholder.jpg"
+                                  }
+                                  alt={item.Movies?.title}
+                                />
+                              </div>
+                            ))}
+                            {list.SharedListMovies?.length > 3 && (
+                              <div className="more-count">
+                                +{list.SharedListMovies.length - 3}
+                              </div>
+                            )}
+                          </div>
+                          <div className="list-meta">
+                            <span>
+                              {list.SharedListMovies?.length || 0} movies
+                            </span>
+                            <span>
+                              {new Date(list.created_at).toLocaleDateString()}
+                            </span>
+                          </div>
                         </div>
-                        <div className="list-meta">
-                          <span>
-                            {list.SharedListMovies?.length || 0} movies
-                          </span>
-                          <span>
-                            {new Date(list.created_at).toLocaleDateString()}
-                          </span>
-                        </div>
-                      </div>
+                      </Link>
                     ))}
                   </div>
                 ) : (
@@ -620,10 +623,9 @@ const ProfilePage = () => {
                         </div>
                         <button
                           className="view-profile-btn"
-                          onClick={() => {
-                            navigate(`/profile/${follower.follower_id}`);
-                            window.scrollTo({ top: 0 });
-                          }}
+                          onClick={() =>
+                            navigate(`/profile/${follower.follower_id}`)
+                          }
                         >
                           View Profile
                         </button>
@@ -670,10 +672,9 @@ const ProfilePage = () => {
                         </div>
                         <button
                           className="view-profile-btn"
-                          onClick={() => {
-                            navigate(`/profile/${follow.followee_id}`);
-                            window.scrollTo({ top: 0 });
-                          }}
+                          onClick={() =>
+                            navigate(`/profile/${follow.followee_id}`)
+                          }
                         >
                           View Profile
                         </button>
