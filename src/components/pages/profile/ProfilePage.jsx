@@ -45,6 +45,7 @@ const ProfilePage = () => {
     handleUnfollowUser,
     isFollowing: checkIsFollowing,
     loadUserSocialData,
+    checkUserFollowingStatus,
   } = useSocial();
 
   const isOwnProfile = currentUser?.id === userId || (!userId && currentUser);
@@ -144,8 +145,11 @@ const ProfilePage = () => {
     }
 
     try {
-      if (checkIsFollowing(userId)) {
+      const isCurrentlyFollowing = checkIsFollowing(userId);
+
+      if (isCurrentlyFollowing) {
         await handleUnfollowUser(userId);
+        toast.info(`You unfollowed ${userData.name || userData.username}`);
       } else {
         const followeeData = {
           id: userData.id,
@@ -154,11 +158,23 @@ const ProfilePage = () => {
           avatar_url: userData.avatar_url,
         };
         await handleFollowUser(userId, followeeData);
+        toast.success(
+          `You're now following ${userData.name || userData.username}`
+        );
       }
+
+      checkUserFollowingStatus(userId);
     } catch (error) {
       console.error("Error toggling follow:", error);
+      toast.error("Failed to update follow status");
     }
   };
+
+  useEffect(() => {
+    if (currentUser && userId && userId !== currentUser.id) {
+      checkUserFollowingStatus(userId);
+    }
+  }, [currentUser, userId, checkUserFollowingStatus]);
 
   if (loading && !userData) {
     return (
