@@ -181,29 +181,36 @@ const Home = () => {
                 <div className="list-footer">
                   <div className="list-creator">
                     <div className="creator-avatar">
-                      {list.Users?.avatar_url ? (
+                      {list.user_public_profiles?.avatar_url ? (
                         <img
-                          src={list.Users.avatar_url}
-                          alt={list.Users.name}
+                          src={list.user_public_profiles.avatar_url}
+                          alt={list.user_public_profiles.name}
                         />
                       ) : (
                         <span>
-                          {(list.Users?.name ||
-                            list.Users?.username ||
+                          {(list.user_public_profiles?.name ||
+                            list.user_public_profiles?.username ||
                             "?")[0].toUpperCase()}
                         </span>
                       )}
                     </div>
                     <span
                       className="creator-name"
-                      onClick={() => navigate(`/profile/${list.user_id}`)}
+                      onClick={() => {
+                        navigate(`/profile/${list.user_id}`);
+                        window.scrollTo({ top: 0 });
+                      }}
                     >
-                      {list.Users?.name || list.Users?.username}
+                      {list.user_public_profiles?.name ||
+                        list.user_public_profiles?.username}
                     </span>
                   </div>
                   <button
                     className="view-list-btn"
-                    onClick={() => navigate(`/shared-lists/${list.id}`)}
+                    onClick={() => {
+                      navigate(`/shared-lists/${list.id}`);
+                      window.scrollTo({ top: 0 });
+                    }}
                   >
                     View List
                   </button>
