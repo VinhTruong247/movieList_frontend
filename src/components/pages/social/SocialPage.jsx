@@ -147,8 +147,8 @@ const SocialPage = () => {
           onClick={() => setActiveTab("network")}
         >
           <span className="tab-icon">👥</span>
-          {currentUser ? "My Network" : "Our Community"}
-          {currentUser && (
+          {isAdmin ? "User List" : currentUser ? "My Network" : "Our Community"}
+          {currentUser && !isAdmin && (
             <span className="count-badge">
               {following.length + followers.length}
             </span>
@@ -431,21 +431,10 @@ const SocialPage = () => {
               <div className="network-section">
                 {currentUser ? (
                   isAdmin ? (
-                    // Admin view - show just a header and button to view all users
                     <div className="admin-network-view">
                       <div className="section-header">
                         <h2>User Management</h2>
                         <p>As an admin, you can view all application users</p>
-                      </div>
-
-                      <div className="admin-actions">
-                        <button
-                          className="discover-people-btn admin-btn"
-                          onClick={() => navigate("/social/discover")}
-                        >
-                          <span className="btn-icon">👥</span>
-                          View App Users
-                        </button>
                       </div>
                     </div>
                   ) : (
@@ -640,6 +629,22 @@ const SocialPage = () => {
                         </div>
                       </div>
 
+                      {isAdmin ? (
+                        <button
+                          className="explore-btn"
+                          onClick={() => navigate("/social/discover")}
+                        >
+                          View App Users
+                        </button>
+                      ) : (
+                        <button
+                          className="explore-btn"
+                          onClick={() => navigate(`/social/discover`)}
+                        >
+                          Discover People
+                        </button>
+                      )}
+
                       <div className="discover-more-section">
                         <button
                           className="discover-people-btn"
@@ -703,13 +708,23 @@ const SocialPage = () => {
 
                 {currentUser && (
                   <div className="discover-more-section">
-                    <button
-                      className="discover-people-btn"
-                      onClick={() => navigate("/social/discover")}
-                    >
-                      <span className="btn-icon">🔍</span>
-                      Discover More People
-                    </button>
+                    {isAdmin ? (
+                      <button
+                        className="discover-people-btn"
+                        onClick={() => navigate("/social/discover")}
+                      >
+                        <span className="btn-icon">🔍</span>
+                        View App Users
+                      </button>
+                    ) : (
+                      <button
+                        className="discover-people-btn"
+                        onClick={() => navigate("/social/discover")}
+                      >
+                        <span className="btn-icon">🔍</span>
+                        Discover More People
+                      </button>
+                    )}
                   </div>
                 )}
               </div>
