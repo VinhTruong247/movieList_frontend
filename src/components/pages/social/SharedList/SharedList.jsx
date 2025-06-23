@@ -10,7 +10,7 @@ const SharedList = () => {
   const navigate = useNavigate();
   const toast = useToast();
   const currentUser = useSelector((state) => state.auth.currentUser);
-  
+
   const {
     userLists,
     listsLoading,
@@ -90,12 +90,12 @@ const SharedList = () => {
       );
 
       if (success) {
-        setSelectedList(prev => ({
+        setSelectedList((prev) => ({
           ...prev,
           SharedListMovies: [
             ...(prev.SharedListMovies || []),
-            { movie_id: movieId, Movies: movieData }
-          ]
+            { movie_id: movieId, Movies: movieData },
+          ],
         }));
       }
     } catch (error) {
@@ -107,11 +107,12 @@ const SharedList = () => {
     try {
       const success = await handleRemoveMovieFromList(listId, movieId);
       if (success && selectedList && selectedList.id === listId) {
-        setSelectedList(prev => ({
+        setSelectedList((prev) => ({
           ...prev,
-          SharedListMovies: prev.SharedListMovies?.filter(
-            item => item.movie_id !== movieId
-          ) || []
+          SharedListMovies:
+            prev.SharedListMovies?.filter(
+              (item) => item.movie_id !== movieId
+            ) || [],
         }));
       }
     } catch (error) {
@@ -120,7 +121,11 @@ const SharedList = () => {
   };
 
   const handleDeleteListConfirm = async (listId) => {
-    if (window.confirm("Are you sure you want to delete this list? This action cannot be undone.")) {
+    if (
+      window.confirm(
+        "Are you sure you want to delete this list? This action cannot be undone."
+      )
+    ) {
       try {
         const success = await handleDeleteList(listId);
         if (success && selectedList && selectedList.id === listId) {
@@ -133,18 +138,25 @@ const SharedList = () => {
     }
   };
 
-  const filteredLists = userLists.filter((list) =>
-    list.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    (list.description && list.description.toLowerCase().includes(searchQuery.toLowerCase()))
+  const filteredLists = userLists.filter(
+    (list) =>
+      list.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (list.description &&
+        list.description.toLowerCase().includes(searchQuery.toLowerCase()))
   );
 
-  const filteredMovies = allMovies.filter((movie) =>
-    movie.title.toLowerCase().includes(movieSearchQuery.toLowerCase()) &&
-    !movie.isDisabled
+  const filteredMovies = allMovies.filter(
+    (movie) =>
+      movie.title.toLowerCase().includes(movieSearchQuery.toLowerCase()) &&
+      !movie.isDisabled
   );
 
   const isMovieInList = (movieId) => {
-    return selectedList?.SharedListMovies?.some(item => item.movie_id === movieId) || false;
+    return (
+      selectedList?.SharedListMovies?.some(
+        (item) => item.movie_id === movieId
+      ) || false
+    );
   };
 
   if (!currentUser) {
@@ -185,10 +197,7 @@ const SharedList = () => {
             className="search-input"
           />
           {searchQuery && (
-            <button
-              className="clear-search"
-              onClick={() => setSearchQuery("")}
-            >
+            <button className="clear-search" onClick={() => setSearchQuery("")}>
               ✕
             </button>
           )}
@@ -200,13 +209,13 @@ const SharedList = () => {
           </span>
           <span className="stat">
             <span className="count">
-              {userLists.filter(list => list.isPublic).length}
+              {userLists.filter((list) => list.isPublic).length}
             </span>
             <span className="label">Public</span>
           </span>
           <span className="stat">
             <span className="count">
-              {userLists.filter(list => !list.isPublic).length}
+              {userLists.filter((list) => !list.isPublic).length}
             </span>
             <span className="label">Private</span>
           </span>
@@ -228,8 +237,10 @@ const SharedList = () => {
                     <div className="list-title-section">
                       <h3>{list.title}</h3>
                       <div className="list-badges">
-                        <span className={`visibility-badge ${list.isPublic ? 'public' : 'private'}`}>
-                          {list.isPublic ? '🌍 Public' : '🔒 Private'}
+                        <span
+                          className={`visibility-badge ${list.isPublic ? "public" : "private"}`}
+                        >
+                          {list.isPublic ? "🌍 Public" : "🔒 Private"}
                         </span>
                         <span className="movie-count-badge">
                           {list.SharedListMovies?.length || 0} movies
@@ -262,28 +273,38 @@ const SharedList = () => {
                   )}
 
                   <div className="list-movies">
-                    {list.SharedListMovies && list.SharedListMovies.length > 0 ? (
+                    {list.SharedListMovies &&
+                    list.SharedListMovies.length > 0 ? (
                       <div className="movies-preview">
-                        {list.SharedListMovies.slice(0, 5).map((item) => (
-                          <div key={item.movie_id} className="movie-poster-container">
+                        {list.SharedListMovies.slice(0, 2).map((item) => (
+                          <div
+                            key={item.movie_id}
+                            className="movie-poster-container"
+                          >
                             <img
-                              src={item.Movies?.poster_url || "/placeholder.jpg"}
+                              src={
+                                item.Movies?.poster_url || "/placeholder.jpg"
+                              }
                               alt={item.Movies?.title}
                               className="movie-poster"
-                              onClick={() => navigate(`/movie/${item.movie_id}`)}
+                              onClick={() =>
+                                navigate(`/movie/${item.movie_id}`)
+                              }
                             />
                             <button
                               className="remove-movie-btn"
-                              onClick={() => handleRemoveMovie(list.id, item.movie_id)}
+                              onClick={() =>
+                                handleRemoveMovie(list.id, item.movie_id)
+                              }
                               title="Remove from list"
                             >
                               ✕
                             </button>
                           </div>
                         ))}
-                        {list.SharedListMovies.length > 5 && (
+                        {list.SharedListMovies.length > 2 && (
                           <div className="more-movies-indicator">
-                            <span>+{list.SharedListMovies.length - 5}</span>
+                            <span>+{list.SharedListMovies.length - 2}</span>
                             <small>more</small>
                           </div>
                         )}
@@ -322,9 +343,7 @@ const SharedList = () => {
           ) : (
             <div className="empty-state">
               <div className="empty-icon">📋</div>
-              <h3>
-                {searchQuery ? "No lists found" : "No shared lists yet"}
-              </h3>
+              <h3>{searchQuery ? "No lists found" : "No shared lists yet"}</h3>
               <p>
                 {searchQuery
                   ? `No lists match "${searchQuery}"`
@@ -365,7 +384,10 @@ const SharedList = () => {
                   id="title"
                   value={createFormData.title}
                   onChange={(e) =>
-                    setCreateFormData(prev => ({ ...prev, title: e.target.value }))
+                    setCreateFormData((prev) => ({
+                      ...prev,
+                      title: e.target.value,
+                    }))
                   }
                   placeholder="e.g., My Favorite Action Movies"
                   required
@@ -378,7 +400,10 @@ const SharedList = () => {
                   id="description"
                   value={createFormData.description}
                   onChange={(e) =>
-                    setCreateFormData(prev => ({ ...prev, description: e.target.value }))
+                    setCreateFormData((prev) => ({
+                      ...prev,
+                      description: e.target.value,
+                    }))
                   }
                   placeholder="Tell others about your list..."
                   rows="3"
@@ -391,12 +416,17 @@ const SharedList = () => {
                     type="checkbox"
                     checked={createFormData.isPublic}
                     onChange={(e) =>
-                      setCreateFormData(prev => ({ ...prev, isPublic: e.target.checked }))
+                      setCreateFormData((prev) => ({
+                        ...prev,
+                        isPublic: e.target.checked,
+                      }))
                     }
                   />
                   <span className="checkmark"></span>
                   Make this list public
-                  <small>Public lists can be discovered and viewed by other users</small>
+                  <small>
+                    Public lists can be discovered and viewed by other users
+                  </small>
                 </label>
               </div>
 
@@ -455,7 +485,9 @@ const SharedList = () => {
                   </div>
                   <div className="movie-info">
                     <h4>{movie.title}</h4>
-                    <p>{movie.year} • {movie.imdb_rating}⭐</p>
+                    <p>
+                      {movie.year} • {movie.imdb_rating}⭐
+                    </p>
                   </div>
                   <button
                     className={`add-movie-btn ${
