@@ -457,7 +457,9 @@ const ProfilePage = () => {
                 <div className="info-content">
                   <span className="label">Email</span>
                   <span className="value">
-                    {isOwnProfile ? userData.email : "•••••••••••••"}
+                    {isOwnProfile || currentUser?.role === "admin"
+                      ? userData.email
+                      : "•••••••••••••"}
                   </span>
                 </div>
               </div>
@@ -467,12 +469,14 @@ const ProfilePage = () => {
                 <div className="info-content">
                   <span className="label">Username</span>
                   <span className="value">
-                    {isOwnProfile ? userData.username : "•••••••••••••"}
+                    {isOwnProfile || currentUser?.role === "admin"
+                      ? userData.username
+                      : "•••••••••••••"}
                   </span>
                 </div>
               </div>
 
-              {isOwnProfile && (
+              {(isOwnProfile || currentUser?.role === "admin") && (
                 <div className="info-item">
                   <div className="info-icon">🔒</div>
                   <div className="info-content">
