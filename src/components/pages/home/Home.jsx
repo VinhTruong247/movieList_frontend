@@ -143,9 +143,18 @@ const Home = () => {
       <section className="content-section">
         <div className="section-header">
           <h2>Featured Lists</h2>
-          <Link to="/shared-lists" className="see-all-link">
-            Create your list <span className="arrow-icon">→</span>
-          </Link>
+          {currentUser ? (
+            <Link to="/shared-lists" className="see-all-link">
+              Create your list <span className="arrow-icon">→</span>
+            </Link>
+          ) : (
+            <button
+              className="see-all-link"
+              onClick={() => navigate("/not-login")}
+            >
+              Create your list <span className="arrow-icon">→</span>
+            </button>
+          )}
         </div>
         {isLoading ? (
           <div className="loading-container">
