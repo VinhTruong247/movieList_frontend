@@ -25,7 +25,7 @@ const AppRoutes = [
   {
     path: "/",
     element: <Layout />,
-    // errorElement: <NotFound />,
+    errorElement: <NotFound />,
     children: [
       {
         path: "",
@@ -107,14 +107,14 @@ const AppRoutes = [
     path: "/not-login",
     element: <NotLogin />,
   },
-  // {
-  //   path: "/404",
-  //   element: <NotFound />,
-  // },
-  // {
-  //   path: "*",
-  //   element: <Navigate to="/404" replace />,
-  // },
+  {
+    path: "/404",
+    element: <NotFound />,
+  },
+  {
+    path: "*",
+    element: <Navigate to="/404" replace />,
+  },
 ];
 
 export default AppRoutes;

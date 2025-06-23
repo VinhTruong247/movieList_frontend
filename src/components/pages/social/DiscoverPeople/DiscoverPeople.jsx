@@ -193,7 +193,13 @@ const DiscoverPeople = () => {
     }
   }, [currentUser, searchResults, suggestedUsers, checkUserFollowingStatus]);
 
-  if (!currentUser || initialLoading) {
+  useEffect(() => {
+    if (!currentUser) {
+      navigate("/not-login");
+    }
+  }, [currentUser, navigate]);
+
+  if (initialLoading) {
     return (
       <div className="discover-people-container">
         <div className="loading-container">
