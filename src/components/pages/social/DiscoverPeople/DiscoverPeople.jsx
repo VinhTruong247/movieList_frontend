@@ -24,6 +24,7 @@ const DiscoverPeople = () => {
     handleFollowUser,
     handleUnfollowUser,
     isFollowing,
+    checkUserFollowingStatus,
   } = useSocial();
 
   const dataLoadedRef = useRef(false);
@@ -175,6 +176,22 @@ const DiscoverPeople = () => {
   };
 
   const showNotFound = isSearching && searchResults.length === 0 && !loading;
+
+  useEffect(() => {
+    if (!currentUser) return;
+
+    if (searchResults.length > 0) {
+      searchResults.forEach((user) => {
+        checkUserFollowingStatus(user.id);
+      });
+    }
+
+    if (suggestedUsers.length > 0) {
+      suggestedUsers.forEach((user) => {
+        checkUserFollowingStatus(user.id);
+      });
+    }
+  }, [currentUser, searchResults, suggestedUsers, checkUserFollowingStatus]);
 
   if (!currentUser || initialLoading) {
     return (
