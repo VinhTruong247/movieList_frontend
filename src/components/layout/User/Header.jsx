@@ -161,25 +161,7 @@ const Header = () => {
 
                 {dropdownOpen && (
                   <div className="dropdown-menu" role="menu">
-                    <Link
-                      to={`/profile/${currentUser.id}`}
-                      className="dropdown-item"
-                      onClick={() => setDropdownOpen(false)}
-                    >
-                      <span className="item-icon">👤</span>
-                      My Profile
-                    </Link>
-
-                    <Link
-                      to={`/shared-lists`}
-                      className="dropdown-item"
-                      onClick={() => setDropdownOpen(false)}
-                    >
-                      <span className="item-icon">📋</span>
-                      My Share Lists
-                    </Link>
-
-                    {isAdmin && (
+                    {isAdmin ? (
                       <Link
                         to="/admin"
                         className="dropdown-item admin-link"
@@ -188,6 +170,26 @@ const Header = () => {
                         <span className="item-icon">⚙️</span>
                         Admin Dashboard
                       </Link>
+                    ) : (
+                      <>
+                        <Link
+                          to={`/profile/${currentUser.id}`}
+                          className="dropdown-item"
+                          onClick={() => setDropdownOpen(false)}
+                        >
+                          <span className="item-icon">👤</span>
+                          My Profile
+                        </Link>
+
+                        <Link
+                          to={`/shared-lists`}
+                          className="dropdown-item"
+                          onClick={() => setDropdownOpen(false)}
+                        >
+                          <span className="item-icon">📋</span>
+                          My Share Lists
+                        </Link>
+                      </>
                     )}
 
                     <button
