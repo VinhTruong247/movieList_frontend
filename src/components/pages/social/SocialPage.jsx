@@ -430,175 +430,227 @@ const SocialPage = () => {
             {activeTab === "network" && (
               <div className="network-section">
                 {currentUser ? (
-                  <div className="network-grid">
-                    <div className="network-column">
-                      <div className="network-card">
-                        <h3>People I Follow ({following.length})</h3>
-                        {following.length > 0 ? (
-                          <div className="user-list">
-                            {following.map((follow) => (
-                              <div
-                                key={follow.followee_id}
-                                className="user-item"
-                              >
-                                <div
-                                  className="user-avatar"
-                                  onClick={() =>
-                                    navigate(`/profile/${follow.followee_id}`)
-                                  }
-                                >
-                                  {follow.user_public_profiles?.avatar_url ? (
-                                    <img
-                                      src={
-                                        follow.user_public_profiles.avatar_url
-                                      }
-                                      alt={follow.user_public_profiles.name}
-                                    />
-                                  ) : (
-                                    <div className="avatar-placeholder">
-                                      {follow.user_public_profiles?.name
-                                        ?.charAt(0)
-                                        ?.toUpperCase() ||
-                                        follow.user_public_profiles?.username
-                                          ?.charAt(0)
-                                          ?.toUpperCase() ||
-                                        "U"}
-                                    </div>
-                                  )}
-                                </div>
-                                <div className="user-info">
-                                  <h4>{follow.user_public_profiles?.name}</h4>
-                                  <p>
-                                    @{follow.user_public_profiles?.username}
-                                  </p>
-                                </div>
-                                <div className="user-actions">
-                                  <button
-                                    className="profile-btn"
-                                    onClick={() =>
-                                      navigate(`/profile/${follow.followee_id}`)
-                                    }
-                                  >
-                                    Profile
-                                  </button>
-                                  <button
-                                    className="unfollow-btn"
-                                    onClick={() =>
-                                      handleFollowToggle(follow.followee_id)
-                                    }
-                                  >
-                                    Unfollow
-                                  </button>
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        ) : (
-                          <div className="empty-state">
-                            <div className="empty-icon">👥</div>
-                            <p>You aren't following anyone yet</p>
-                            <button
-                              className="explore-btn"
-                              onClick={() => navigate(`/social/discover`)}
-                            >
-                              Discover People
-                            </button>
-                          </div>
-                        )}
+                  isAdmin ? (
+                    // Admin view - show just a header and button to view all users
+                    <div className="admin-network-view">
+                      <div className="section-header">
+                        <h2>User Management</h2>
+                        <p>As an admin, you can view all application users</p>
+                      </div>
+
+                      <div className="admin-actions">
+                        <button
+                          className="discover-people-btn admin-btn"
+                          onClick={() => navigate("/social/discover")}
+                        >
+                          <span className="btn-icon">👥</span>
+                          View App Users
+                        </button>
                       </div>
                     </div>
-
-                    <div className="network-column">
-                      <div className="network-card">
-                        <h3>My Followers ({followers.length})</h3>
-                        {followers.length > 0 ? (
-                          <div className="user-list">
-                            {followers.map((follower) => (
-                              <div
-                                key={follower.follower_id}
-                                className="user-item"
-                              >
-                                <div
-                                  className="user-avatar"
-                                  onClick={() =>
-                                    navigate(`/profile/${follower.follower_id}`)
-                                  }
-                                >
-                                  {follower.user_public_profiles?.avatar_url ? (
-                                    <img
-                                      src={
-                                        follower.user_public_profiles.avatar_url
-                                      }
-                                      alt={follower.user_public_profiles.name}
-                                    />
-                                  ) : (
-                                    <div className="avatar-placeholder">
-                                      {follower.user_public_profiles?.name
-                                        ?.charAt(0)
-                                        ?.toUpperCase() ||
-                                        follower.user_public_profiles?.username
-                                          ?.charAt(0)
-                                          ?.toUpperCase() ||
-                                        "U"}
-                                    </div>
-                                  )}
-                                </div>
-                                <div className="user-info">
-                                  <h4>{follower.user_public_profiles?.name}</h4>
-                                  <p>
-                                    @{follower.user_public_profiles?.username}
-                                  </p>
-                                </div>
-                                <div className="user-actions">
-                                  <button
-                                    className="profile-btn"
-                                    onClick={() =>
-                                      navigate(
-                                        `/profile/${follower.follower_id}`
-                                      )
-                                    }
+                  ) : (
+                    <>
+                      <div className="network-grid">
+                        <div className="network-column">
+                          <div className="network-card">
+                            <h3>People I Follow ({following.length})</h3>
+                            {following.length > 0 ? (
+                              <div className="user-list">
+                                {following.map((follow) => (
+                                  <div
+                                    key={follow.followee_id}
+                                    className="user-item"
                                   >
-                                    Profile
-                                  </button>
-                                  {!isFollowing(follower.follower_id) && (
-                                    <button
-                                      className="follow-btn"
+                                    <div
+                                      className="user-avatar"
                                       onClick={() =>
-                                        handleFollowToggle(
-                                          follower.follower_id,
-                                          {
-                                            id: follower.follower_id,
-                                            name: follower.user_public_profiles
-                                              ?.name,
-                                            username:
-                                              follower.user_public_profiles
-                                                ?.username,
-                                            avatar_url:
-                                              follower.user_public_profiles
-                                                ?.avatar_url,
-                                          }
+                                        navigate(
+                                          `/profile/${follow.followee_id}`
                                         )
                                       }
                                     >
-                                      Follow Back
-                                    </button>
-                                  )}
-                                </div>
+                                      {follow.user_public_profiles
+                                        ?.avatar_url ? (
+                                        <img
+                                          src={
+                                            follow.user_public_profiles
+                                              .avatar_url
+                                          }
+                                          alt={follow.user_public_profiles.name}
+                                        />
+                                      ) : (
+                                        <div className="avatar-placeholder">
+                                          {follow.user_public_profiles?.name
+                                            ?.charAt(0)
+                                            ?.toUpperCase() ||
+                                            follow.user_public_profiles?.username
+                                              ?.charAt(0)
+                                              ?.toUpperCase() ||
+                                            "U"}
+                                        </div>
+                                      )}
+                                    </div>
+                                    <div className="user-info">
+                                      <h4>
+                                        {follow.user_public_profiles?.name}
+                                      </h4>
+                                      <p>
+                                        @{follow.user_public_profiles?.username}
+                                      </p>
+                                    </div>
+                                    <div className="user-actions">
+                                      <button
+                                        className="profile-btn"
+                                        onClick={() =>
+                                          navigate(
+                                            `/profile/${follow.followee_id}`
+                                          )
+                                        }
+                                      >
+                                        Profile
+                                      </button>
+                                      <button
+                                        className="unfollow-btn"
+                                        onClick={() =>
+                                          handleFollowToggle(follow.followee_id)
+                                        }
+                                      >
+                                        Unfollow
+                                      </button>
+                                    </div>
+                                  </div>
+                                ))}
                               </div>
-                            ))}
+                            ) : (
+                              <div className="empty-state">
+                                <div className="empty-icon">👥</div>
+                                <p>You aren't following anyone yet</p>
+                                <button
+                                  className="explore-btn"
+                                  onClick={() => navigate(`/social/discover`)}
+                                >
+                                  Discover People
+                                </button>
+                              </div>
+                            )}
                           </div>
-                        ) : (
-                          <div className="empty-state">
-                            <div className="empty-icon">🔍</div>
-                            <p>You don't have any followers yet</p>
-                            <p className="empty-subtitle">
-                              Share your profile to attract followers!
-                            </p>
+                        </div>
+
+                        <div className="network-column">
+                          <div className="network-card">
+                            <h3>My Followers ({followers.length})</h3>
+                            {followers.length > 0 ? (
+                              <div className="user-list">
+                                {followers.map((follower) => (
+                                  <div
+                                    key={follower.follower_id}
+                                    className="user-item"
+                                  >
+                                    <div
+                                      className="user-avatar"
+                                      onClick={() =>
+                                        navigate(
+                                          `/profile/${follower.follower_id}`
+                                        )
+                                      }
+                                    >
+                                      {follower.user_public_profiles
+                                        ?.avatar_url ? (
+                                        <img
+                                          src={
+                                            follower.user_public_profiles
+                                              .avatar_url
+                                          }
+                                          alt={
+                                            follower.user_public_profiles.name
+                                          }
+                                        />
+                                      ) : (
+                                        <div className="avatar-placeholder">
+                                          {follower.user_public_profiles?.name
+                                            ?.charAt(0)
+                                            ?.toUpperCase() ||
+                                            follower.user_public_profiles?.username
+                                              ?.charAt(0)
+                                              ?.toUpperCase() ||
+                                            "U"}
+                                        </div>
+                                      )}
+                                    </div>
+                                    <div className="user-info">
+                                      <h4>
+                                        {follower.user_public_profiles?.name}
+                                      </h4>
+                                      <p>
+                                        @
+                                        {
+                                          follower.user_public_profiles
+                                            ?.username
+                                        }
+                                      </p>
+                                    </div>
+                                    <div className="user-actions">
+                                      <button
+                                        className="profile-btn"
+                                        onClick={() =>
+                                          navigate(
+                                            `/profile/${follower.follower_id}`
+                                          )
+                                        }
+                                      >
+                                        Profile
+                                      </button>
+                                      {!isFollowing(follower.follower_id) && (
+                                        <button
+                                          className="follow-btn"
+                                          onClick={() =>
+                                            handleFollowToggle(
+                                              follower.follower_id,
+                                              {
+                                                id: follower.follower_id,
+                                                name: follower
+                                                  .user_public_profiles?.name,
+                                                username:
+                                                  follower.user_public_profiles
+                                                    ?.username,
+                                                avatar_url:
+                                                  follower.user_public_profiles
+                                                    ?.avatar_url,
+                                              }
+                                            )
+                                          }
+                                        >
+                                          Follow Back
+                                        </button>
+                                      )}
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            ) : (
+                              <div className="empty-state">
+                                <div className="empty-icon">🔍</div>
+                                <p>You don't have any followers yet</p>
+                                <p className="empty-subtitle">
+                                  Share your profile to attract followers!
+                                </p>
+                              </div>
+                            )}
                           </div>
-                        )}
+                        </div>
                       </div>
-                    </div>
-                  </div>
+
+                      <div className="discover-more-section">
+                        <button
+                          className="discover-people-btn"
+                          onClick={() => navigate("/social/discover")}
+                        >
+                          <span className="btn-icon">🔍</span>
+                          Discover More People
+                        </button>
+                      </div>
+                    </>
+                  )
                 ) : (
                   <div className="guest-network-view">
                     <div className="section-header">
