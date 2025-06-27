@@ -1,6 +1,6 @@
 # Movie Collection Application README.md
-<ins>Deployment: https://movielistdemo1.netlify.app/</ins>
-<ins>Documentation:</ins> https://docs.google.com/document/d/1mffem8AY-fuX3b-noI_bCd67XShTOxHN/edit?usp=sharing&ouid=117860082458085802780&rtpof=true&sd=true
+<p><ins>Deployment: https://movielistdemo1.netlify.app/</ins></p>
+<p><ins>Documentation:</ins> https://docs.google.com/document/d/1mffem8AY-fuX3b-noI_bCd67XShTOxHN/edit?usp=sharing&ouid=117860082458085802780&rtpof=true&sd=true</p>
 
 ## Technologies & Skills
 React with functional components and hooks
@@ -37,6 +37,6 @@ Responsive Design across multiple device sizes
 - Comprehensive state management with Redux
 
 ## Release Version Date
-### v.206 (20/Jun/2025) **_ Newest Version _**
+### v.206 (20/Jun/2025) **_*Newest Version*_**
 ### v.106 (10/Jun/2025)
 ### First Release (May/2025)
