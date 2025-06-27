@@ -1,12 +1,41 @@
-# React + Vite
+# Movie Collection Application README.md
+(Documentation: https://docs.google.com/document/d/1mffem8AY-fuX3b-noI_bCd67XShTOxHN/edit?usp=sharing&ouid=117860082458085802780&rtpof=true&sd=true)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Technologies & Skills
+React with functional components and hooks
+Redux Toolkit for state management (slices, async thunks)
+Formik & Yup for form handling and validation
+Toast for notification
+Supabase integration for authentication and database
+SCSS/Sass with advanced styling patterns
+React Router for navigation and route management (now handling v7)
+Responsive Design across multiple device sizes
 
-Currently, two official plugins are available:
+## Feature Implementations
+### Authentication & User Management (Use Supabase Auth System)
+- Complete authentication flow (login, registration, profile management)
+- Role-based access control (admin/user permissions)
+- Profile customization with avatars and user information.
+### Social Features
+- User following system with relationship management.
+- User discovery and recommendation system.
+- Public profile viewing and interactions.
+- Shared movie lists with public/private visibility settings.
+### Content Management
+- Movie, actor, and director information management.
+- Admin dashboard with CRUD operations.
+- Dynamic movie listings with filtering and sorting function.
+### User Experience
+- Responsive UI adapting to different screen sizes (still have bugs need more updating).
+- Loading states and error handling throughout the application.
+- Toast notification system for user feedback.
+### Architecture Highlights
+- Custom hooks pattern (useSocial, useFavorites, useAuth,...)
+- Service layer architecture separating API logic from UI components.
+- Component-based structure with reusable UI elements.
+- Comprehensive state management with Redux
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Release Version Date
+### v.206 (20/Jun/2025) ** Newest Version **
+### v.106 (10/Jun/2025)
+### First Release (May/2025)
