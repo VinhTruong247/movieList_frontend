@@ -1,5 +1,5 @@
 # Movie Collection Application README.md
-<p><ins>Deployment: https://movielistdemo1.netlify.app/</ins></p>
+<p><ins>Deployment:</ins> https://movielistdemo1.netlify.app/</p>
 <p><ins>Documentation:</ins> https://docs.google.com/document/d/1mffem8AY-fuX3b-noI_bCd67XShTOxHN/edit?usp=sharing&ouid=117860082458085802780&rtpof=true&sd=true</p>
 
 ## Technologies & Skills
